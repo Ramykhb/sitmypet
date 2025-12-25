@@ -1,7 +1,7 @@
 import {View, Text, Image, TouchableOpacity} from 'react-native'
 import React from 'react'
 import {SafeAreaView} from "react-native-safe-area-context";
-import {Link} from "expo-router";
+import {Link, router} from "expo-router";
 
 const HomeAuth = () => {
     return (
@@ -17,14 +17,14 @@ const HomeAuth = () => {
                 <Text className="text-[#0A0A0A] text-lg mt-5 font-bold">Continue as</Text>
                 <TouchableOpacity
                     className="w-[75%] bg-[#3944D5] h-16 rounded-full flex flex-row items-center justify-center my-5"
-                    onPress={() => {}}
+                    onPress={() => router.push("/(auth)/signin")}
                 >
                     <Image source={require('../../assets/icons/house.png')} alt="logo" className="w-6 h-6 mr-3" />
                     <Text className="text-white text-lg font-bold">Pet Owner</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     className="w-[75%] bg-[#0F1998] h-16 rounded-full flex flex-row items-center justify-center"
-                    onPress={() => {}}
+                    onPress={() => router.push("/(auth)/signin")}
                 >
                     <Image source={require('../../assets/icons/paw.png')} alt="logo" className="w-6 h-6 mr-3" />
                     <Text className="text-white text-lg font-bold">Pet Sitter</Text>
