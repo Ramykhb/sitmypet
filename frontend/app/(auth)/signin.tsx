@@ -13,17 +13,11 @@ const Signin = () => {
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             >
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                    <View className="flex flex-col flex-1 w-full p-10 items-center">
-                        <Link href={"/(auth)/homeAuth"} className={"self-start"}>
-                            <View className={"flex flex-row items-center justify-center"}>
-                                <Image source={require('../../assets/icons/back-arrow.png')} alt="arrow" className={"w-7 h-7 mr-3"} />
-                                <Text className="text-[#0A0A0A] text-2xl font-bold">Login</Text>
-                            </View>
-                        </Link>
+                    <View className="flex flex-col flex-1 w-full px-10 items-center">
                         <Image
                             source={require('../../assets/images/loginIcon.png')}
                             alt="logo"
-                            className="w-full h-60 mt-8"
+                            className="w-full h-60"
                             resizeMode="contain"
                         />
                         <View className={"px-5 w-full mt-10 text-[#0A0A0A]"}>
@@ -57,7 +51,7 @@ const Signin = () => {
 
                         <View className="flex-grow" />
 
-                        <View className={"flex flex-row justify-around w-full"}>
+                        <View className={"flex flex-row justify-around w-full mb-5"}>
                             <View className="flex flex-col items-center justify-center">
                                 <Text className="text-text-gray-600 text-sm">Need help?</Text>
                                 <Link href="/">

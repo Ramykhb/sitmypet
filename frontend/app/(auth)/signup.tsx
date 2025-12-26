@@ -18,15 +18,8 @@ const Signin = () => {
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             >
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                    <View className="flex flex-col flex-1 w-full p-10 items-center">
-                        <Link href={"/(auth)/signin"} className={"self-start"}>
-                            <View className={"flex flex-row items-center justify-center"}>
-                                <Image source={require('../../assets/icons/back-arrow.png')} alt="arrow"
-                                       className={"w-7 h-7 mr-3"}/>
-                                <Text className="text-[#0A0A0A] text-2xl font-bold">Create Account</Text>
-                            </View>
-                        </Link>
-                        <View className={"flex flex-row items-center justify-center w-full mt-10"}>
+                    <View className="flex flex-col flex-1 w-full px-10 items-center">
+                        <View className={"flex flex-row items-center justify-center w-full"}>
                             <View className={"px-5 w-[50%] text-[#0A0A0A]"}>
                                 <Text className={"text-xl"}>First Name</Text>
                                 <TextInput className={"w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"}
@@ -78,7 +71,7 @@ const Signin = () => {
 
                         <View className="flex-grow"/>
 
-                        <View className="flex flex-col items-center justify-center">
+                        <View className="flex flex-col items-center justify-center mb-5">
                             <Text className="text-text-gray-600 text-sm">Need help?</Text>
                             <Link href="/">
                                 <Text className="text-[#0A0A0A] text-lg font-bold">Contact us</Text>
