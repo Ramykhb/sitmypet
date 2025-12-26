@@ -1,18 +1,23 @@
 import {
-    View, Text, Image, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard
+    View, Text, Image, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard,
+    ScrollView
 } from 'react-native'
-import React from 'react'
+import React, {useRef} from 'react'
 import {Link} from "expo-router";
 import {SafeAreaView} from "react-native-safe-area-context";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 
 const Signin = () => {
     return (
-        <SafeAreaView className="flex-1">
-            <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            >
-                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <SafeAreaView style={{ flex: 1 }}>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <KeyboardAwareScrollView
+                    contentContainerStyle={{flexGrow: 1}}
+                    enableOnAndroid={true}
+                    extraScrollHeight={35}
+                    keyboardOpeningTime={100}
+                    keyboardShouldPersistTaps="handled"
+                >
                     <View className="flex flex-col flex-1 w-full px-10 items-center">
                         <Image
                             source={require('../../assets/images/loginIcon.png')}
@@ -40,7 +45,8 @@ const Signin = () => {
                         </View>
                         <TouchableOpacity
                             className="w-[85%] bg-[#3944D5] h-14 rounded-full flex flex-row items-center justify-center mt-10 mb-5"
-                            onPress={() => {}}
+                            onPress={() => {
+                            }}
                         >
                             <Text className="text-white text-lg font-bold">Login</Text>
                         </TouchableOpacity>
@@ -49,7 +55,7 @@ const Signin = () => {
                             <Text className={"text-gray-600 underline"}>Forgot password?</Text>
                         </Link>
 
-                        <View className="flex-grow" />
+                        <View className="flex-grow"/>
 
                         <View className={"flex flex-row justify-around w-full mb-5"}>
                             <View className="flex flex-col items-center justify-center">
@@ -66,8 +72,8 @@ const Signin = () => {
                             </View>
                         </View>
                     </View>
-                </TouchableWithoutFeedback>
-            </KeyboardAvoidingView>
+                </KeyboardAwareScrollView>
+            </TouchableWithoutFeedback>
         </SafeAreaView>
     )
 }

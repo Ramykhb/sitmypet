@@ -11,7 +11,7 @@ const HomeAuth = () => {
                 <Image
                     source={require('../../assets/images/heroImage.png')}
                     alt="logo"
-                    className="w-full h-60 mt-12"
+                    className="w-full h-64 mt-12"
                     resizeMode="contain"
                 />
                 <Text className="text-[#0A0A0A] text-lg mt-5 font-bold">Continue as</Text>
