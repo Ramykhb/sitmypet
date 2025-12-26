@@ -8,16 +8,20 @@ import {SafeAreaView} from "react-native-safe-area-context";
 import {Label} from "@react-navigation/elements";
 import CheckBox from "@react-native-community/checkbox";
 import {Checkbox} from "expo-checkbox";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 
 const Signin = () => {
     const [isAccepted, setIsAccepted] = useState(false);
     return (
         <SafeAreaView className="home-auth flex-1">
-            <KeyboardAvoidingView
-                style={{flex: 1}}
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            >
-                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <KeyboardAwareScrollView
+                    contentContainerStyle={{flexGrow: 1}}
+                    enableOnAndroid={true}
+                    extraScrollHeight={35}
+                    keyboardOpeningTime={100}
+                    keyboardShouldPersistTaps="handled"
+                >
                     <View className="flex flex-col flex-1 w-full px-10 items-center">
                         <View className={"flex flex-row items-center justify-center w-full "}>
                             <View className={"px-5 pr-2 w-[50%] text-[#0A0A0A] "}>
@@ -78,8 +82,8 @@ const Signin = () => {
                             </Link>
                         </View>
                     </View>
-                </TouchableWithoutFeedback>
-            </KeyboardAvoidingView>
+                </KeyboardAwareScrollView>
+            </TouchableWithoutFeedback>
         </SafeAreaView>
     )
 }
