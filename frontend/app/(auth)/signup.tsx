@@ -19,13 +19,13 @@ const Signin = () => {
             >
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View className="flex flex-col flex-1 w-full px-10 items-center">
-                        <View className={"flex flex-row items-center justify-center w-full"}>
-                            <View className={"px-5 w-[50%] text-[#0A0A0A]"}>
+                        <View className={"flex flex-row items-center justify-center w-full "}>
+                            <View className={"px-5 pr-2 w-[50%] text-[#0A0A0A] "}>
                                 <Text className={"text-xl"}>First Name</Text>
                                 <TextInput className={"w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"}
                                            autoCapitalize={"none"}></TextInput>
                             </View>
-                            <View className={"px-5 w-[50%] text-[#0A0A0A]"}>
+                            <View className={"px-5 pl-2 w-[50%] text-[#0A0A0A]"}>
                                 <Text className={"text-xl"}>Last Name</Text>
                                 <TextInput className={"w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"}
                                            autoCapitalize={"none"}></TextInput>

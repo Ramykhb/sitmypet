@@ -4,7 +4,7 @@
     "slug": "sitmypet",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/mainIcon.png",
+    "icon": "./assets/images/SitMyPet-iOS-Default.png",
     "scheme": "sitmypet",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -24,7 +24,7 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/mainIcon.png",
+      "favicon": "./assets/images/SitMyPet-iOS-Default.png",
       "bundler": "metro"
     },
     "plugins": [
