@@ -35,7 +35,7 @@ export default function Index() {
 
                 <View className="flex flex-col items-center justify-center">
                     <Text className="text-text-gray-600 text-sm">Need help?</Text>
-                    <Link href="/">
+                    <Link href={"/(auth)/contactPage"}>
                         <Text className="text-[#0A0A0A] text-lg font-bold">Contact us</Text>
                     </Link>
                 </View>
