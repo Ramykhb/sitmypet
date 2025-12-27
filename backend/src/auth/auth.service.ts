@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -20,7 +21,6 @@ export class AuthService {
     lastname: string;
     email: string;
     password: string;
-    role?: Role;
   }) {
     const existingUser = await this.usersService.findByEmail(data.email);
     if (existingUser) {
@@ -33,15 +33,15 @@ export class AuthService {
       firstname: data.firstname,
       lastname: data.lastname,
       email: data.email,
-      password: passwordHash,
-      roles: [data.role ?? Role.OWNER],
+      passwordHash,
+      roles: [],
     });
 
-    const payload = { sub: user.id, roles: user.roles };
-
     return {
-      accessToken: this.jwtService.sign(payload),
-      user,
+      id: user.id,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      email: user.email,
     };
   }
 
@@ -60,7 +60,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { sub: user.id, roles: user.roles };
+    const payload = {
+      sub: user.id,
+      roles: user.roles,
+    };
 
     return {
       accessToken: this.jwtService.sign(payload),
@@ -72,6 +75,31 @@ export class AuthService {
         roles: user.roles,
         createdAt: user.createdAt,
       },
+    };
+  }
+
+  async switchRole(userId: string, role: Role) {
+    const user = await this.usersService.findById(userId);
+
+    if (!user) {
+      throw new ForbiddenException('User not found');
+    }
+
+    if (!user.roles.includes(role)) {
+      throw new ForbiddenException('Role not owned by user');
+    }
+
+    const payload = {
+      sub: user.id,
+      roles: user.roles,
+      activeRole: role,
+    };
+
+    console.log('JWT payload:', payload);
+
+    return {
+      accessToken: this.jwtService.sign(payload),
+      activeRole: role,
     };
   }
 }
