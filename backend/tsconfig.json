@@ -1,4 +1,11 @@
 {
+  "inculde" : ["src/**/*.ts"],
+  "exclude": [
+  "node_modules",
+  "dist",
+  "generated",
+  "prisma"
+  ],  
   "compilerOptions": {
     "module": "nodenext",
     "moduleResolution": "nodenext",
