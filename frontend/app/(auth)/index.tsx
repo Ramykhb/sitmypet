@@ -19,7 +19,7 @@ const HomeAuth = () => {
                     className="w-[75%] bg-[#3944D5] h-16 rounded-full flex flex-row items-center justify-center my-5"
                     onPress={() => router.push("/(auth)/signin")}
                 >
-                    <Image source={require('../../assets/icons/house.png')} alt="logo" className="w-6 h-6 mr-3" />
+                    <Image source={require('../../assets/icons/house-filled.png')} alt="logo" className="w-6 h-6 mr-3" />
                     <Text className="text-white text-lg font-bold">Pet Owner</Text>
                 </TouchableOpacity>
                 <TouchableOpacity

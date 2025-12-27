@@ -63,16 +63,16 @@ export default function TabsLayout() {
             }}
         >
             <Tabs.Screen name="index" options={{title:"Home", headerShown: false,  tabBarIcon: ( { focused } ) => (
-                    <TabIcon focused={focused} icon={require("../../assets/icons/house.png")} title="Home" />
+                    <TabIcon focused={focused} icon={focused ? require("../../assets/icons/house-filled.png") : require("../../assets/icons/house.png")} title="Home" />
                 )}} />
             <Tabs.Screen name="index2" options={{title:"Home", headerShown: false,  tabBarIcon: ( { focused } ) => (
                     <TabIcon focused={focused} icon={require("../../assets/icons/post.png")} title="Post" />
                 )}} />
             <Tabs.Screen name="index3" options={{title:"Home", headerShown: false,  tabBarIcon: ( { focused } ) => (
-                    <TabIcon focused={focused} icon={require("../../assets/icons/tray.png")} title="Requests" />
+                    <TabIcon focused={focused} icon={focused ? require("../../assets/icons/tray-filled.png") : require("../../assets/icons/tray.png")} title="Requests" />
                 )}} />
             <Tabs.Screen name="index4" options={{title:"Home", headerShown: false,  tabBarIcon: ( { focused } ) => (
-                    <TabIcon focused={focused} icon={require("../../assets/icons/profile.png")} title="Profile" />
+                    <TabIcon focused={focused} icon={focused ? require("../../assets/icons/person-filled.png") : require("../../assets/icons/profile.png")} title="Profile" />
                 )}} />
 
         </Tabs>
