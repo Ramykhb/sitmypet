@@ -1,6 +1,6 @@
 import {Stack, Tabs} from "expo-router";
 import {BlurView} from "expo-blur";
-import "./global.css"
+import "../global.css"
 import {SafeAreaProvider} from "react-native-safe-area-context";
 import {Image, ImageBackground, StyleSheet, Text, View} from "react-native";
 
@@ -8,19 +8,19 @@ const TabIcon = (props:any) => {
     if (props.focused)
     {
         return (
-            <View className="justify-center items-center rounded-full mt-4 size-full bg-red-400">
-                <Image source={props.icon} className="size-5" tintColor="#3944D5"/>
+            <View className="flex flex-row flex-1 min-w-[85px] w-full min-h-[48px] mt-[21px] justify-center items-center rounded-full overflow-hidden" style={{backgroundColor: "rgba(160,160,160,0.2)"}}>
+                <Image source={props.icon} className="size-9" tintColor="#3944D5"></Image>
             </View>
         );
     }
     return (
-        <View className="justify-center items-center rounded-full mt-4 size-full">
-            <Image source={props.icon} className="size-5" tintColor="#A8B5DB"/>
+        <View className="flex flex-row flex-1 min-w-[85px] w-full min-h-[48px] mt-[21px] justify-center items-center rounded-full overflow-hidden">
+            <Image source={props.icon} className="size-9" tintColor="#666666"></Image>
         </View>
     )
 }
 
-export default function RootLayout() {
+export default function TabsLayout() {
     return <SafeAreaProvider>
         <Tabs
             screenOptions={{
@@ -29,10 +29,11 @@ export default function RootLayout() {
 
                 tabBarStyle: {
                     position: "absolute",
-                    backgroundColor: "transparent", // IMPORTANT
+                    backgroundColor: "transparent",
                     marginHorizontal: 20,
                     marginBottom: 36,
-                    height: 58,
+                    paddingHorizontal: 5,
+                    height: 60,
                     borderTopWidth: 0,
                     elevation: 0,
                 },
@@ -60,16 +61,16 @@ export default function RootLayout() {
             }}
         >
             <Tabs.Screen name="index" options={{title:"Home", headerShown: false,  tabBarIcon: ( { focused } ) => (
-                    <TabIcon focused={focused} icon={require("../assets/icons/house.png")} title="Home" />
+                    <TabIcon focused={focused} icon={require("../../assets/icons/house.png")} title="Home" />
                 )}} />
             <Tabs.Screen name="index2" options={{title:"Home", headerShown: false,  tabBarIcon: ( { focused } ) => (
-                    <TabIcon focused={focused} icon={require("../assets/icons/house.png")} title="Home" />
+                    <TabIcon focused={focused} icon={require("../../assets/icons/post.png")} title="Home" />
                 )}} />
             <Tabs.Screen name="index3" options={{title:"Home", headerShown: false,  tabBarIcon: ( { focused } ) => (
-                    <TabIcon focused={focused} icon={require("../assets/icons/house.png")} title="Home" />
+                    <TabIcon focused={focused} icon={require("../../assets/icons/tray.png")} title="Home" />
                 )}} />
             <Tabs.Screen name="index4" options={{title:"Home", headerShown: false,  tabBarIcon: ( { focused } ) => (
-                    <TabIcon focused={focused} icon={require("../assets/icons/house.png")} title="Home" />
+                    <TabIcon focused={focused} icon={require("../../assets/icons/profile.png")} title="Home" />
                 )}} />
 
         </Tabs>

@@ -1,9 +1,9 @@
 import {
     View, Text, Image, TouchableOpacity, TextInput, Platform, Keyboard, KeyboardAvoidingView,
-    TouchableWithoutFeedback
+    TouchableWithoutFeedback, Linking
 } from 'react-native'
 import React, {useState} from 'react'
-import {Link} from "expo-router";
+import {Link, router} from "expo-router";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {Label} from "@react-navigation/elements";
 import CheckBox from "@react-native-community/checkbox";
@@ -12,7 +12,7 @@ import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 
 const ContactPage = () => {
     return (
-        <SafeAreaView className="home-auth flex-1">
+        <SafeAreaView className="flex-1 py-10" edges={["left", "right", "bottom"]}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <KeyboardAwareScrollView
                     contentContainerStyle={{flexGrow: 1}}
@@ -39,7 +39,7 @@ const ContactPage = () => {
                         </View>
                         <View className={"px-5 w-full mt-5 text-[#0A0A0A]"}>
                             <Text className={"text-xl"}>Message</Text>
-                            <TextInput className={"w-full h-40 border border-gray-300 rounded-xl mt-3 px-5 py-3"}
+                            <TextInput className={"w-full h-36 border border-gray-300 rounded-xl mt-3 px-5 py-3"}
                                        multiline={true}
                                        textAlignVertical={"top"}
                             >
@@ -47,11 +47,18 @@ const ContactPage = () => {
                             </TextInput>
                         </View>
                         <TouchableOpacity
-                            className="w-[85%] bg-[#3944D5] h-14 rounded-full flex flex-row items-center justify-center my-10"
+                            className="w-[85%] bg-[#3944D5] h-14 rounded-full flex flex-row items-center justify-center mt-7"
                             onPress={() => {
                             }}
                         >
                             <Text className="text-white text-lg font-bold">Send Message</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            className="w-[85%] bg-[#26BE5A] h-14 rounded-full flex flex-row items-center justify-center my-5"
+                            onPress={() => Linking.openURL("https://wa.me/96170820520")}
+                        >
+                            <Image source={require('../../assets/icons/whatsapp.png')} alt="logo" className="w-6 h-6 mr-3" />
+                            <Text className="text-white text-lg font-bold">Whatsapp Support</Text>
                         </TouchableOpacity>
                     </View>
                 </KeyboardAwareScrollView>

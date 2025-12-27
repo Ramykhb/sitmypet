@@ -67,7 +67,7 @@ export default function AuthLayout() {
                 }}
             />
             <Stack.Screen
-                name="homeAuth"
+                name="index"
                 options={{headerShown: false}}
             />
         </Stack>

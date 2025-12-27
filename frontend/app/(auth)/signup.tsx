@@ -13,8 +13,8 @@ import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 const Signin = () => {
     const [isAccepted, setIsAccepted] = useState(false);
     return (
-        <SafeAreaView className="home-auth flex-1">
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <SafeAreaView className="flex-1 py-12" edges={["left", "right", "bottom"]}>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss} className={"bg-green-200 h-screen"}>
                 <KeyboardAwareScrollView
                     contentContainerStyle={{flexGrow: 1}}
                     enableOnAndroid={true}
@@ -23,7 +23,7 @@ const Signin = () => {
                     keyboardShouldPersistTaps="handled"
                 >
                     <View className="flex flex-col flex-1 w-full px-10 items-center">
-                        <View className={"flex flex-row items-center justify-center w-full "}>
+                        <View className={"flex flex-row items-center justify-center w-full"}>
                             <View className={"px-5 pr-2 w-[50%] text-[#0A0A0A] "}>
                                 <Text className={"text-xl"}>First Name</Text>
                                 <TextInput className={"w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"}
