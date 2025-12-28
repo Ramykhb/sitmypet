@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
+
 
 export default function Index() {
     const router = useRouter();
@@ -21,8 +23,13 @@ export default function Index() {
     return null;
 }
 
-async function fakeCheckAuth() {
-    // hay fake login check for now
-    // hota true to simulate he is logged in, false otherwise
-    return true;
+async function fakeCheckAuth(): Promise<boolean> {
+    try {
+        const token = await SecureStore.getItemAsync('accessToken');
+
+        return token !== null && token !== '';
+    } catch (error) {
+        console.error('Error checking auth:', error);
+        return false;
+    }
 }
