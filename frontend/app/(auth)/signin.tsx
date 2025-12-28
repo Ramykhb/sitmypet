@@ -24,7 +24,7 @@ const Signin = () => {
             await SecureStore.setItemAsync('email', String(res.data.user.email));
             await SecureStore.setItemAsync('id', String(res.data.user.id));
             await SecureStore.setItemAsync('accessToken', String(res.data.accessToken));
-            router.push("/(tabs)");
+            router.push("/(auth)/homeAuth");
         } catch (error) {
             console.log(error);
         }
@@ -39,7 +39,8 @@ const Signin = () => {
                     keyboardOpeningTime={100}
                     keyboardShouldPersistTaps="handled"
                 >
-                    <View className="flex flex-col flex-1 w-full px-10 items-center">
+                    <View className="flex flex-col flex-1 w-full p-10 items-center">
+                        <Text className="text-[#0A0A0A] text-5xl self-start">Welcome</Text>
                         <Image
                             source={require('../../assets/images/loginIcon.png')}
                             alt="logo"

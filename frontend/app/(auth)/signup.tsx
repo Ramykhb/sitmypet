@@ -48,7 +48,7 @@ const SignUp = () => {
             await SecureStore.setItemAsync('email', String(res.data.email));
             await SecureStore.setItemAsync('id', String(res.data.id));
             await SecureStore.setItemAsync('accessToken', String(res.data.accessToken));
-            router.push("/(tabs)");
+            router.push("/(auth)/homeAuth");
         } catch (error) {
             console.log(error);
         }

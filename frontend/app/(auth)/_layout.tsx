@@ -13,22 +13,7 @@ export default function AuthLayout() {
         }}>
             <Stack.Screen
                 name="signin"
-                options={{
-                    header: () => {
-                        return (
-                        <View style={{ height: 120, justifyContent: 'flex-end', paddingLeft: 15}}>
-                            <TouchableOpacity onPress={() => {router.back();}}>
-                                <View className="flex flex-row items-center">
-                                    <Image
-                                        source={require('../../assets/icons/back-arrow.png')}
-                                        className="w-7 h-7 mr-3"
-                                    />
-                                    <Text className="text-[#0A0A0A] text-2xl font-bold">Login</Text>
-                                </View>
-                            </TouchableOpacity>
-                        </View>
-                    )},
-                }}
+                options={{headerShown: false}}
             />
             <Stack.Screen
                 name="signup"
@@ -67,7 +52,7 @@ export default function AuthLayout() {
                 }}
             />
             <Stack.Screen
-                name="index"
+                name="homeAuth"
                 options={{headerShown: false}}
             />
         </Stack>
