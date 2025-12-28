@@ -36,11 +36,21 @@ export class AuthService {
       passwordHash,
     });
 
+    const payload = {
+      sub: user.id,
+      roles: user.roles,
+    };
+
     return {
-      id: user.id,
-      firstname: user.firstname,
-      lastname: user.lastname,
-      email: user.email,
+      accessToken: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        roles: user.roles,
+        createdAt: user.createdAt,
+      },
     };
   }
 
