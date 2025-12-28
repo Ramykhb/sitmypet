@@ -39,10 +39,12 @@ export default function Index() {
                     <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                         <View className={"flex flex-col px-6 py-6 w-[310px] h-48 rounded-3xl border-gray-300 border ml-8 justify-between"}>
                             <View className={"flex-row flex w-full justify-between items-center "}>
-                                <Image source={require("../../assets/images/pfp.jpg")} alt="Home Image" className={"w-12 h-12 rounded-full"} resizeMode={"cover"}/>
-                                <View className={"flex flex-col mr-16"}>
-                                    <Text className={"text-base text-[#0A0A0A] text-left"}>RK da Goat</Text>
-                                    <Text className={"text-sm text-gray-500 text-left"}>Falha ahh dog</Text>
+                                <View className={"flex flex-row"}>
+                                    <Image source={require("../../assets/images/pfp.jpg")} alt="Home Image" className={"w-12 h-12 rounded-full"} resizeMode={"cover"}/>
+                                    <View className={"flex flex-col ml-3"}>
+                                        <Text className={"text-base text-[#0A0A0A] text-left"}>RK da Goat</Text>
+                                        <Text className={"text-sm text-gray-500 text-left"}>Falha ahh dog</Text>
+                                    </View>
                                 </View>
                                 <Image source={require("../../assets/icons/bell-red.png")} alt="Home Image" className={"w-8 h-8 rounded-full"} resizeMode={"cover"}/>
                             </View>
