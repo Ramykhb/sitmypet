@@ -112,7 +112,7 @@ export default function TabsLayout() {
                     }).start();
                 },
             }}/>
-            <Tabs.Screen name="index2" options={{
+            {role === 'owner' ? <Tabs.Screen name="index2" options={{
                 title: "Home", headerShown: false, tabBarIcon: ({focused}) => (
                     <TabIcon focused={focused} icon={require("../../assets/icons/post.png")} title="Post"/>
                 )
@@ -123,7 +123,18 @@ export default function TabsLayout() {
                         useNativeDriver: true,
                     }).start();
                 },
-            }}/>
+            }}/> : <Tabs.Screen name="index2" options={{
+                title: "Home", headerShown: false, tabBarIcon: ({focused}) => (
+                    <TabIcon focused={focused} icon={require("../../assets/icons/search.png")} title="Explore"/>
+                )
+            }} listeners={{
+                focus: () => {
+                    Animated.spring(indicatorX, {
+                        toValue: step * 1,
+                        useNativeDriver: true,
+                    }).start();
+                },
+            }}/>}
             {role === 'owner' ? <Tabs.Screen name="index3" options={{
                 title: "Home", headerShown: false, tabBarIcon: ({focused}) => (
                     <TabIcon focused={focused}
