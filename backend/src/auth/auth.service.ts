@@ -8,6 +8,8 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Role } from '../common/enums/role.enum';
 import { UsersService } from '../users/users.service';
+import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -16,23 +18,18 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(data: {
-    firstname: string;
-    lastname: string;
-    email: string;
-    password: string;
-  }) {
-    const existingUser = await this.usersService.findByEmail(data.email);
+  async register(dto: RegisterDto) {
+    const existingUser = await this.usersService.findByEmail(dto.email);
     if (existingUser) {
       throw new BadRequestException('Email already in use');
     }
 
-    const passwordHash = await bcrypt.hash(data.password, 10);
+    const passwordHash = await bcrypt.hash(dto.password, 10);
 
     const user = await this.usersService.createUser({
-      firstname: data.firstname,
-      lastname: data.lastname,
-      email: data.email,
+      firstname: dto.firstname,
+      lastname: dto.lastname,
+      email: dto.email,
       passwordHash,
     });
 
@@ -54,14 +51,14 @@ export class AuthService {
     };
   }
 
-  async login(data: { email: string; password: string }) {
-    const user = await this.usersService.findByEmailWithPassword(data.email);
+  async login(dto: LoginDto) {
+    const user = await this.usersService.findByEmailWithPassword(dto.email);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
     const isPasswordValid = await bcrypt.compare(
-      data.password,
+      dto.password,
       user.passwordHash,
     );
 
