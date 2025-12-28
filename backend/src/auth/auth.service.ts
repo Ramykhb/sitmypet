@@ -34,7 +34,6 @@ export class AuthService {
       lastname: data.lastname,
       email: data.email,
       passwordHash,
-      roles: [],
     });
 
     return {
