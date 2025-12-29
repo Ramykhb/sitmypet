@@ -11,6 +11,7 @@ import * as SecureStore from "expo-secure-store";
 
 const Signin = () => {
     const [formData, setFormData] = useState({email: "", password: ""});
+    const [error, setError] = useState("");
 
     const handleSubmit = async () => {
         if (!formData.email || !formData.password) {
@@ -25,8 +26,14 @@ const Signin = () => {
             await SecureStore.setItemAsync('id', String(res.data.user.id));
             await SecureStore.setItemAsync('accessToken', String(res.data.accessToken));
             router.push("/(auth)/homeAuth");
-        } catch (error) {
-            console.log(error);
+        } catch (error: any) {
+            if (error.status === 401) {
+                setError("Invalid email or password.");
+            }
+            else
+            {
+                setError("An error has occurred, please try again later.");
+            }
         }
     }
     return (
@@ -77,8 +84,9 @@ const Signin = () => {
                                 }}
                             />
                         </View>
+                        <Text className={"text-base text-red-500 mt-5"}>{error}</Text>
                         <TouchableOpacity
-                            className="w-[85%] bg-[#3944D5] h-14 rounded-full flex flex-row items-center justify-center mt-10 mb-5"
+                            className="w-[85%] bg-[#3944D5] h-14 rounded-full flex flex-row items-center justify-center mt-5 mb-5"
                             onPress={handleSubmit}
                         >
                             <Text className="text-white text-lg font-bold">Login</Text>
