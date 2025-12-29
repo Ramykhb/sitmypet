@@ -6,7 +6,7 @@ import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
 import { Image, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import "../global.css";
+import "../../global.css";
 
 export default function Index() {
   const [name, setName] = useState("");
@@ -29,7 +29,7 @@ export default function Index() {
             }
           >
             <Image
-              source={require("../../assets/images/pfp.jpg")}
+              source={require("../../../assets/images/pfp.jpg")}
               alt="Home Image"
               className={"w-14 h-14 rounded-full"}
               resizeMode={"cover"}
@@ -43,7 +43,7 @@ export default function Index() {
               </Text>
             </View>
             <Image
-              source={require("../../assets/icons/bell-red.png")}
+              source={require("../../../assets/icons/bell-red.png")}
               alt="Home Image"
               className={"w-8 h-8 rounded-full"}
               resizeMode={"cover"}
@@ -107,7 +107,7 @@ export default function Index() {
               }
             >
               <Text className={"text-2xl ml-8 text-[#0A0A0A]"}>Near You</Text>
-              <Link href={"/"} className={"mr-8"}>
+              <Link href={"/(tabs)/(home)/nearYou"} className={"mr-8"}>
                 <Text className={"text-lg font-bold  text-[#3944D5]"}>
                   See all
                 </Text>
@@ -116,9 +116,14 @@ export default function Index() {
             <ScrollView
               horizontal={true}
               showsHorizontalScrollIndicator={false}
+              className={"w-full"}
             >
-              <NearYouCard />
-              <NearYouCard />
+                <View className={"w-[300px] h-52 pl-8"}>
+                    <NearYouCard />
+                </View>
+                <View className={"w-[300px] h-52 pl-8"}>
+                    <NearYouCard />
+                </View>
             </ScrollView>
           </View>
         </View>

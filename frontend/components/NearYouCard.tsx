@@ -7,7 +7,7 @@ const NearYouCard = (props: any) => {
   return (
     <View
       className={
-        "flex flex-col px-4 py-4 w-[280px] h-52 rounded-3xl border-gray-300 border ml-8"
+        "flex flex-col px-4 py-4 w-full h-full rounded-3xl border-gray-300 border"
       }
     >
       <View className={"w-full h-[70%] rounded-2xl overflow-hidden relative"}>
@@ -32,7 +32,7 @@ const NearYouCard = (props: any) => {
           onPress={() => {
             setIsSaved(!isSaved);
           }}
-          className="absolute top-3 right-3 z-50 p-2"
+          className="absolute top-1 right-1 z-50 p-2"
         >
           {isSaved ? (
             <Image

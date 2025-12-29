@@ -98,7 +98,7 @@ export default function TabsLayout() {
                 )
             }}
         >
-            <Tabs.Screen name="index" options={{
+            <Tabs.Screen name="(home)" options={{
                 title: "Home", headerShown: false, tabBarIcon: ({focused}) => (
                     <TabIcon focused={focused}
                              icon={focused ? require("../../assets/icons/house-filled.png") : require("../../assets/icons/house.png")}
