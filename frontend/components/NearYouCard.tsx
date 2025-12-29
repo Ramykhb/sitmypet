@@ -36,15 +36,15 @@ const NearYouCard = (props: any) => {
         >
           {isSaved ? (
             <Image
-              source={require("../assets/icons/heart-filled.png")}
-              tintColor={"#f73838ff"}
-              className={"z-20 w-7 h-7"}
+              source={require("../assets/icons/bookmark-filled.png")}
+              tintColor={"#ffffff"}
+              className={"z-20 w-6 h-6"}
             />
           ) : (
             <Image
-              source={require("../assets/icons/heart.png")}
-              tintColor={"#ffffffff"}
-              className={"z-20 w-7 h-7"}
+              source={require("../assets/icons/bookmark.png")}
+              tintColor={"#ffffff"}
+              className={"z-20 w-6 h-6"}
             />
           )}
         </Pressable>
