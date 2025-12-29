@@ -108,4 +108,12 @@ export class AuthService {
       activeRole: role,
     };
   }
+
+  private async hashToken(token: string) {
+    return bcrypt.hash(token, 10);
+  }
+
+  private async compareToken(token: string, hash: string) {
+    return bcrypt.compare(token, hash);
+  }
 }
