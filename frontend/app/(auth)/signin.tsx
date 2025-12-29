@@ -8,6 +8,7 @@ import {SafeAreaView} from "react-native-safe-area-context";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
+import {backendPath} from "@/config/backConfig";
 
 const Signin = () => {
     const [formData, setFormData] = useState({email: "", password: ""});
@@ -19,7 +20,7 @@ const Signin = () => {
             return;
         }
         try {
-            const res = await axios.post("http://localhost:3000/auth/login", formData);
+            const res = await axios.post(`${backendPath}/auth/login`, formData);
             await SecureStore.setItemAsync('lastname', String(res.data.user.lastname));
             await SecureStore.setItemAsync('firstname', String(res.data.user.firstname));
             await SecureStore.setItemAsync('email', String(res.data.user.email));
