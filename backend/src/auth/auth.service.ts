@@ -274,7 +274,6 @@ export class AuthService {
   async resendEmailOtp(email: string) {
     const normalizedEmail = this.emailToLowerCase(email);
     const user = await this.usersService.findByEmailWithOtp(normalizedEmail);
-
     if (!user) {
       throw new UnauthorizedException('User not found');
     }

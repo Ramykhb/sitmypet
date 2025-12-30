@@ -1,14 +1,26 @@
-import React, { useRef, useState } from "react";
-import {View, TextInput, StyleSheet, Text, Image, TouchableOpacity} from "react-native";
+import React, {useEffect, useRef, useState} from "react";
+import {View, TextInput, StyleSheet, Text, Image, TouchableOpacity, TouchableWithoutFeedback} from "react-native";
 import * as SecureStore from "expo-secure-store";
 import {Link, router} from "expo-router";
 import {SafeAreaView} from "react-native-safe-area-context";
+import axios from "axios";
+import {backendPath} from "@/config/backConfig";
 
 const OTP_LENGTH = 6;
 
-export default function OtpInput({ onChange }: { onChange?: (otp: string) => void }) {
+export default function OtpInput({onChange}: { onChange?: (otp: string) => void }) {
     const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
     const inputs = useRef<(TextInput | null)[]>([]);
+    const [email, setEmail] = useState("");
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        const getEmail = async () => {
+            const em:string | null = await SecureStore.getItemAsync("email");
+            setEmail("test@gmail.com");
+        }
+        getEmail();
+    }, []);
 
     const handleChange = (text: string, index: number) => {
         if (!/^\d?$/.test(text)) return;
@@ -28,6 +40,33 @@ export default function OtpInput({ onChange }: { onChange?: (otp: string) => voi
             inputs.current[index - 1]?.focus();
         }
     };
+
+    const handleSubmit = async () => {
+        let newOtp = '';
+        otp.forEach((otp, i) => {
+            newOtp += String(otp);
+        })
+        try {
+            const res = await axios.post(`${backendPath}/auth/verify-email-otp`, {
+                email: email,
+                otp: newOtp,
+            })
+            console.log(res.data);
+        } catch (error: any) {
+            setError("Invalid OTP, please try again.");
+        }
+    }
+
+    const handleResend = async () => {
+        try {
+            const res = await axios.post(`${backendPath}/auth/resend-email-otp`, {
+                email: email,
+            })
+            console.log(res.data)
+        } catch (error: any) {
+            setError("Please wait before resending another OTP.");
+        }
+    }
 
     return (
         <SafeAreaView className="home-auth flex-1">
@@ -54,7 +93,7 @@ export default function OtpInput({ onChange }: { onChange?: (otp: string) => voi
                             }}
                             value={digit}
                             onChangeText={(text) => handleChange(text, index)}
-                            onKeyPress={({ nativeEvent }) =>
+                            onKeyPress={({nativeEvent}) =>
                                 handleKeyPress(nativeEvent.key, index)
                             }
                             keyboardType="number-pad"
@@ -66,12 +105,16 @@ export default function OtpInput({ onChange }: { onChange?: (otp: string) => voi
                     ))}
                 </View>
                 <TouchableOpacity
-                    className="w-[75%] bg-[#3944D5] h-16 rounded-full flex flex-row items-center justify-center my-5"
+                    className="w-[75%] bg-[#3944D5] h-16 rounded-full flex flex-row items-center justify-center my-8"
+                    onPress={handleSubmit}
                 >
+
                     <Text className="text-white text-lg font-bold">Submit</Text>
                 </TouchableOpacity>
-                <Text className="text-gray-500 text-base mt-5 font-bold text-center">
-                    {"Didn't receive OTP?"}<Link href={"/"}><Text className="text-[#3944D5] text-base mt-5 font-bold text-center">{" Resend OTP"}</Text></Link>
+                <Text className={"text-base text-red-600 my-4"}>{error}</Text>
+                <Text className="text-gray-500 text-base font-bold text-center">
+                    {"Didn't receive OTP?"}<TouchableWithoutFeedback onPress={handleResend}><Text
+                    className="text-[#3944D5] text-base mt-5 font-bold text-center">{" Resend OTP"}</Text></TouchableWithoutFeedback>
                 </Text>
             </View>
         </SafeAreaView>

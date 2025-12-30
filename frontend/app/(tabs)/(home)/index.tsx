@@ -12,7 +12,7 @@ export default function Index() {
   const [name, setName] = useState("");
   const [bookingFound, setBookingFound] = useState(true);
   const [clientFound, setClientFound] = useState(true);
-  const [nearYouFound, setNearYouFound] = useState(false);
+  const [nearYouFound, setNearYouFound] = useState(true);
 
   useEffect(() => {
     const getName = async () => {
@@ -176,7 +176,7 @@ export default function Index() {
                   No current jobs available. 🙁
                 </Text>
                 <Text className="text-lg text-[#0a0a0a]">
-                  We'll notify you when something opens up.
+                    {"We'll notify you when something opens up."}
                 </Text>
               </View>
             )}
