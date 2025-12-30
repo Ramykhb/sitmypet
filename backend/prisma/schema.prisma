@@ -13,16 +13,21 @@ enum Role {
 }
 
 model User {
-  id               String    @id @default(uuid())
-  firstname        String
-  lastname         String
-  email            String    @unique
-  passwordHash     String
-  roles            Role[]
-  activeRole       Role?
-  refreshTokenHash String?
-  refreshTokenJti  String?
-  refreshTokenExp  DateTime?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id                 String    @id @default(uuid())
+  firstname          String
+  lastname           String
+  email              String    @unique @db.Citext
+  emailVerified      Boolean   @default(false)
+  emailOtpHash       String?
+  emailOtpExpires    DateTime?
+  emailOtpAttempts   Int       @default(0)
+  emailOtpLastSentAt DateTime?
+  passwordHash       String
+  roles              Role[]
+  activeRole         Role?
+  refreshTokenHash   String?
+  refreshTokenJti    String?
+  refreshTokenExp    DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 }

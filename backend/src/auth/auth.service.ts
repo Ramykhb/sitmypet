@@ -7,13 +7,16 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { Role } from '../common/enums/role.enum';
+import { Role } from '@prisma/client';
+import { EmailService } from '../email/email.service';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 
-const ACCESS_TOKEN_TTL = '15m';
 const REFRESH_TOKEN_DAYS = 30;
+const EMAIL_OTP_EXPIRY_MINUTES = 10;
+const EMAIL_OTP_COOLDOWN_SECONDS = 60;
+const EMAIL_OTP_MAX_ATTEMPTS = 5;
 
 @Injectable()
 export class AuthService {
@@ -21,10 +24,12 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly emailService: EmailService,
   ) {}
 
   async register(dto: RegisterDto) {
-    const existingUser = await this.usersService.findByEmail(dto.email);
+    const email = this.emailToLowerCase(dto.email);
+    const existingUser = await this.usersService.findByEmail(email);
     if (existingUser) {
       throw new BadRequestException('Email already in use');
     }
@@ -34,33 +39,43 @@ export class AuthService {
     const user = await this.usersService.createUser({
       firstname: dto.firstname,
       lastname: dto.lastname,
-      email: dto.email,
+      email,
       passwordHash,
     });
 
-    const { accessToken, refreshToken } = await this.generateTokens(
-      user.id,
-      user.roles as Role[],
-    );
+    const otp = this.generateOtp();
 
-    await this.saveRefreshToken(user.id, refreshToken);
+    await this.saveEmailOtp(user.id, otp);
+    await this.emailService.sendOtp(user.email, otp);
 
     return {
-      accessToken,
-      refreshToken,
-      user: {
-        id: user.id,
-        firstname: user.firstname,
-        lastname: user.lastname,
-        email: user.email,
-        roles: user.roles,
-        createdAt: user.createdAt,
-      },
+      requiresEmailVerification: true,
+      message:
+        'Registration successful. Please check your email for the verification code.',
     };
   }
 
-  async login(dto: LoginDto) {
-    const user = await this.usersService.findByEmailWithPassword(dto.email);
+  async login(dto: LoginDto): Promise<
+    | {
+        requiresEmailVerification: true;
+        message: string;
+        email: string;
+      }
+    | {
+        accessToken: string;
+        refreshToken: string;
+        user: {
+          id: string;
+          firstname: string;
+          lastname: string;
+          email: string;
+          roles: Role[];
+          createdAt: Date;
+        };
+      }
+  > {
+    const email = this.emailToLowerCase(dto.email);
+    const user = await this.usersService.findByEmailWithPassword(email);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -74,16 +89,21 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const { accessToken, refreshToken } = await this.generateTokens(
-      user.id,
-      user.roles as Role[],
-    );
+    if (!user.emailVerified) {
+      return {
+        requiresEmailVerification: true,
+        message: 'Please verify your email before logging in',
+        email: user.email,
+      };
+    }
 
-    await this.saveRefreshToken(user.id, refreshToken);
+    const tokens = this.generateTokens(user.id, user.roles);
+
+    void this.saveRefreshToken(user.id, tokens.refreshToken);
 
     return {
-      accessToken,
-      refreshToken,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
       user: {
         id: user.id,
         firstname: user.firstname,
@@ -106,13 +126,15 @@ export class AuthService {
       throw new ForbiddenException('Role not owned by user');
     }
 
-    const payload = {
+    const payload: {
+      sub: string;
+      roles: Role[];
+      activeRole: Role;
+    } = {
       sub: user.id,
       roles: user.roles,
       activeRole: role,
     };
-
-    console.log('JWT payload:', payload);
 
     return {
       accessToken: this.jwtService.sign(payload),
@@ -121,18 +143,30 @@ export class AuthService {
   }
 
   async refresh(refreshToken: string) {
-    let payload: any;
+    let payload: {
+      sub: string;
+      jti: string;
+      roles: Role[];
+      activeRole?: Role;
+    };
+
     try {
-      payload = this.jwtService.verify(refreshToken, {
+      const verified = this.jwtService.verify(refreshToken, {
         secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-      });
-    } catch (error) {
+      }) as unknown;
+      payload = verified as typeof payload;
+    } catch {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
     const user = await this.usersService.findByIdWithRefreshToken(payload.sub);
 
-    if (!user || !user.refreshTokenHash || !user.refreshTokenExp || !user.refreshTokenJti) {
+    if (
+      !user ||
+      !user.refreshTokenHash ||
+      !user.refreshTokenExp ||
+      !user.refreshTokenJti
+    ) {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
@@ -140,7 +174,6 @@ export class AuthService {
       throw new UnauthorizedException('Refresh token expired');
     }
 
-    // Verify the jti matches (prevents token reuse)
     if (payload.jti !== user.refreshTokenJti) {
       throw new UnauthorizedException('Refresh token already used');
     }
@@ -154,20 +187,120 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    const { accessToken, refreshToken: newRefreshToken } =
-      await this.generateTokens(user.id, user.roles as Role[], user.activeRole as Role | undefined);
+    const tokens = this.generateTokens(
+      user.id,
+      user.roles,
+      user.activeRole ?? undefined,
+    );
 
-    await this.saveRefreshToken(user.id, newRefreshToken);
+    void this.saveRefreshToken(user.id, tokens.refreshToken);
 
     return {
-      accessToken,
-      refreshToken: newRefreshToken,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
     };
   }
 
   async logout(userId: string) {
     await this.usersService.clearRefreshToken(userId);
     return { message: 'Logged out successfully' };
+  }
+
+  async verifyEmailOtp(email: string, otp: string) {
+    const normalizedEmail = this.emailToLowerCase(email);
+    const user = await this.usersService.findByEmailWithOtp(normalizedEmail);
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    if (user.emailVerified) {
+      throw new BadRequestException('Email already verified');
+    }
+
+    if (!user.emailOtpHash || !user.emailOtpExpires) {
+      throw new UnauthorizedException(
+        'No verification code found. Please request a new one.',
+      );
+    }
+
+    if (user.emailOtpExpires < new Date()) {
+      throw new UnauthorizedException(
+        'Verification code expired. Please request a new one.',
+      );
+    }
+
+    if (user.emailOtpAttempts >= EMAIL_OTP_MAX_ATTEMPTS) {
+      throw new UnauthorizedException(
+        'Too many attempts. Please request a new code.',
+      );
+    }
+
+    const isValidOtp = await this.compareToken(otp, user.emailOtpHash);
+
+    if (!isValidOtp) {
+      await this.usersService.incrementOtpAttempts(user.id);
+      const remaining = EMAIL_OTP_MAX_ATTEMPTS - user.emailOtpAttempts - 1;
+      throw new UnauthorizedException(
+        `Invalid verification code. ${remaining} attempts remaining.`,
+      );
+    }
+
+    await this.usersService.verifyEmail(user.id);
+
+    const fullUser =
+      await this.usersService.findByEmailWithPassword(normalizedEmail);
+    if (!fullUser) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    const tokens = this.generateTokens(fullUser.id, fullUser.roles);
+    void this.saveRefreshToken(fullUser.id, tokens.refreshToken);
+
+    return {
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      user: {
+        id: fullUser.id,
+        firstname: fullUser.firstname,
+        lastname: fullUser.lastname,
+        email: fullUser.email,
+        roles: fullUser.roles,
+        createdAt: fullUser.createdAt,
+      },
+    };
+  }
+
+  async resendEmailOtp(email: string) {
+    const normalizedEmail = this.emailToLowerCase(email);
+    const user = await this.usersService.findByEmailWithOtp(normalizedEmail);
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    if (user.emailVerified) {
+      throw new BadRequestException('Email already verified');
+    }
+
+    if (user.emailOtpLastSentAt) {
+      const secondsSinceLastSent =
+        (new Date().getTime() - user.emailOtpLastSentAt.getTime()) / 1000;
+      if (secondsSinceLastSent < EMAIL_OTP_COOLDOWN_SECONDS) {
+        const remaining = Math.ceil(
+          EMAIL_OTP_COOLDOWN_SECONDS - secondsSinceLastSent,
+        );
+        throw new BadRequestException(
+          `Please wait ${remaining} seconds before requesting a new code.`,
+        );
+      }
+    }
+
+    const otp = this.generateOtp();
+    await this.saveEmailOtp(user.id, otp);
+    await this.emailService.sendOtp(user.email, otp);
+
+    return { message: 'Verification code sent' };
   }
 
   private async hashToken(token: string) {
@@ -178,11 +311,7 @@ export class AuthService {
     return bcrypt.compare(token, hash);
   }
 
-  private async generateTokens(
-    userId: string,
-    roles: Role[],
-    activeRole?: Role,
-  ) {
+  private generateTokens(userId: string, roles: Role[], activeRole?: Role) {
     const payload = {
       sub: userId,
       roles,
@@ -191,7 +320,6 @@ export class AuthService {
 
     const accessToken = this.jwtService.sign(payload);
 
-    // Add jti (JWT ID) to make each refresh token unique
     const refreshPayload = {
       ...payload,
       jti: `${userId}-${Date.now()}-${Math.random().toString(36).substring(7)}`,
@@ -210,15 +338,39 @@ export class AuthService {
     const refreshTokenExp = new Date();
     refreshTokenExp.setDate(refreshTokenExp.getDate() + REFRESH_TOKEN_DAYS);
 
-    // Extract jti from the token
-    const payload = this.jwtService.decode(refreshToken) as any;
-    const jti = payload.jti;
+    const decoded: unknown = this.jwtService.decode(refreshToken);
+    const payload = decoded as {
+      jti: string;
+      sub: string;
+    };
 
     await this.usersService.updateRefreshToken(
       userId,
       refreshTokenHash,
-      jti,
+      payload.jti,
       refreshTokenExp,
+    );
+  }
+
+  private emailToLowerCase(email: string): string {
+    return email.trim().toLowerCase();
+  }
+
+  private generateOtp(): string {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  }
+
+  private async saveEmailOtp(userId: string, otp: string) {
+    const otpHash = await this.hashToken(otp);
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + EMAIL_OTP_EXPIRY_MINUTES);
+    const lastSentAt = new Date();
+
+    await this.usersService.saveEmailOtp(
+      userId,
+      otpHash,
+      expiresAt,
+      lastSentAt,
     );
   }
 }
