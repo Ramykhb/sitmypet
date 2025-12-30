@@ -4,12 +4,15 @@ import TodaysBookingCard from "@/components/TodaysBookingCard";
 import { Link } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import "../../global.css";
 
 export default function Index() {
   const [name, setName] = useState("");
+  const [bookingFound, setBookingFound] = useState(true);
+  const [clientFound, setClientFound] = useState(true);
+  const [nearYouFound, setNearYouFound] = useState(false);
 
   useEffect(() => {
     const getName = async () => {
@@ -64,13 +67,32 @@ export default function Index() {
                 </Text>
               </Link>
             </View>
-            <ScrollView
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-            >
-              <TodaysBookingCard />
-              <TodaysBookingCard />
-            </ScrollView>
+
+            {bookingFound ? (
+              <ScrollView
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+              >
+                <TodaysBookingCard />
+                <TodaysBookingCard />
+              </ScrollView>
+            ) : (
+              <View
+                className={
+                  "flex flex-col px-6 py-2 w-full h-42 justify-start items-center"
+                }
+              >
+                <Text className="text-xl text-[#0a0a0a] font-bold mb-1">
+                  No Bookings Found.
+                </Text>
+                <Text className="text-lg text-[#0a0a0a]">
+                  Apply to nearby requests to get started.
+                </Text>
+                <TouchableOpacity className="w-[60%] bg-[#3944D5] h-14 rounded-full flex flex-row items-center justify-center my-5">
+                  <Text className="text-white text-xl">Browse Requests</Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
           <View className={"w-full"}>
             <View
@@ -87,18 +109,36 @@ export default function Index() {
                 </Text>
               </Link>
             </View>
-            <ScrollView
-              horizontal={true}
-              className={"pl-5"}
-              showsHorizontalScrollIndicator={false}
-            >
-              <ClientHistoryCard />
-              <ClientHistoryCard />
-              <ClientHistoryCard />
-              <ClientHistoryCard />
-              <ClientHistoryCard />
-              <ClientHistoryCard />
-            </ScrollView>
+            {clientFound ? (
+              <ScrollView
+                horizontal={true}
+                className={"pl-5"}
+                showsHorizontalScrollIndicator={false}
+              >
+                <ClientHistoryCard />
+                <ClientHistoryCard />
+                <ClientHistoryCard />
+                <ClientHistoryCard />
+                <ClientHistoryCard />
+                <ClientHistoryCard />
+              </ScrollView>
+            ) : (
+              <View
+                className={
+                  "flex flex-col px-6 py-2 w-full h-42 justify-start items-center"
+                }
+              >
+                <Text className="text-xl text-[#0a0a0a] font-bold mb-1">
+                  No Clients Found.
+                </Text>
+                <Text className="text-lg text-[#0a0a0a]">
+                  Apply to nearby requests to get started.
+                </Text>
+                <TouchableOpacity className="w-[60%] bg-[#3944D5] h-14 rounded-full flex flex-row items-center justify-center my-5">
+                  <Text className="text-white text-xl">Browse Requests</Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
           <View className={"w-full"}>
             <View
@@ -113,18 +153,33 @@ export default function Index() {
                 </Text>
               </Link>
             </View>
-            <ScrollView
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-              className={"w-full"}
-            >
+            {nearYouFound ? (
+              <ScrollView
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+                className={"w-full"}
+              >
                 <View className={"w-[300px] h-52 pl-8"}>
-                    <NearYouCard />
+                  <NearYouCard />
                 </View>
                 <View className={"w-[300px] h-52 pl-8"}>
-                    <NearYouCard />
+                  <NearYouCard />
                 </View>
-            </ScrollView>
+              </ScrollView>
+            ) : (
+              <View
+                className={
+                  "flex flex-col px-6 py-4 w-full h-42 justify-start items-center"
+                }
+              >
+                <Text className="text-xl text-[#0a0a0a] font-bold mb-1">
+                  No current jobs available. 🙁
+                </Text>
+                <Text className="text-lg text-[#0a0a0a]">
+                  We'll notify you when something opens up.
+                </Text>
+              </View>
+            )}
           </View>
         </View>
       </ScrollView>
