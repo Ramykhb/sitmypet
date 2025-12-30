@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Role } from '../common/enums/role.enum';
+import { Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 const userSelect = {
@@ -167,6 +167,62 @@ export class UsersService {
         refreshTokenHash: true,
         refreshTokenJti: true,
         refreshTokenExp: true,
+      },
+    });
+  }
+
+  async saveEmailOtp(
+    userId: string,
+    otpHash: string,
+    expiresAt: Date,
+    lastSentAt: Date,
+  ) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        emailOtpHash: otpHash,
+        emailOtpExpires: expiresAt,
+        emailOtpAttempts: 0,
+        emailOtpLastSentAt: lastSentAt,
+      },
+    });
+  }
+
+  async incrementOtpAttempts(userId: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        emailOtpAttempts: {
+          increment: 1,
+        },
+      },
+    });
+  }
+
+  async verifyEmail(userId: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        emailVerified: true,
+        emailOtpHash: null,
+        emailOtpExpires: null,
+        emailOtpAttempts: 0,
+        emailOtpLastSentAt: null,
+      },
+    });
+  }
+
+  async findByEmailWithOtp(email: string) {
+    return this.prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        emailVerified: true,
+        emailOtpHash: true,
+        emailOtpExpires: true,
+        emailOtpAttempts: true,
+        emailOtpLastSentAt: true,
       },
     });
   }

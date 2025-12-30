@@ -3,7 +3,9 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { RegisterDto } from './dto/register.dto';
+import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { SwitchRoleDto } from './dto/switch-role.dto';
+import { VerifyEmailOtpDto } from './dto/verify-email-otp.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
@@ -22,7 +24,10 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('switch-role')
-  switchRole(@Req() req, @Body() dto: SwitchRoleDto) {
+  switchRole(
+    @Req() req: { user: { sub: string } },
+    @Body() dto: SwitchRoleDto,
+  ) {
     return this.authService.switchRole(req.user.sub, dto.role);
   }
 
@@ -33,7 +38,17 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('logout')
-  logout(@Req() req) {
+  logout(@Req() req: { user: { sub: string } }) {
     return this.authService.logout(req.user.sub);
+  }
+
+  @Post('verify-email-otp')
+  verifyEmailOtp(@Body() dto: VerifyEmailOtpDto) {
+    return this.authService.verifyEmailOtp(dto.email, dto.otp);
+  }
+
+  @Post('resend-email-otp')
+  resendEmailOtp(@Body() dto: ResendVerificationDto) {
+    return this.authService.resendEmailOtp(dto.email);
   }
 }

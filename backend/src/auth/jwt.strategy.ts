@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
+import { Role } from '@prisma/client';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { Role } from '../common/enums/role.enum';
 
 export type JwtPayload = {
   sub: string;
@@ -20,7 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: JwtPayload) {
+  validate(payload: JwtPayload) {
     return {
       sub: payload.sub,
       roles: payload.roles,
