@@ -55,6 +55,10 @@ export default function AuthLayout() {
                 name="homeAuth"
                 options={{headerShown: false}}
             />
+            <Stack.Screen
+                name="verifyEmail"
+                options={{headerShown: false}}
+            />
         </Stack>
     );
 }
