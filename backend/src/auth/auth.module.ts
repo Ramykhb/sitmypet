@@ -14,10 +14,15 @@ import { JwtStrategy } from './jwt.strategy';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '7d' },
-      }),
+      useFactory: (config: ConfigService) => {
+        const ttl = config.get<string>('ACCESS_TOKEN_TTL') || '15m';
+        return {
+          secret: config.get<string>('JWT_ACCESS_SECRET'),
+          signOptions: {
+            expiresIn: ttl as any,
+          },
+        };
+      },
     }),
   ],
   controllers: [AuthController],

@@ -129,4 +129,45 @@ export class UsersService {
 
     return user;
   }
+
+  async updateRefreshToken(
+    userId: string,
+    refreshTokenHash: string,
+    refreshTokenJti: string,
+    refreshTokenExp: Date,
+  ) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        refreshTokenHash,
+        refreshTokenJti,
+        refreshTokenExp,
+      },
+    });
+  }
+
+  async clearRefreshToken(userId: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        refreshTokenHash: null,
+        refreshTokenJti: null,
+        refreshTokenExp: null,
+      },
+    });
+  }
+
+  async findByIdWithRefreshToken(userId: string) {
+    return this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        roles: true,
+        activeRole: true,
+        refreshTokenHash: true,
+        refreshTokenJti: true,
+        refreshTokenExp: true,
+      },
+    });
+  }
 }

@@ -1,6 +1,7 @@
 import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { RefreshDto } from './dto/refresh.dto';
 import { RegisterDto } from './dto/register.dto';
 import { SwitchRoleDto } from './dto/switch-role.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -23,5 +24,16 @@ export class AuthController {
   @Post('switch-role')
   switchRole(@Req() req, @Body() dto: SwitchRoleDto) {
     return this.authService.switchRole(req.user.sub, dto.role);
+  }
+
+  @Post('refresh')
+  refresh(@Body() dto: RefreshDto) {
+    return this.authService.refresh(dto.refreshToken);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  logout(@Req() req) {
+    return this.authService.logout(req.user.sub);
   }
 }
