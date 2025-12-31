@@ -99,7 +99,7 @@ const Signin = () => {
                             <Text className="text-white text-lg font-bold">Login</Text>
                         </TouchableOpacity>
 
-                        <Link href={"/"}>
+                        <Link href={"/(auth)/forgotPassword"}>
                             <Text className={"text-gray-600 underline"}>Forgot password?</Text>
                         </Link>
 
