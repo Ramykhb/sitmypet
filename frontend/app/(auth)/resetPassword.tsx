@@ -40,7 +40,7 @@ export default function OtpInput({onChange}: { onChange?: (otp: string) => void 
         try {
             await axios.post(`${backendPath}/auth/reset-password`, {
                 email: email,
-                resetToken: otp,
+                otp: otp,
                 newPassword: newPassword,
             });
             router.push("/(auth)/signin")
