@@ -1,10 +1,20 @@
 import React, {useEffect, useRef, useState} from "react";
-import {View, TextInput, StyleSheet, Text, Image, TouchableOpacity, TouchableWithoutFeedback} from "react-native";
+import {
+    View,
+    TextInput,
+    StyleSheet,
+    Text,
+    Image,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    Keyboard
+} from "react-native";
 import * as SecureStore from "expo-secure-store";
 import {Link, router} from "expo-router";
 import {SafeAreaView} from "react-native-safe-area-context";
 import axios from "axios";
 import {backendPath} from "@/config/backConfig";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 
 const OTP_LENGTH = 6;
 
@@ -106,6 +116,14 @@ export default function OtpInput({onChange}: { onChange?: (otp: string) => void 
 
     return (
         <SafeAreaView className="home-auth flex-1">
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <KeyboardAwareScrollView
+                    contentContainerStyle={{flexGrow: 1}}
+                    enableOnAndroid={true}
+                    extraScrollHeight={35}
+                    keyboardOpeningTime={100}
+                    keyboardShouldPersistTaps="handled"
+                >
             <View className="flex flex-col flex-1 w-full p-10 items-center">
                 <Text className="text-[#0A0A0A] text-4xl self-start">Email Verification</Text>
                 <Image
@@ -161,6 +179,8 @@ export default function OtpInput({onChange}: { onChange?: (otp: string) => void 
                     </TouchableWithoutFeedback>
                 </Text>
             </View>
+                </KeyboardAwareScrollView>
+            </TouchableWithoutFeedback>
         </SafeAreaView>
 
 
