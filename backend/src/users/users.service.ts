@@ -1,5 +1,5 @@
 import {
-  BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -31,7 +31,7 @@ export class UsersService {
     });
 
     if (exists) {
-      throw new BadRequestException('Email already in use');
+      throw new ConflictException('Email already in use');
     }
 
     return this.prisma.user.create({
@@ -69,7 +69,7 @@ export class UsersService {
   async addRole(userId: string, role: Role) {
     const user = await this.findById(userId);
     if (!user) {
-      throw new BadRequestException('User not found');
+      throw new NotFoundException('User not found');
     }
 
     if (user.roles.includes(role)) {
@@ -99,7 +99,7 @@ export class UsersService {
   async removeRole(userId: string, role: Role) {
     const user = await this.findById(userId);
     if (!user) {
-      throw new BadRequestException('User not found');
+      throw new NotFoundException('User not found');
     }
 
     return this.prisma.user.update({

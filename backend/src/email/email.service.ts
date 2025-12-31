@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 
@@ -70,11 +70,8 @@ export class EmailService {
         </html>
       `,
       });
-
-      console.log(`✅ Verification OTP sent to ${email}`);
     } catch (error) {
-      console.error('❌ Failed to send OTP email:', error);
-      throw new Error(
+      throw new InternalServerErrorException(
         `Failed to send verification email: ${(error as Error).message}`,
       );
     }
@@ -91,11 +88,12 @@ export class EmailService {
 
     const smtpFrom = this.configService.get<string>('SMTP_FROM');
 
-    await this.transporter.sendMail({
-      from: smtpFrom,
-      to: email,
-      subject: 'Reset Your SitMyPet Password',
-      html: `
+    try {
+      await this.transporter.sendMail({
+        from: smtpFrom,
+        to: email,
+        subject: 'Reset Your SitMyPet Password',
+        html: `
         <!DOCTYPE html>
         <html>
           <head>
@@ -131,8 +129,11 @@ export class EmailService {
           </body>
         </html>
       `,
-    });
-
-    console.log(`✅ Password reset email sent to ${email}`);
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Failed to send password reset email: ${(error as Error).message}`,
+      );
+    }
   }
 }

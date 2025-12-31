@@ -1,7 +1,9 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -31,7 +33,7 @@ export class AuthService {
     const email = this.emailToLowerCase(dto.email);
     const existingUser = await this.usersService.findByEmail(email);
     if (existingUser) {
-      throw new BadRequestException('Email already in use');
+      throw new ConflictException('Email already in use');
     }
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
@@ -119,7 +121,7 @@ export class AuthService {
     const user = await this.usersService.findById(userId);
 
     if (!user) {
-      throw new ForbiddenException('User not found');
+      throw new NotFoundException('User not found');
     }
 
     if (!user.roles.includes(role)) {
@@ -211,7 +213,7 @@ export class AuthService {
     const user = await this.usersService.findByEmailWithOtp(normalizedEmail);
 
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new NotFoundException('User not found');
     }
 
     if (user.emailVerified) {
@@ -219,19 +221,19 @@ export class AuthService {
     }
 
     if (!user.emailOtpHash || !user.emailOtpExpires) {
-      throw new UnauthorizedException(
+      throw new BadRequestException(
         'No verification code found. Please request a new one.',
       );
     }
 
     if (user.emailOtpExpires < new Date()) {
-      throw new UnauthorizedException(
+      throw new BadRequestException(
         'Verification code expired. Please request a new one.',
       );
     }
 
     if (user.emailOtpAttempts >= EMAIL_OTP_MAX_ATTEMPTS) {
-      throw new UnauthorizedException(
+      throw new BadRequestException(
         'Too many attempts. Please request a new code.',
       );
     }
@@ -251,7 +253,7 @@ export class AuthService {
     const fullUser =
       await this.usersService.findByEmailWithPassword(normalizedEmail);
     if (!fullUser) {
-      throw new UnauthorizedException('User not found');
+      throw new NotFoundException('User not found');
     }
 
     const tokens = this.generateTokens(fullUser.id, fullUser.roles);
@@ -275,7 +277,7 @@ export class AuthService {
     const normalizedEmail = this.emailToLowerCase(email);
     const user = await this.usersService.findByEmailWithOtp(normalizedEmail);
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new NotFoundException('User not found');
     }
 
     if (user.emailVerified) {
