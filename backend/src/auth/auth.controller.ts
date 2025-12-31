@@ -5,7 +5,6 @@ import { RefreshDto } from './dto/refresh.dto';
 import { RegisterDto } from './dto/register.dto';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ResetPasswordWithTokenDto } from './dto/reset-password-with-token.dto';
 import { VerifyPasswordResetOtpDto } from './dto/verify-password-reset-otp.dto';
 import { SwitchRoleDto } from './dto/switch-role.dto';
@@ -68,11 +67,6 @@ export class AuthController {
 
   @Post('reset-password')
   resetPassword(@Body() dto: ResetPasswordWithTokenDto) {
-    return this.authService.resetPasswordWithToken(dto.email, dto.resetToken, dto.newPassword);
-  }
-
-  @Post('reset-password-direct')
-  resetPasswordDirect(@Body() dto: ResetPasswordDto) {
-    return this.authService.resetPassword(dto.email, dto.otp, dto.newPassword);
+    return this.authService.resetPassword(dto.email, dto.resetToken, dto.newPassword);
   }
 }

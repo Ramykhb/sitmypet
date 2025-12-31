@@ -370,7 +370,7 @@ export class AuthService {
     };
   }
 
-  async resetPasswordWithToken(email: string, token: string, newPassword: string) {
+  async resetPassword(email: string, token: string, newPassword: string) {
     const normalizedEmail = this.emailToLowerCase(email);
     
     let payload: { sub: string; email: string; purpose: string };
@@ -388,54 +388,6 @@ export class AuthService {
     const user = await this.usersService.findByEmail(normalizedEmail);
     if (!user) {
       throw new NotFoundException('User not found');
-    }
-
-    const newPasswordHash = await bcrypt.hash(newPassword, 10);
-    await this.usersService.resetPassword(user.id, newPasswordHash);
-
-    return {
-      message:
-        'Password reset successful. Please log in with your new password.',
-    };
-  }
-
-  // Keep old method for backward compatibility
-  async resetPassword(email: string, otp: string, newPassword: string) {
-    const normalizedEmail = this.emailToLowerCase(email);
-    const user =
-      await this.usersService.findByEmailWithPasswordResetOtp(normalizedEmail);
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    if (!user.passwordResetOtpHash || !user.passwordResetOtpExpires) {
-      throw new BadRequestException(
-        'No password reset code found. Please request a new one.',
-      );
-    }
-
-    if (user.passwordResetOtpExpires < new Date()) {
-      throw new BadRequestException(
-        'Password reset code expired. Please request a new one.',
-      );
-    }
-
-    if (user.passwordResetOtpAttempts >= PASSWORD_RESET_OTP_MAX_ATTEMPTS) {
-      throw new BadRequestException(
-        'Too many attempts. Please request a new code.',
-      );
-    }
-
-    const isValidOtp = await this.compareToken(otp, user.passwordResetOtpHash);
-
-    if (!isValidOtp) {
-      await this.usersService.incrementPasswordResetOtpAttempts(user.id);
-      const remaining =
-        PASSWORD_RESET_OTP_MAX_ATTEMPTS - user.passwordResetOtpAttempts - 1;
-      throw new UnauthorizedException(
-        `Invalid reset code. ${remaining} attempts remaining.`,
-      );
     }
 
     const newPasswordHash = await bcrypt.hash(newPassword, 10);
