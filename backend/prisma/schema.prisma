@@ -23,6 +23,10 @@ model User {
   emailOtpAttempts   Int       @default(0)
   emailOtpLastSentAt DateTime?
   passwordHash       String
+  passwordResetOtpHash       String?
+  passwordResetOtpExpires    DateTime?
+  passwordResetOtpAttempts   Int      @default(0)
+  passwordResetOtpLastSentAt DateTime?
   roles              Role[]
   activeRole         Role?
   refreshTokenHash   String?

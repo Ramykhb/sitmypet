@@ -226,4 +226,63 @@ export class UsersService {
       },
     });
   }
+
+  async savePasswordResetOtp(
+    userId: string,
+    otpHash: string,
+    expiresAt: Date,
+    lastSentAt: Date,
+  ) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        passwordResetOtpHash: otpHash,
+        passwordResetOtpExpires: expiresAt,
+        passwordResetOtpAttempts: 0,
+        passwordResetOtpLastSentAt: lastSentAt,
+      },
+    });
+  }
+
+  async findByEmailWithPasswordResetOtp(email: string) {
+    return this.prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        passwordResetOtpHash: true,
+        passwordResetOtpExpires: true,
+        passwordResetOtpAttempts: true,
+        passwordResetOtpLastSentAt: true,
+      },
+    });
+  }
+
+  async incrementPasswordResetOtpAttempts(userId: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        passwordResetOtpAttempts: {
+          increment: 1,
+        },
+      },
+    });
+  }
+
+  async resetPassword(userId: string, newPasswordHash: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        passwordHash: newPasswordHash,
+        emailVerified: true,
+        passwordResetOtpHash: null,
+        passwordResetOtpExpires: null,
+        passwordResetOtpAttempts: 0,
+        passwordResetOtpLastSentAt: null,
+        refreshTokenHash: null,
+        refreshTokenJti: null,
+        refreshTokenExp: null,
+      },
+    });
+  }
 }

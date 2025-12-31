@@ -19,6 +19,9 @@ const REFRESH_TOKEN_DAYS = 30;
 const EMAIL_OTP_EXPIRY_MINUTES = 10;
 const EMAIL_OTP_COOLDOWN_SECONDS = 60;
 const EMAIL_OTP_MAX_ATTEMPTS = 5;
+const PASSWORD_RESET_OTP_EXPIRY_MINUTES = 10;
+const PASSWORD_RESET_OTP_COOLDOWN_SECONDS = 60;
+const PASSWORD_RESET_OTP_MAX_ATTEMPTS = 5;
 
 @Injectable()
 export class AuthService {
@@ -304,6 +307,89 @@ export class AuthService {
     return { message: 'Verification code sent' };
   }
 
+  async requestPasswordReset(email: string) {
+    const normalizedEmail = this.emailToLowerCase(email);
+    const user =
+      await this.usersService.findByEmailWithPasswordResetOtp(normalizedEmail);
+
+    if (!user) {
+      return {
+        message:
+          'If an account exists with this email, a password reset code has been sent.',
+      };
+    }
+
+    if (user.passwordResetOtpLastSentAt) {
+      const secondsSinceLastSent =
+        (new Date().getTime() - user.passwordResetOtpLastSentAt.getTime()) /
+        1000;
+      if (secondsSinceLastSent < PASSWORD_RESET_OTP_COOLDOWN_SECONDS) {
+        const remaining = Math.ceil(
+          PASSWORD_RESET_OTP_COOLDOWN_SECONDS - secondsSinceLastSent,
+        );
+        throw new BadRequestException(
+          `Please wait ${remaining} seconds before requesting a new code.`,
+        );
+      }
+    }
+
+    const otp = this.generateOtp();
+    await this.savePasswordResetOtp(user.id, otp);
+    await this.emailService.sendPasswordResetOtp(user.email, otp);
+
+    return {
+      message:
+        'If an account exists with this email, a password reset code has been sent.',
+    };
+  }
+
+  async resetPassword(email: string, otp: string, newPassword: string) {
+    const normalizedEmail = this.emailToLowerCase(email);
+    const user =
+      await this.usersService.findByEmailWithPasswordResetOtp(normalizedEmail);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (!user.passwordResetOtpHash || !user.passwordResetOtpExpires) {
+      throw new BadRequestException(
+        'No password reset code found. Please request a new one.',
+      );
+    }
+
+    if (user.passwordResetOtpExpires < new Date()) {
+      throw new BadRequestException(
+        'Password reset code expired. Please request a new one.',
+      );
+    }
+
+    if (user.passwordResetOtpAttempts >= PASSWORD_RESET_OTP_MAX_ATTEMPTS) {
+      throw new BadRequestException(
+        'Too many attempts. Please request a new code.',
+      );
+    }
+
+    const isValidOtp = await this.compareToken(otp, user.passwordResetOtpHash);
+
+    if (!isValidOtp) {
+      await this.usersService.incrementPasswordResetOtpAttempts(user.id);
+      const remaining =
+        PASSWORD_RESET_OTP_MAX_ATTEMPTS - user.passwordResetOtpAttempts - 1;
+      throw new UnauthorizedException(
+        `Invalid reset code. ${remaining} attempts remaining.`,
+      );
+    }
+
+    const newPasswordHash = await bcrypt.hash(newPassword, 10);
+    await this.usersService.resetPassword(user.id, newPasswordHash);
+
+    return {
+      message:
+        'Password reset successful. Please log in with your new password.',
+    };
+  }
+
   private async hashToken(token: string) {
     return bcrypt.hash(token, 10);
   }
@@ -368,6 +454,22 @@ export class AuthService {
     const lastSentAt = new Date();
 
     await this.usersService.saveEmailOtp(
+      userId,
+      otpHash,
+      expiresAt,
+      lastSentAt,
+    );
+  }
+
+  private async savePasswordResetOtp(userId: string, otp: string) {
+    const otpHash = await this.hashToken(otp);
+    const expiresAt = new Date();
+    expiresAt.setMinutes(
+      expiresAt.getMinutes() + PASSWORD_RESET_OTP_EXPIRY_MINUTES,
+    );
+    const lastSentAt = new Date();
+
+    await this.usersService.savePasswordResetOtp(
       userId,
       otpHash,
       expiresAt,
