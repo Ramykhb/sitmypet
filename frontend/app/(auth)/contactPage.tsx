@@ -14,13 +14,14 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { SafeAreaView } from "react-native-safe-area-context";
 import axios from "axios";
 import {router} from "expo-router";
+import {backendPath} from "@/config/backConfig";
 
 const ContactPage = () => {
-    const [formData, setFormData] = useState({name: "", email: "", subject: "", message: ""});
+    const [formData, setFormData] = useState({fullName: "", email: "", subject: "", message: ""});
 
     const handleSubmit = async () => {
         try {
-            const res = await axios.post("/contact", formData);
+            const res = await axios.post(`${backendPath}/contact`, formData);
             Alert.alert("Message Sent!", "Thanks for reaching out. We’ve received your message and will get back to you shortly.");
             router.push("/");
         } catch (error) {
@@ -45,11 +46,11 @@ const ContactPage = () => {
                 className={
                   "w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"
                 }
-                value={formData.name}
+                value={formData.fullName}
                 onChangeText={(text) => {
                     setFormData((prevState) => ({
                         ...prevState,
-                        name: text
+                        fullName: text
                     }));
                 }}
                 autoCapitalize={"none"}
@@ -106,7 +107,7 @@ const ContactPage = () => {
             </View>
             <TouchableOpacity
               className="w-[85%] bg-[#3944D5] h-14 rounded-full flex flex-row items-center justify-center mt-7"
-              onPress={() => {}}
+              onPress={handleSubmit}
             >
               <Text className="text-white text-lg font-bold">Send Message</Text>
             </TouchableOpacity>
