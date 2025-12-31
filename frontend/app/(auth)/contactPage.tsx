@@ -1,18 +1,33 @@
-import React from "react";
+import React, {useState} from "react";
 import {
-  Image,
-  Keyboard,
-  Linking,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
+    Alert,
+    Image,
+    Keyboard,
+    Linking,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
+import axios from "axios";
+import {router} from "expo-router";
 
 const ContactPage = () => {
+    const [formData, setFormData] = useState({name: "", email: "", subject: "", message: ""});
+
+    const handleSubmit = async () => {
+        try {
+            const res = await axios.post("/contact", formData);
+            Alert.alert("Message Sent!", "Thanks for reaching out. We’ve received your message and will get back to you shortly.");
+            router.push("/");
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
   return (
     <SafeAreaView className="flex-1 py-10" edges={["left", "right", "bottom"]}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -30,6 +45,13 @@ const ContactPage = () => {
                 className={
                   "w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"
                 }
+                value={formData.name}
+                onChangeText={(text) => {
+                    setFormData((prevState) => ({
+                        ...prevState,
+                        name: text
+                    }));
+                }}
                 autoCapitalize={"none"}
               ></TextInput>
             </View>
@@ -39,6 +61,13 @@ const ContactPage = () => {
                 className={
                   "w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"
                 }
+                value={formData.email}
+                onChangeText={(text) => {
+                    setFormData((prevState) => ({
+                        ...prevState,
+                        email: text
+                    }));
+                }}
                 autoCapitalize={"none"}
               ></TextInput>
             </View>
@@ -48,6 +77,13 @@ const ContactPage = () => {
                 className={
                   "w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"
                 }
+                value={formData.subject}
+                onChangeText={(text) => {
+                    setFormData((prevState) => ({
+                        ...prevState,
+                        subject: text
+                    }));
+                }}
                 autoCapitalize={"none"}
               ></TextInput>
             </View>
@@ -58,6 +94,13 @@ const ContactPage = () => {
                   "w-full h-36 border border-gray-300 rounded-xl mt-3 px-5 py-3"
                 }
                 multiline={true}
+                value={formData.message}
+                onChangeText={(text) => {
+                    setFormData((prevState) => ({
+                        ...prevState,
+                        message: text
+                    }));
+                }}
                 textAlignVertical={"top"}
               ></TextInput>
             </View>
