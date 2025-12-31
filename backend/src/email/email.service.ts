@@ -27,12 +27,6 @@ export class EmailService {
 
   async sendOtp(email: string, otp: string): Promise<void> {
     if (!this.transporter) {
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      console.log('📧 EMAIL VERIFICATION OTP (SMTP not configured)');
-      console.log(`To: ${email}`);
-      console.log(`OTP: ${otp}`);
-      console.log('Expires in: 10 minutes');
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       return;
     }
 
@@ -92,11 +86,6 @@ export class EmailService {
     const resetLink = `${frontendUrl}/reset-password?token=${token}`;
 
     if (!this.transporter) {
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      console.log('🔐 PASSWORD RESET (SMTP not configured)');
-      console.log(`To: ${email}`);
-      console.log(`Link: ${resetLink}`);
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       return;
     }
 
