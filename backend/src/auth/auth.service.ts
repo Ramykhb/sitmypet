@@ -8,8 +8,8 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
 import { Role } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 import { EmailService } from '../email/email.service';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
@@ -352,50 +352,54 @@ export class AuthService {
       );
     }
 
-    // Generate a temporary token valid for 5 minutes
-    const resetToken = this.jwtService.sign(
-      {
-        sub: user.id,
-        email: user.email,
-        purpose: 'password-reset',
-      },
-      {
-        expiresIn: '5m',
-      },
-    );
-
     return {
-      resetToken,
-      message: 'OTP verified successfully. You may now reset your password.',
+      message: 'Reset code is valid',
     };
   }
 
-  async resetPassword(email: string, token: string, newPassword: string) {
+  async resetPassword(email: string, otp: string, newPassword: string) {
     const normalizedEmail = this.emailToLowerCase(email);
-    
-    let payload: { sub: string; email: string; purpose: string };
-    try {
-      const verified = this.jwtService.verify(token) as unknown;
-      payload = verified as typeof payload;
-    } catch {
-      throw new UnauthorizedException('Invalid or expired reset token');
-    }
+    const user =
+      await this.usersService.findByEmailWithPasswordResetOtp(normalizedEmail);
 
-    if (payload.purpose !== 'password-reset' || payload.email !== normalizedEmail) {
-      throw new UnauthorizedException('Invalid reset token');
-    }
-
-    const user = await this.usersService.findByEmail(normalizedEmail);
     if (!user) {
       throw new NotFoundException('User not found');
+    }
+
+    if (!user.passwordResetOtpHash || !user.passwordResetOtpExpires) {
+      throw new BadRequestException(
+        'No password reset code found. Please request a new one.',
+      );
+    }
+
+    if (user.passwordResetOtpExpires < new Date()) {
+      throw new BadRequestException(
+        'Password reset code expired. Please request a new one.',
+      );
+    }
+
+    if (user.passwordResetOtpAttempts >= PASSWORD_RESET_OTP_MAX_ATTEMPTS) {
+      throw new BadRequestException(
+        'Too many attempts. Please request a new code.',
+      );
+    }
+
+    const isValidOtp = await this.compareToken(otp, user.passwordResetOtpHash);
+
+    if (!isValidOtp) {
+      await this.usersService.incrementPasswordResetOtpAttempts(user.id);
+      const remaining =
+        PASSWORD_RESET_OTP_MAX_ATTEMPTS - user.passwordResetOtpAttempts - 1;
+      throw new UnauthorizedException(
+        `Invalid reset code. ${remaining} attempts remaining.`,
+      );
     }
 
     const newPasswordHash = await bcrypt.hash(newPassword, 10);
     await this.usersService.resetPassword(user.id, newPasswordHash);
 
     return {
-      message:
-        'Password reset successful. Please log in with your new password.',
+      message: 'Password reset successful. Log in with your new password.',
     };
   }
 
