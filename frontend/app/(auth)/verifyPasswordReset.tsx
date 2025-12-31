@@ -87,7 +87,7 @@ export default function OtpInput({onChange}: { onChange?: (otp: string) => void 
             newOtp += String(otp);
         })
         try {
-            const res = await axios.post(`${backendPath}/auth/verify-email-otp`, {
+            const res = await axios.post(`${backendPath}/auth/verify-otp`, {
                 email: email,
                 otp: newOtp,
             })
