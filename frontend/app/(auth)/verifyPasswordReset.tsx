@@ -91,6 +91,7 @@ export default function OtpInput({onChange}: { onChange?: (otp: string) => void 
                 email: email,
                 otp: newOtp,
             })
+            await SecureStore.setItemAsync("passResetToken", String(newOtp));
             router.push("/(auth)/resetPassword");
         } catch (error: any) {
             setError("Invalid OTP, please try again.");

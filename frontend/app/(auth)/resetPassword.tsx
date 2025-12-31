@@ -18,6 +18,7 @@ import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 
 export default function OtpInput({onChange}: { onChange?: (otp: string) => void }) {
     const [email, setEmail] = useState("");
+    const [otp, setOTP] = useState("");
     const [error, setError] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -25,7 +26,11 @@ export default function OtpInput({onChange}: { onChange?: (otp: string) => void 
     useEffect(() => {
         const getEmail = async () => {
             const em:string | null = await SecureStore.getItemAsync("passResetEmail");
+            const tok:string | null = await SecureStore.getItemAsync("passResetToken");
             setEmail(em as string);
+            setOTP(tok as string);
+            await SecureStore.deleteItemAsync("passResetEmail");
+            await SecureStore.deleteItemAsync("passResetToken");
         }
         getEmail();
     }, []);
@@ -35,11 +40,13 @@ export default function OtpInput({onChange}: { onChange?: (otp: string) => void 
         try {
             await axios.post(`${backendPath}/auth/reset-password`, {
                 email: email,
+                resetToken: otp,
                 newPassword: newPassword,
             });
-            router.push("/(auth)/homeAuth")
+            router.push("/(auth)/signin")
 
         } catch (error: any) {
+            console.log(error);
             setError("An error has occured.");
         }
     };
@@ -70,7 +77,7 @@ export default function OtpInput({onChange}: { onChange?: (otp: string) => void 
                     <TextInput
                         className={"w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"}
                         autoCapitalize={"none"}
-                        keyboardType="email-address"
+                        secureTextEntry={true}
                         autoComplete="off"
                         textContentType="none"
                         importantForAutofill="no"
@@ -80,16 +87,16 @@ export default function OtpInput({onChange}: { onChange?: (otp: string) => void 
                         }}
                     />
                 </View>
-                <View className={"px-5 w-full mt-10 text-[#0A0A0A]"}>
+                <View className={"px-5 w-full mt-5 text-[#0A0A0A]"}>
                     <Text className={"text-xl"}>Confirm New Password</Text>
                     <TextInput
                         className={"w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"}
                         autoCapitalize={"none"}
-                        keyboardType="email-address"
+                        secureTextEntry={true}
                         autoComplete="off"
                         textContentType="none"
                         importantForAutofill="no"
-                        returnKeyType="next"
+                        returnKeyType="done"
                         onChangeText={(text) => {
                             setConfirmPassword(text);
                         }}
