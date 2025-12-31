@@ -128,4 +128,72 @@ export class EmailService {
       );
     }
   }
+
+  async sendContactForm(
+    fullName: string,
+    email: string,
+    subject: string,
+    message: string,
+  ): Promise<void> {
+    if (!this.transporter) {
+      throw new InternalServerErrorException('Email service is not configured');
+    }
+
+    const smtpFrom = this.configService.get<string>('SMTP_FROM');
+    const ramyEmail = 'ramykhb18@gmail.com';
+    const tarekEmail = 'tarekalkhatibb@gmail.com;';
+
+    try {
+      await this.transporter.sendMail({
+        from: smtpFrom,
+        to: [tarekEmail, ramyEmail],
+        replyTo: email,
+        subject: `Contact Form: ${subject}`,
+        html: `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+              .header { background: #4F46E5; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+              .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+              .info-row { margin: 15px 0; padding: 10px; background: white; border-radius: 4px; }
+              .label { font-weight: bold; color: #4F46E5; }
+              .message-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #4F46E5; }
+              .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 14px; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="content">
+                <h2>New Contact Form Submission</h2>
+                <div class="info-row">
+                  <span class="label">From:</span> ${fullName}
+                </div>
+                <div class="info-row">
+                  <span class="label">Email:</span> ${email}
+                </div>
+                <div class="info-row">
+                  <span class="label">Subject:</span> ${subject}
+                </div>
+                <div class="message-box">
+                  <div class="label">Message:</div>
+                  <p>${message.replace(/\n/g, '<br>')}</p>
+                </div>
+              </div>
+              <div class="footer">
+                <p>© 2025 SitMyPet. All rights reserved.</p>
+              </div>
+            </div>
+          </body>
+        </html>
+      `,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Failed to send contact form email: ${(error as Error).message}`,
+      );
+    }
+  }
 }
