@@ -9,10 +9,10 @@ export default function Index() {
     const checkAuth = async () => {
       const userLoggedIn = await fakeCheckAuth();
 
-      if (!userLoggedIn) {
+      if (userLoggedIn) {
         router.replace("/(tabs)/(home)");
       } else {
-        router.replace("/(auth)/verifyEmail");
+        router.replace("/(auth)/signin");
       }
     };
 

@@ -43,13 +43,10 @@ const SignUp = () => {
                 email: formData.email,
                 password: formData.password
             });
-
-            await SecureStore.setItemAsync('firstname', String(res.data.firstname));
-            await SecureStore.setItemAsync('lastname', String(res.data.lastname));
-            await SecureStore.setItemAsync('email', String(res.data.email));
-            await SecureStore.setItemAsync('id', String(res.data.id));
-            await SecureStore.setItemAsync('accessToken', String(res.data.accessToken));
-            router.push("/(auth)/homeAuth");
+            await SecureStore.setItemAsync('firstname', String(formData.firstname));
+            await SecureStore.setItemAsync('lastname', String(formData.lastname));
+            await SecureStore.setItemAsync('email', String(formData.email));
+            router.push("/(auth)/verifyEmail");
         } catch (error) {
             console.log(error);
         }

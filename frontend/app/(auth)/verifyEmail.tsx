@@ -17,10 +17,16 @@ export default function OtpInput({onChange}: { onChange?: (otp: string) => void 
     useEffect(() => {
         const getEmail = async () => {
             const em:string | null = await SecureStore.getItemAsync("email");
-            setEmail("test@gmail.com");
+            setEmail(em as string);
         }
         getEmail();
     }, []);
+
+    useEffect(() => {
+        if (email.length > 0) {
+            handleResend();
+        }
+    }, [email]);
 
     const handleChange = (text: string, index: number) => {
         if (!/^\d?$/.test(text)) return;
@@ -43,6 +49,7 @@ export default function OtpInput({onChange}: { onChange?: (otp: string) => void 
 
     const handleSubmit = async () => {
         let newOtp = '';
+        setError("");
         otp.forEach((otp, i) => {
             newOtp += String(otp);
         })
@@ -51,18 +58,24 @@ export default function OtpInput({onChange}: { onChange?: (otp: string) => void 
                 email: email,
                 otp: newOtp,
             })
-            console.log(res.data);
+            await SecureStore.setItemAsync('lastname', String(res.data.user.lastname));
+            await SecureStore.setItemAsync('firstname', String(res.data.user.firstname));
+            await SecureStore.setItemAsync('email', String(res.data.user.email));
+            await SecureStore.setItemAsync('id', String(res.data.user.id));
+            await SecureStore.setItemAsync('accessToken', String(res.data.accessToken));
+            await SecureStore.setItemAsync('refreshToken', String(res.data.refreshToken));
+            router.push("/(auth)/homeAuth");
         } catch (error: any) {
             setError("Invalid OTP, please try again.");
         }
     }
 
     const handleResend = async () => {
+        setError("");
         try {
             const res = await axios.post(`${backendPath}/auth/resend-email-otp`, {
                 email: email,
             })
-            console.log(res.data)
         } catch (error: any) {
             setError("Please wait before resending another OTP.");
         }
