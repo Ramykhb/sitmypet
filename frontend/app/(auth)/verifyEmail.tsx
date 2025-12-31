@@ -1,10 +1,20 @@
 import React, {useEffect, useRef, useState} from "react";
-import {View, TextInput, StyleSheet, Text, Image, TouchableOpacity, TouchableWithoutFeedback} from "react-native";
+import {
+    View,
+    TextInput,
+    StyleSheet,
+    Text,
+    Image,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    Keyboard
+} from "react-native";
 import * as SecureStore from "expo-secure-store";
 import {Link, router} from "expo-router";
 import {SafeAreaView} from "react-native-safe-area-context";
 import axios from "axios";
 import {backendPath} from "@/config/backConfig";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 
 const OTP_LENGTH = 6;
 
@@ -13,6 +23,19 @@ export default function OtpInput({onChange}: { onChange?: (otp: string) => void 
     const inputs = useRef<(TextInput | null)[]>([]);
     const [email, setEmail] = useState("");
     const [error, setError] = useState("");
+    const [canResend, setCanResend] = useState(false);
+    const resendTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const startResendCooldown = () => {
+        setCanResend(false);
+
+        if (resendTimerRef.current) {
+            clearTimeout(resendTimerRef.current);
+        }
+
+        resendTimerRef.current = setTimeout(() => {
+            setCanResend(true);
+        }, 60_000);
+    };
 
     useEffect(() => {
         const getEmail = async () => {
@@ -20,11 +43,18 @@ export default function OtpInput({onChange}: { onChange?: (otp: string) => void 
             setEmail(em as string);
         }
         getEmail();
+
+        return () => {
+            if (resendTimerRef.current) {
+                clearTimeout(resendTimerRef.current);
+            }
+        };
     }, []);
 
     useEffect(() => {
         if (email.length > 0) {
             handleResend();
+            startResendCooldown();
         }
     }, [email]);
 
@@ -71,18 +101,29 @@ export default function OtpInput({onChange}: { onChange?: (otp: string) => void 
     }
 
     const handleResend = async () => {
+        if (!canResend) return;
+
         setError("");
         try {
-            const res = await axios.post(`${backendPath}/auth/resend-email-otp`, {
+            await axios.post(`${backendPath}/auth/resend-email-otp`, {
                 email: email,
-            })
+            });
+            startResendCooldown();
         } catch (error: any) {
             setError("Please wait before resending another OTP.");
         }
-    }
+    };
 
     return (
         <SafeAreaView className="home-auth flex-1">
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <KeyboardAwareScrollView
+                    contentContainerStyle={{flexGrow: 1}}
+                    enableOnAndroid={true}
+                    extraScrollHeight={35}
+                    keyboardOpeningTime={100}
+                    keyboardShouldPersistTaps="handled"
+                >
             <View className="flex flex-col flex-1 w-full p-10 items-center">
                 <Text className="text-[#0A0A0A] text-4xl self-start">Email Verification</Text>
                 <Image
@@ -126,10 +167,20 @@ export default function OtpInput({onChange}: { onChange?: (otp: string) => void 
                 </TouchableOpacity>
                 <Text className={"text-base text-red-600 my-4"}>{error}</Text>
                 <Text className="text-gray-500 text-base font-bold text-center">
-                    {"Didn't receive OTP?"}<TouchableWithoutFeedback onPress={handleResend}><Text
-                    className="text-[#3944D5] text-base mt-5 font-bold text-center">{" Resend OTP"}</Text></TouchableWithoutFeedback>
+                    {"Didn't receive OTP?"}
+                    <TouchableWithoutFeedback onPress={handleResend} disabled={!canResend} className={"ml-2"}>
+                        <Text
+                            className={`text-base mt-5 font-bold text-center ${
+                                canResend ? "text-[#3944D5]" : "text-gray-300"
+                            }`}
+                        >
+                            {" Resend OTP"}
+                        </Text>
+                    </TouchableWithoutFeedback>
                 </Text>
             </View>
+                </KeyboardAwareScrollView>
+            </TouchableWithoutFeedback>
         </SafeAreaView>
 
 

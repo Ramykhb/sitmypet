@@ -67,7 +67,9 @@ const SignUp = () => {
                             <View className={"px-5 pr-2 w-[50%] text-[#0A0A0A] "}>
                                 <Text className={"text-xl"}>First Name</Text>
                                 <TextInput className={"w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"}
-                                           autoCapitalize={"none"} onChangeText={(text) => {
+                                           autoCapitalize={"none"} autoComplete="off"
+                                           textContentType="none"
+                                           importantForAutofill="no" onChangeText={(text) => {
                                     setFormData((prevState) => ({
                                         ...prevState,
                                         firstname: text
@@ -77,7 +79,9 @@ const SignUp = () => {
                             <View className={"px-5 pl-2 w-[50%] text-[#0A0A0A]"}>
                                 <Text className={"text-xl"}>Last Name</Text>
                                 <TextInput className={"w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"}
-                                           autoCapitalize={"none"} onChangeText={(text) => {
+                                           autoCapitalize={"none"} autoComplete="off"
+                                           textContentType="none"
+                                           importantForAutofill="no" onChangeText={(text) => {
                                     setFormData((prevState) => ({
                                         ...prevState,
                                         lastname: text
@@ -88,6 +92,10 @@ const SignUp = () => {
                         <View className={"px-5 w-full mt-5 text-[#0A0A0A]"}>
                             <Text className={"text-xl"}>Email</Text>
                             <TextInput className={"w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"}
+                                       autoComplete="off"
+                                       textContentType="none"
+                                       importantForAutofill="no"
+                                       value={formData.email}
                                        autoCapitalize={"none"} keyboardType="email-address" onChangeText={(text) => {
                                 setFormData((prevState) => ({
                                     ...prevState,
@@ -100,7 +108,11 @@ const SignUp = () => {
                             <TextInput className={"w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"}
                                        autoCapitalize={"none"}
                                        secureTextEntry={true}
+                                       autoComplete="off"
+                                       textContentType="none"
+                                       importantForAutofill="no"
                                        returnKeyType="next"
+                                       value={formData.password}
                                        onChangeText={(text) => {
                                            setFormData((prevState) => ({
                                                ...prevState,
@@ -113,6 +125,10 @@ const SignUp = () => {
                             <TextInput className={"w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"}
                                        autoCapitalize={"none"}
                                        secureTextEntry={true}
+                                       autoComplete="off"
+                                       textContentType="none"
+                                       importantForAutofill="no"
+                                       value={formData.confirmPassword}
                                        returnKeyType="done" onChangeText={(text) => {
                                 setFormData((prevState) => ({
                                     ...prevState,
