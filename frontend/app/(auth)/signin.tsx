@@ -61,6 +61,9 @@ const Signin = () => {
                                 className={"w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"}
                                 autoCapitalize={"none"}
                                 keyboardType="email-address"
+                                autoComplete="off"
+                                textContentType="none"
+                                importantForAutofill="no"
                                 returnKeyType="next"
                                 onChangeText={(text) => {
                                     setFormData((prevState) => ({
@@ -77,6 +80,9 @@ const Signin = () => {
                                 autoCapitalize={"none"}
                                 secureTextEntry={true}
                                 returnKeyType="done"
+                                autoComplete="off"
+                                textContentType="none"
+                                importantForAutofill="no"
                                 onChangeText={(text) => {
                                     setFormData((prevState) => ({
                                         ...prevState,
