@@ -175,7 +175,6 @@ export class UsersService {
     userId: string,
     otpHash: string,
     expiresAt: Date,
-    lastSentAt: Date,
   ) {
     return this.prisma.user.update({
       where: { id: userId },
@@ -183,7 +182,6 @@ export class UsersService {
         emailOtpHash: otpHash,
         emailOtpExpires: expiresAt,
         emailOtpAttempts: 0,
-        emailOtpLastSentAt: lastSentAt,
       },
     });
   }
@@ -207,7 +205,6 @@ export class UsersService {
         emailOtpHash: null,
         emailOtpExpires: null,
         emailOtpAttempts: 0,
-        emailOtpLastSentAt: null,
       },
     });
   }
@@ -222,7 +219,6 @@ export class UsersService {
         emailOtpHash: true,
         emailOtpExpires: true,
         emailOtpAttempts: true,
-        emailOtpLastSentAt: true,
       },
     });
   }
@@ -231,7 +227,6 @@ export class UsersService {
     userId: string,
     otpHash: string,
     expiresAt: Date,
-    lastSentAt: Date,
   ) {
     return this.prisma.user.update({
       where: { id: userId },
@@ -239,7 +234,6 @@ export class UsersService {
         passwordResetOtpHash: otpHash,
         passwordResetOtpExpires: expiresAt,
         passwordResetOtpAttempts: 0,
-        passwordResetOtpLastSentAt: lastSentAt,
       },
     });
   }
@@ -253,7 +247,6 @@ export class UsersService {
         passwordResetOtpHash: true,
         passwordResetOtpExpires: true,
         passwordResetOtpAttempts: true,
-        passwordResetOtpLastSentAt: true,
       },
     });
   }
@@ -278,7 +271,6 @@ export class UsersService {
         passwordResetOtpHash: null,
         passwordResetOtpExpires: null,
         passwordResetOtpAttempts: 0,
-        passwordResetOtpLastSentAt: null,
         refreshTokenHash: null,
         refreshTokenJti: null,
         refreshTokenExp: null,

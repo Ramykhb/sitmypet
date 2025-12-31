@@ -17,10 +17,8 @@ import { RegisterDto } from './dto/register.dto';
 
 const REFRESH_TOKEN_DAYS = 30;
 const EMAIL_OTP_EXPIRY_MINUTES = 10;
-const EMAIL_OTP_COOLDOWN_SECONDS = 5;
 const EMAIL_OTP_MAX_ATTEMPTS = 5;
 const PASSWORD_RESET_OTP_EXPIRY_MINUTES = 10;
-const PASSWORD_RESET_OTP_COOLDOWN_SECONDS = 5;
 const PASSWORD_RESET_OTP_MAX_ATTEMPTS = 5;
 
 @Injectable()
@@ -287,19 +285,6 @@ export class AuthService {
       throw new BadRequestException('Email already verified');
     }
 
-    if (user.emailOtpLastSentAt) {
-      const secondsSinceLastSent =
-        (new Date().getTime() - user.emailOtpLastSentAt.getTime()) / 1000;
-      if (secondsSinceLastSent < EMAIL_OTP_COOLDOWN_SECONDS) {
-        const remaining = Math.ceil(
-          EMAIL_OTP_COOLDOWN_SECONDS - secondsSinceLastSent,
-        );
-        throw new BadRequestException(
-          `Please wait ${remaining} seconds before requesting a new code.`,
-        );
-      }
-    }
-
     const otp = this.generateOtp();
     await this.saveEmailOtp(user.id, otp);
     await this.emailService.sendOtp(user.email, otp);
@@ -317,20 +302,6 @@ export class AuthService {
         message:
           'If an account exists with this email, a password reset code has been sent.',
       };
-    }
-
-    if (user.passwordResetOtpLastSentAt) {
-      const secondsSinceLastSent =
-        (new Date().getTime() - user.passwordResetOtpLastSentAt.getTime()) /
-        1000;
-      if (secondsSinceLastSent < PASSWORD_RESET_OTP_COOLDOWN_SECONDS) {
-        const remaining = Math.ceil(
-          PASSWORD_RESET_OTP_COOLDOWN_SECONDS - secondsSinceLastSent,
-        );
-        throw new BadRequestException(
-          `Please wait ${remaining} seconds before requesting a new code.`,
-        );
-      }
     }
 
     const otp = this.generateOtp();
@@ -451,14 +422,8 @@ export class AuthService {
     const otpHash = await this.hashToken(otp);
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + EMAIL_OTP_EXPIRY_MINUTES);
-    const lastSentAt = new Date();
 
-    await this.usersService.saveEmailOtp(
-      userId,
-      otpHash,
-      expiresAt,
-      lastSentAt,
-    );
+    await this.usersService.saveEmailOtp(userId, otpHash, expiresAt);
   }
 
   private async savePasswordResetOtp(userId: string, otp: string) {
@@ -467,13 +432,7 @@ export class AuthService {
     expiresAt.setMinutes(
       expiresAt.getMinutes() + PASSWORD_RESET_OTP_EXPIRY_MINUTES,
     );
-    const lastSentAt = new Date();
 
-    await this.usersService.savePasswordResetOtp(
-      userId,
-      otpHash,
-      expiresAt,
-      lastSentAt,
-    );
+    await this.usersService.savePasswordResetOtp(userId, otpHash, expiresAt);
   }
 }
