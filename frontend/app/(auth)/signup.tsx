@@ -143,9 +143,9 @@ const SignUp = () => {
                                 color={isAccepted ? '#3944D5' : undefined}
                                 className={"mr-3"}
                             />
-                            <Text className={"text-sm text-gray-600"}>I agree to the <Link href={"/"}><Text
+                            <Text className={"text-sm text-gray-600"}>I agree to the <Link href={"/(policy)/termsAndConditions"}><Text
                                 className={"font-bold underline"}>terms of use</Text></Link> and acknowledge the <Link
-                                href={"/"}><Text className={"font-bold underline"}>privacy policy</Text></Link>.</Text>
+                                href={"/(policy)/privacyPolicy"}><Text className={"font-bold underline"}>privacy policy</Text></Link>.</Text>
                         </View>
                         <TouchableOpacity
                             className="w-[85%] bg-[#3944D5] h-14 rounded-full flex flex-row items-center justify-center my-10"
