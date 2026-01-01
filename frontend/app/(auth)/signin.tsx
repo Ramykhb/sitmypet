@@ -31,6 +31,10 @@ const Signin = () => {
             if (error.status === 401) {
                 setError("Invalid email or password.");
             }
+            else if (error.status === 403) {
+                await SecureStore.setItemAsync('email', String(formData.email));
+                router.push("/(auth)/verifyEmail");
+            }
             else
             {
                 setError("An error has occurred, please try again later.");
