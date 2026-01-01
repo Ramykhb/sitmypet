@@ -58,25 +58,18 @@ export class AuthService {
     };
   }
 
-  async login(dto: LoginDto): Promise<
-    | {
-        requiresEmailVerification: true;
-        message: string;
-        email: string;
-      }
-    | {
-        accessToken: string;
-        refreshToken: string;
-        user: {
-          id: string;
-          firstname: string;
-          lastname: string;
-          email: string;
-          roles: Role[];
-          createdAt: Date;
-        };
-      }
-  > {
+  async login(dto: LoginDto): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    user: {
+      id: string;
+      firstname: string;
+      lastname: string;
+      email: string;
+      roles: Role[];
+      createdAt: Date;
+    };
+  }> {
     const email = this.emailToLowerCase(dto.email);
     const user = await this.usersService.findByEmailWithPassword(email);
     if (!user) {
@@ -93,11 +86,7 @@ export class AuthService {
     }
 
     if (!user.emailVerified) {
-      return {
-        requiresEmailVerification: true,
-        message: 'Please verify your email before logging in',
-        email: user.email,
-      };
+      throw new ForbiddenException();
     }
 
     const tokens = this.generateTokens(user.id, user.roles);
