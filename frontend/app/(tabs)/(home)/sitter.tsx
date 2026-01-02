@@ -61,8 +61,8 @@ export default function Sitter() {
               <Text className={"text-2xl ml-8 text-[#0A0A0A]"}>
                 {"Today's Bookings"}
               </Text>
-              <Link href={"/"} className={"mr-8"}>
-                <Text className={"text-lg font-bold  text-[#3944D5]"}>
+              <Link href={"/"} className={"mr-8"} disabled={!bookingFound}>
+                <Text className={"text-lg font-bold  text-[#3944D5]"} style={bookingFound ? {} : {color: "#AAAAAA"}}>
                   See all
                 </Text>
               </Link>
@@ -103,8 +103,8 @@ export default function Sitter() {
               <Text className={"text-2xl ml-8 text-[#0A0A0A]"}>
                 Client History
               </Text>
-              <Link href={"/"} className={"mr-8"}>
-                <Text className={"text-lg font-bold  text-[#3944D5]"}>
+              <Link href={"/"} className={"mr-8"} disabled={!clientFound}>
+                <Text className={"text-lg font-bold  text-[#3944D5]"} style={clientFound ? {} : {color: "#AAAAAA"}}>
                   See all
                 </Text>
               </Link>
@@ -147,8 +147,8 @@ export default function Sitter() {
               }
             >
               <Text className={"text-2xl ml-8 text-[#0A0A0A]"}>Near You</Text>
-              <Link href={"/(tabs)/(home)/sitterNearYou"} className={"mr-8"}>
-                <Text className={"text-lg font-bold  text-[#3944D5]"}>
+              <Link href={"/(tabs)/(home)/sitterNearYou"} className={"mr-8"} disabled={!nearYouFound}>
+                <Text className={"text-lg font-bold  text-[#3944D5]"} style={nearYouFound ? {} : {color: "#AAAAAA"}}>
                   See all
                 </Text>
               </Link>

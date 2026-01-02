@@ -12,7 +12,7 @@ import OwnerNearYouCard from "@/components/OwnerNearYouCard";
 export default function Sitter() {
   const [name, setName] = useState("");
   const [bookingFound, setBookingFound] = useState(false);
-  const [clientFound, setClientFound] = useState(false);
+  const [sitterFound, setSitterFound] = useState(false);
   const [nearYouFound, setNearYouFound] = useState(false);
 
   useEffect(() => {
@@ -62,8 +62,8 @@ export default function Sitter() {
               <Text className={"text-2xl ml-8 text-[#0A0A0A]"}>
                 {"Today's Bookings"}
               </Text>
-              <Link href={"/"} className={"mr-8"}>
-                <Text className={"text-lg font-bold  text-[#3944D5]"}>
+              <Link href={"/"} className={"mr-8"} disabled={!bookingFound}>
+                <Text className={"text-lg font-bold  text-[#3944D5]"} style={bookingFound ? {} : {color: "#AAAAAA"}}>
                   See all
                 </Text>
               </Link>
@@ -104,13 +104,13 @@ export default function Sitter() {
               <Text className={"text-2xl ml-8 text-[#0A0A0A]"}>
                 Pet Sitters History
               </Text>
-              <Link href={"/"} className={"mr-8"}>
-                <Text className={"text-lg font-bold  text-[#3944D5]"}>
+              <Link href={"/"} className={"mr-8"} disabled={!sitterFound}>
+                <Text className={"text-lg font-bold  text-[#3944D5]"} style={sitterFound ? {} : {color: "#AAAAAA"}}>
                   See all
                 </Text>
               </Link>
             </View>
-            {clientFound ? (
+            {sitterFound ? (
               <ScrollView
                 horizontal={true}
                 className={"pl-5"}
@@ -148,8 +148,8 @@ export default function Sitter() {
               }
             >
               <Text className={"text-2xl ml-8 text-[#0A0A0A]"}>Pet Sitters Near You</Text>
-              <Link href={"/(tabs)/(home)/ownerNearYou"} className={"mr-8"}>
-                <Text className={"text-lg font-bold  text-[#3944D5]"}>
+              <Link href={"/(tabs)/(home)/ownerNearYou"} className={"mr-8"} disabled={!nearYouFound}>
+                <Text className={"text-lg font-bold  text-[#3944D5]"} style={nearYouFound ? {} : {color: "#AAAAAA"}}>
                   See all
                 </Text>
               </Link>
