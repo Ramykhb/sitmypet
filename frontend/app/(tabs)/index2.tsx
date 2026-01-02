@@ -33,9 +33,12 @@ export default function Index() {
         <Text className="text-[#0A0A0A] text-lg mt-5 font-bold">
           Homepage 2
         </Text>
-        <TouchableOpacity onPress={clearAuthData}>
+        <TouchableOpacity className={"my-5"} onPress={clearAuthData}>
           <Text>LOGOUT</Text>
         </TouchableOpacity>
+          <TouchableOpacity className={"my-5"} onPress={() => {router.push("/(auth)/homeAuth")}}>
+              <Text>Change Role</Text>
+          </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

@@ -1,27 +1,27 @@
-import NearYouCard from "@/components/NearYouCard";
+import SitterNearYouCard from "@/components/SitterNearYouCard";
 import React from "react";
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const NearYou = () => {
+const SitterNearYou = () => {
   return (
     <SafeAreaView className={"flex-1"} edges={["right", "bottom", "left"]}>
       <ScrollView
         horizontal={false}
         showsVerticalScrollIndicator={false}
-        className={"w-full mt-5"}
+        className={"w-full mt-5 mb-24"}
       >
         <View className={"w-full h-60 px-8 mb-6"}>
-          <NearYouCard />
+          <SitterNearYouCard />
         </View>
         <View className={"w-full h-60 px-8 mb-6"}>
-          <NearYouCard />
+          <SitterNearYouCard />
         </View>
         <View className={"w-full h-60 px-8 mb-6"}>
-          <NearYouCard />
+          <SitterNearYouCard />
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
-export default NearYou;
+export default SitterNearYou;

@@ -16,7 +16,7 @@ export default function PolicyLayout() {
                 options={{
                     header: () => (
                         <View style={{ height: 120, justifyContent: 'flex-end', paddingLeft: 15}}>
-                            <TouchableOpacity onPress={() => {router.push("/(auth)/signup")}}>
+                            <TouchableOpacity onPress={() => {router.push("/(auth)/signin")}}>
                                 <View className="flex flex-row items-center">
                                     <Image
                                         source={require('../../assets/icons/back-arrow.png')}
@@ -34,7 +34,7 @@ export default function PolicyLayout() {
                 options={{
                     header: () => (
                         <View style={{ height: 120, justifyContent: 'flex-end', paddingLeft: 15}}>
-                            <TouchableOpacity onPress={() => {router.push("/(auth)/signup")}}>
+                            <TouchableOpacity onPress={() => {router.push("/(auth)/signin")}}>
                                 <View className="flex flex-row items-center">
                                     <Image
                                         source={require('../../assets/icons/back-arrow.png')}
