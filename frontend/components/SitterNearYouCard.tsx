@@ -2,8 +2,20 @@ import {BlurView} from "expo-blur";
 import React, {useState} from "react";
 import {Image, Pressable, Text, View} from "react-native";
 
-const SitterNearYouCard = (props: any) => {
-    const [isSaved, setIsSaved] = useState(false);
+type NearbyRequest = {
+    id: string;
+    title: string;
+    duration: string;
+    imageUrl: string;
+    isSaved: boolean;
+    location: string;
+    serviceType: string;
+    rating?: number;
+    reviewCount?: number;
+};
+
+const SitterNearYouCard = (props: NearbyRequest) => {
+    const [isSaved, setIsSaved] = useState(props.isSaved);
     return (
         <View
             className={
@@ -11,22 +23,24 @@ const SitterNearYouCard = (props: any) => {
             }
         >
             <View className={"w-full h-[70%] rounded-2xl overflow-hidden relative"}>
-                <View className={"rounded-full absolute top-3 left-3 z-10 overflow-hidden"}>
-                    <BlurView
-                        intensity={60}
-                        tint="dark"
-                        className="flex-row items-center px-2 py-1"
-                    >
-                        <Image
-                            source={require("../assets/icons/star.png")}
-                            className={"w-4 h-4 ml-1"}
-                        />
-                        <Text className={"text-[#FFCA00] text-sm ml-1"}>4.7</Text>
-                        <Text className={"text-sm text-white ml-1"}>(320)</Text>
-                    </BlurView>
-                </View>
+                {props.rating && props.reviewCount && (
+                    <View className={"rounded-full absolute top-3 left-3 z-10 overflow-hidden"}>
+                        <BlurView
+                            intensity={60}
+                            tint="dark"
+                            className="flex-row items-center px-2 py-1"
+                        >
+                            <Image
+                                source={require("../assets/icons/star.png")}
+                                className={"w-4 h-4 ml-1"}
+                            />
+                            <Text className={"text-[#FFCA00] text-sm ml-1"}>{props.rating}</Text>
+                            <Text className={"text-sm text-white ml-1"}>({props.reviewCount})</Text>
+                        </BlurView>
+                    </View>
+                )}
                 <Image
-                    source={require("../assets/images/dog.jpg")}
+                    source={{ uri: props.imageUrl }}
                     className={"w-full h-full"}
                     resizeMode={"cover"}
                 />
@@ -61,7 +75,7 @@ const SitterNearYouCard = (props: any) => {
                     ellipsizeMode="tail"
                     className="w-full font-bold"
                 >
-                    Golden retriever needs a walk to the park
+                    {props.title}
                 </Text>
                 <View className={"w-full flex flex-row items-center h-8"}>
                     <Image
@@ -69,15 +83,15 @@ const SitterNearYouCard = (props: any) => {
                         className={"w-4 h-4"}
                     />
                     <Text className={"text-gray-500 ml-2 font-semibold text-sm"}>
-                        Beirut
+                        {props.location}
                     </Text>
                     <View className={"w-1 h-1 rounded-full ml-2 bg-gray-500"}/>
                     <Text className={"text-gray-500 ml-2 font-semibold text-sm"}>
-                        Hike
+                        {props.serviceType}
                     </Text>
                     <View className={"w-[1px] h-[12px] rounded-full ml-2 bg-gray-500"}/>
                     <Text className={"text-gray-500 ml-2 font-semibold text-sm"}>
-                        2-3 Days
+                        {props.duration}
                     </Text>
                 </View>
             </View>

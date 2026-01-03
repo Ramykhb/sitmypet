@@ -15,13 +15,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import axios from "axios";
 import {router} from "expo-router";
 import {backendPath} from "@/config/backConfig";
+import api from "@/config/api";
 
 const ContactPage = () => {
     const [formData, setFormData] = useState({fullName: "", email: "", subject: "", message: ""});
 
     const handleSubmit = async () => {
         try {
-            const res = await axios.post(`${backendPath}/contact`, formData);
+            const res = await api.post(`/contact`, formData);
             Alert.alert("Message Sent!", "Thanks for reaching out. We’ve received your message and will get back to you shortly.");
             router.push("/");
         } catch (error) {

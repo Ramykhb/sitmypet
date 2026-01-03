@@ -21,15 +21,9 @@ export class SitterController {
       user: {
         sub: string;
         roles: Role[];
-        activeRole?: Role;
       };
     },
   ) {
-    const currentRole = req.user.activeRole || req.user.roles[0];
-    if (currentRole !== Role.SITTER) {
-      throw new ForbiddenException('Access denied: SITTER role required');
-    }
-
     const userId = req.user.sub;
     return this.sitterService.getHomeFeed(userId);
   }

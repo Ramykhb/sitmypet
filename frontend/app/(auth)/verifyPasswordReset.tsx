@@ -15,6 +15,7 @@ import {SafeAreaView} from "react-native-safe-area-context";
 import axios from "axios";
 import {backendPath} from "@/config/backConfig";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
+import api from "@/config/api";
 
 const OTP_LENGTH = 6;
 
@@ -87,7 +88,7 @@ export default function OtpInput({onChange}: { onChange?: (otp: string) => void 
             newOtp += String(otp);
         })
         try {
-            const res = await axios.post(`${backendPath}/auth/verify-otp`, {
+            const res = await api.post(`/auth/verify-otp`, {
                 email: email,
                 otp: newOtp,
             })
@@ -103,7 +104,7 @@ export default function OtpInput({onChange}: { onChange?: (otp: string) => void 
 
         setError("");
         try {
-            await axios.post(`${backendPath}/auth/request-password-reset`, {
+            await api.post(`/auth/request-password-reset`, {
                 email: email,
             });
             startResendCooldown();

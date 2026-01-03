@@ -10,6 +10,7 @@ import {Checkbox} from "expo-checkbox";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import axios from "axios";
 import {backendPath} from "@/config/backConfig";
+import api from "@/config/api";
 
 const SignUp = () => {
     const [isAccepted, setIsAccepted] = useState(false);
@@ -37,7 +38,7 @@ const SignUp = () => {
 
         try {
             delete (formData as Record<string, any>)['confirmPassword'];
-            const res = await axios.post(`${backendPath}/auth/register`, {
+            const res = await api.post(`/auth/register`, {
                 firstname: formData.firstname,
                 lastname: formData.lastname,
                 email: formData.email,
