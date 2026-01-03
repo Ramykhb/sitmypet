@@ -12,6 +12,17 @@ enum Role {
   SITTER
 }
 
+enum BookingStatus {
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum RequestStatus {
+  OPEN
+  CLOSED
+}
+
 model User {
   id                 String    @id @default(uuid())
   firstname          String
@@ -27,9 +38,78 @@ model User {
   passwordResetOtpAttempts   Int      @default(0)
   roles              Role[]
   activeRole         Role?
+  profileImageUrl    String?
   refreshTokenHash   String?
   refreshTokenJti    String?
   refreshTokenExp    DateTime?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
+
+  // Relations
+  ownedPets          Pet[]            @relation("PetOwner")
+  bookingsAsSitter   Booking[]        @relation("SitterBookings")
+  bookingsAsOwner    Booking[]        @relation("OwnerBookings")
+  requestsAsOwner    Request[]        @relation("OwnerRequests")
+  savedRequests      SavedRequest[]
+}
+
+model Pet {
+  id          String    @id @default(uuid())
+  name        String
+  breed       String?
+  imageUrl    String?
+  ownerId     String
+  owner       User      @relation("PetOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  bookings    Booking[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Booking {
+  id              String        @id @default(uuid())
+  sitterId        String
+  sitter          User          @relation("SitterBookings", fields: [sitterId], references: [id], onDelete: Cascade)
+  ownerId         String
+  owner           User          @relation("OwnerBookings", fields: [ownerId], references: [id], onDelete: Cascade)
+  petId           String
+  pet             Pet           @relation(fields: [petId], references: [id], onDelete: Cascade)
+  serviceType     String
+  location        String
+  scheduledTime   DateTime
+  status          BookingStatus @default(CONFIRMED)
+  hasNotification Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([sitterId, scheduledTime])
+  @@index([ownerId])
+}
+
+model Request {
+  id            String          @id @default(uuid())
+  ownerId       String
+  owner         User            @relation("OwnerRequests", fields: [ownerId], references: [id], onDelete: Cascade)
+  title         String
+  location      String
+  serviceType   String
+  duration      String
+  imageUrl      String?
+  status        RequestStatus   @default(OPEN)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  savedBy       SavedRequest[]
+
+  @@index([status, createdAt])
+}
+
+model SavedRequest {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  requestId  String
+  request    Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, requestId])
+  @@index([userId])
 }

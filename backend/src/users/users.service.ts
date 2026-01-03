@@ -171,11 +171,7 @@ export class UsersService {
     });
   }
 
-  async saveEmailOtp(
-    userId: string,
-    otpHash: string,
-    expiresAt: Date,
-  ) {
+  async saveEmailOtp(userId: string, otpHash: string, expiresAt: Date) {
     return this.prisma.user.update({
       where: { id: userId },
       data: {
@@ -223,11 +219,7 @@ export class UsersService {
     });
   }
 
-  async savePasswordResetOtp(
-    userId: string,
-    otpHash: string,
-    expiresAt: Date,
-  ) {
+  async savePasswordResetOtp(userId: string, otpHash: string, expiresAt: Date) {
     return this.prisma.user.update({
       where: { id: userId },
       data: {
