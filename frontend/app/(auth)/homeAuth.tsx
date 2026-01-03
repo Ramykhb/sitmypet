@@ -1,8 +1,10 @@
 import { Link, router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import axios from "axios";
+import { backendPath } from "@/config/backConfig";
 
 const HomeAuth = () => {
   const [name, setName] = useState("");
@@ -30,8 +32,19 @@ const HomeAuth = () => {
         <TouchableOpacity
           className="w-[75%] bg-[#3944D5] h-16 rounded-full flex flex-row items-center justify-center my-5"
           onPress={async () => {
-            await SecureStore.setItemAsync("role", "owner");
-            router.push("/(tabs)/(home)");
+            try {
+              const accessToken = await SecureStore.getItemAsync("accessToken");
+              const res = await axios.post(
+                `${backendPath}/auth/switch-role`,
+                { role: "OWNER" },
+                { headers: { Authorization: `Bearer ${accessToken}` } }
+              );
+              await SecureStore.setItemAsync("accessToken", res.data.accessToken);
+              await SecureStore.setItemAsync("role", "owner");
+              router.push("/(tabs)/(home)");
+            } catch (error) {
+              Alert.alert("Error", "Failed to switch role. Please try again.");
+            }
           }}
         >
           <Image
@@ -44,8 +57,19 @@ const HomeAuth = () => {
         <TouchableOpacity
           className="w-[75%] bg-[#0F1998] h-16 rounded-full flex flex-row items-center justify-center"
           onPress={async () => {
-            await SecureStore.setItemAsync("role", "sitter");
-            router.push("/(tabs)/(home)");
+            try {
+              const accessToken = await SecureStore.getItemAsync("accessToken");
+              const res = await axios.post(
+                `${backendPath}/auth/switch-role`,
+                { role: "SITTER" },
+                { headers: { Authorization: `Bearer ${accessToken}` } }
+              );
+              await SecureStore.setItemAsync("accessToken", res.data.accessToken);
+              await SecureStore.setItemAsync("role", "sitter");
+              router.push("/(tabs)/(home)");
+            } catch (error) {
+              Alert.alert("Error", "Failed to switch role. Please try again.");
+            }
           }}
         >
           <Image

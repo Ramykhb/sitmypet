@@ -107,39 +107,11 @@ export class AuthService {
     };
   }
 
-  async switchRole(userId: string, role: Role) {
-    const user = await this.usersService.findById(userId);
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    if (!user.roles.includes(role)) {
-      throw new ForbiddenException('Role not owned by user');
-    }
-
-    const payload: {
-      sub: string;
-      roles: Role[];
-      activeRole: Role;
-    } = {
-      sub: user.id,
-      roles: user.roles,
-      activeRole: role,
-    };
-
-    return {
-      accessToken: this.jwtService.sign(payload),
-      activeRole: role,
-    };
-  }
-
   async refresh(refreshToken: string) {
     let payload: {
       sub: string;
       jti: string;
       roles: Role[];
-      activeRole?: Role;
     };
 
     try {
@@ -179,11 +151,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    const tokens = this.generateTokens(
-      user.id,
-      user.roles,
-      user.activeRole ?? undefined,
-    );
+    const tokens = this.generateTokens(user.id, user.roles);
 
     void this.saveRefreshToken(user.id, tokens.refreshToken);
 
@@ -400,11 +368,10 @@ export class AuthService {
     return bcrypt.compare(token, hash);
   }
 
-  private generateTokens(userId: string, roles: Role[], activeRole?: Role) {
+  private generateTokens(userId: string, roles: Role[]) {
     const payload = {
       sub: userId,
       roles,
-      ...(activeRole && { activeRole }),
     };
 
     const accessToken = this.jwtService.sign(payload);

@@ -37,7 +37,6 @@ model User {
   passwordResetOtpExpires    DateTime?
   passwordResetOtpAttempts   Int      @default(0)
   roles              Role[]
-  activeRole         Role?
   profileImageUrl    String?
   refreshTokenHash   String?
   refreshTokenJti    String?

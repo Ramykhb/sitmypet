@@ -163,7 +163,6 @@ export class UsersService {
       select: {
         id: true,
         roles: true,
-        activeRole: true,
         refreshTokenHash: true,
         refreshTokenJti: true,
         refreshTokenExp: true,

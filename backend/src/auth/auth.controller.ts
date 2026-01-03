@@ -6,7 +6,6 @@ import { RegisterDto } from './dto/register.dto';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { SwitchRoleDto } from './dto/switch-role.dto';
 import { VerifyEmailOtpDto } from './dto/verify-email-otp.dto';
 import { VerifyPasswordResetOtpDto } from './dto/verify-password-reset-otp.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -23,15 +22,6 @@ export class AuthController {
   @Post('login')
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('switch-role')
-  switchRole(
-    @Req() req: { user: { sub: string } },
-    @Body() dto: SwitchRoleDto,
-  ) {
-    return this.authService.switchRole(req.user.sub, dto.role);
   }
 
   @Post('refresh')
