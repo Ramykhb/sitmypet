@@ -3,6 +3,9 @@ import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import axios from "axios";
+import {backendPath} from "@/config/backConfig";
+import api from "@/config/api";
 
 const HomeAuth = () => {
   const [name, setName] = useState("");
@@ -31,6 +34,13 @@ const HomeAuth = () => {
           className="w-[75%] bg-[#3944D5] h-16 rounded-full flex flex-row items-center justify-center my-5"
           onPress={async () => {
             await SecureStore.setItemAsync("role", "owner");
+            try {
+                await api.post(`/auth/switch-role`, {
+                    role: "OWNER"
+                })
+            } catch (error) {
+                console.error(error);
+            }
             router.push("/(tabs)/(home)");
           }}
         >
@@ -45,6 +55,13 @@ const HomeAuth = () => {
           className="w-[75%] bg-[#0F1998] h-16 rounded-full flex flex-row items-center justify-center"
           onPress={async () => {
             await SecureStore.setItemAsync("role", "sitter");
+              // try {
+              //     await api.post(`/auth/switch-role`, {
+              //         role: "SITTER"
+              //     })
+              // } catch (error) {
+              //     console.error(error);
+              // }
             router.push("/(tabs)/(home)");
           }}
         >

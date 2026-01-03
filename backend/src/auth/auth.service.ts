@@ -117,7 +117,6 @@ export class AuthService {
     if (!user.roles.includes(role)) {
       throw new ForbiddenException('Role not owned by user');
     }
-
     const payload: {
       sub: string;
       roles: Role[];

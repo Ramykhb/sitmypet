@@ -9,6 +9,7 @@ import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import {backendPath} from "@/config/backConfig";
+import api from "@/config/api";
 
 const Signin = () => {
     const [formData, setFormData] = useState({email: "", password: ""});
@@ -20,14 +21,16 @@ const Signin = () => {
             return;
         }
         try {
-            const res = await axios.post(`${backendPath}/auth/login`, formData);
+            const res = await api.post(`/auth/login`, formData);
             await SecureStore.setItemAsync('lastname', String(res.data.user.lastname));
             await SecureStore.setItemAsync('firstname', String(res.data.user.firstname));
             await SecureStore.setItemAsync('email', String(res.data.user.email));
             await SecureStore.setItemAsync('id', String(res.data.user.id));
             await SecureStore.setItemAsync('accessToken', String(res.data.accessToken));
+            await SecureStore.setItemAsync('refreshToken', String(res.data.refreshToken));
             router.push("/(auth)/homeAuth");
         } catch (error: any) {
+            console.error(error);
             if (error.status === 401) {
                 setError("Invalid email or password.");
             }

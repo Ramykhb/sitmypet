@@ -15,6 +15,7 @@ import {SafeAreaView} from "react-native-safe-area-context";
 import axios from "axios";
 import {backendPath} from "@/config/backConfig";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
+import api from "@/config/api";
 
 export default function OtpInput({onChange}: { onChange?: (otp: string) => void }) {
     const [email, setEmail] = useState("");
@@ -23,7 +24,7 @@ export default function OtpInput({onChange}: { onChange?: (otp: string) => void 
     const handleSubmit = async () => {
         setError("");
         try {
-            await axios.post(`${backendPath}/auth/request-password-reset`, {
+            await api.post(`/auth/request-password-reset`, {
                 email: email,
             });
             await SecureStore.setItemAsync("passResetEmail", email);
