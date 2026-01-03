@@ -40,7 +40,7 @@ export class UsersService {
         lastname: data.lastname,
         email: data.email,
         passwordHash: data.passwordHash,
-        roles: data.roles ?? [Role.OWNER],
+        roles: data.roles ?? [Role.OWNER, Role.SITTER],
       },
       select: userSelect,
     });
