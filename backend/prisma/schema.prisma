@@ -75,9 +75,9 @@ model Booking {
   location        String
   scheduledTime   DateTime
   status          BookingStatus @default(CONFIRMED)
-  hasNotification Boolean       @default(false)
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
+  review          Review?
 
   @@index([sitterId, scheduledTime])
   @@index([ownerId])
@@ -110,4 +110,16 @@ model SavedRequest {
 
   @@unique([userId, requestId])
   @@index([userId])
+}
+
+model Review {
+  id         String   @id @default(uuid())
+  bookingId  String   @unique
+  booking    Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  rating     Int      // 1-5 stars (whole numbers only)
+  comment    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([bookingId])
 }

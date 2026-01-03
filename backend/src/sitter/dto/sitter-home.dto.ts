@@ -6,7 +6,6 @@ export class TodaysBookingDto {
   serviceType: string;
   location: string;
   time: string;
-  hasNotification: boolean;
 }
 
 export class ClientHistoryDto {
@@ -21,8 +20,8 @@ export class NearbyRequestDto {
   location: string;
   serviceType: string;
   duration: string;
-  rating?: number;
-  reviewCount?: number;
+  rating: number;
+  reviewCount: number;
   imageUrl?: string;
   isSaved: boolean;
 }

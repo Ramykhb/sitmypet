@@ -10,8 +10,8 @@ type NearbyRequest = {
     isSaved: boolean;
     location: string;
     serviceType: string;
-    rating?: number;
-    reviewCount?: number;
+    rating: number;
+    reviewCount: number;
 };
 
 const SitterNearYouCard = (props: NearbyRequest) => {
@@ -23,7 +23,7 @@ const SitterNearYouCard = (props: NearbyRequest) => {
             }
         >
             <View className={"w-full h-[70%] rounded-2xl overflow-hidden relative"}>
-                {props.rating && props.reviewCount && (
+                {props.reviewCount > 0 && (
                     <View className={"rounded-full absolute top-3 left-3 z-10 overflow-hidden"}>
                         <BlurView
                             intensity={60}

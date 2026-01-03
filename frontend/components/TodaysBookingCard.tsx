@@ -2,7 +2,6 @@ import React from "react";
 import { Image, Text, View } from "react-native";
 
 type TodaysBooking = {
-    hasNotification: boolean;
     id: string;
     location: string;
     ownerImageURL: string;

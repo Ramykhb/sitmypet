@@ -107,32 +107,6 @@ export class AuthService {
     };
   }
 
-  async switchRole(userId: string, role: Role) {
-    const user = await this.usersService.findById(userId);
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    if (!user.roles.includes(role)) {
-      throw new ForbiddenException('Role not owned by user');
-    }
-    const payload: {
-      sub: string;
-      roles: Role[];
-      activeRole: Role;
-    } = {
-      sub: user.id,
-      roles: user.roles,
-      activeRole: role,
-    };
-
-    return {
-      accessToken: this.jwtService.sign(payload),
-      activeRole: role,
-    };
-  }
-
   async refresh(refreshToken: string) {
     let payload: {
       sub: string;

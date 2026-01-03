@@ -40,7 +40,6 @@ export class SitterService {
         hour: '2-digit',
         minute: '2-digit',
       }),
-      hasNotification: booking.hasNotification,
     }));
 
     const completedBookings = await this.prisma.booking.findMany({
@@ -75,6 +74,9 @@ export class SitterService {
               where: {
                 status: 'COMPLETED',
               },
+              include: {
+                review: true,
+              },
             },
           },
         },
@@ -91,11 +93,16 @@ export class SitterService {
     });
 
     const nearbyRequests = requests.map((request) => {
-      const completedBookings = request.owner.bookingsAsOwner.length;
+      const reviews = request.owner.bookingsAsOwner
+        .map((booking) => booking.review)
+        .filter((review) => review !== null);
+
+      const reviewCount = reviews.length;
       const rating =
-        completedBookings > 0
-          ? Math.min(4.3 + completedBookings * 0.1, 5.0)
-          : undefined;
+        reviewCount > 0
+          ? reviews.reduce((sum, review) => sum + review.rating, 0) /
+            reviewCount
+          : 0;
 
       return {
         id: request.id,
@@ -103,8 +110,8 @@ export class SitterService {
         location: request.location,
         serviceType: request.serviceType,
         duration: request.duration,
-        rating: rating ? Number(rating.toFixed(1)) : undefined,
-        reviewCount: completedBookings > 0 ? completedBookings : undefined,
+        rating: Number(rating.toFixed(1)),
+        reviewCount: reviewCount,
         imageUrl: request.imageUrl ?? undefined,
         isSaved: request.savedBy.length > 0,
       };

@@ -17,8 +17,8 @@ type NearbyRequest = {
     imageUrl: string;
     isSaved: boolean;
     serviceType: string;
-    rating?: number;
-    reviewCount?: number;
+    rating: number;
+    reviewCount: number;
 };
 
 type ClientHistory = {
@@ -28,7 +28,6 @@ type ClientHistory = {
 }
 
 type TodaysBooking = {
-    hasNotification: boolean;
     id: string;
     location: string;
     ownerImageURL: string;
