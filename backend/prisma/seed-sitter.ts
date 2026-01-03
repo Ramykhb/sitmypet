@@ -123,7 +123,6 @@ async function main() {
         location: 'Hamra, Beirut',
         scheduledTime: new Date(today.setHours(10, 0, 0, 0)),
         status: 'CONFIRMED',
-        hasNotification: true,
       },
     }),
     prisma.booking.create({
@@ -135,7 +134,6 @@ async function main() {
         location: 'Achrafieh, Beirut',
         scheduledTime: new Date(today.setHours(14, 30, 0, 0)),
         status: 'CONFIRMED',
-        hasNotification: false,
       },
     }),
   ]);
@@ -156,7 +154,6 @@ async function main() {
         location: 'Hamra, Beirut',
         scheduledTime: pastDate,
         status: 'COMPLETED',
-        hasNotification: false,
       },
     }),
     prisma.booking.create({
@@ -168,7 +165,6 @@ async function main() {
         location: 'Verdun, Beirut',
         scheduledTime: new Date(pastDate.getTime() - 2 * 24 * 60 * 60 * 1000),
         status: 'COMPLETED',
-        hasNotification: false,
       },
     }),
     prisma.booking.create({
@@ -180,7 +176,6 @@ async function main() {
         location: 'Mar Mikhael, Beirut',
         scheduledTime: new Date(pastDate.getTime() - 5 * 24 * 60 * 60 * 1000),
         status: 'COMPLETED',
-        hasNotification: false,
       },
     }),
   ]);

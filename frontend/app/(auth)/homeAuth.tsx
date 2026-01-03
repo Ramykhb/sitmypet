@@ -32,19 +32,8 @@ const HomeAuth = () => {
         <TouchableOpacity
           className="w-[75%] bg-[#3944D5] h-16 rounded-full flex flex-row items-center justify-center my-5"
           onPress={async () => {
-            try {
-              const accessToken = await SecureStore.getItemAsync("accessToken");
-              const res = await axios.post(
-                `${backendPath}/auth/switch-role`,
-                { role: "OWNER" },
-                { headers: { Authorization: `Bearer ${accessToken}` } }
-              );
-              await SecureStore.setItemAsync("accessToken", res.data.accessToken);
               await SecureStore.setItemAsync("role", "owner");
               router.push("/(tabs)/(home)");
-            } catch (error) {
-              Alert.alert("Error", "Failed to switch role. Please try again.");
-            }
           }}
         >
           <Image
@@ -58,13 +47,6 @@ const HomeAuth = () => {
           className="w-[75%] bg-[#0F1998] h-16 rounded-full flex flex-row items-center justify-center"
           onPress={async () => {
             try {
-              const accessToken = await SecureStore.getItemAsync("accessToken");
-              const res = await axios.post(
-                `${backendPath}/auth/switch-role`,
-                { role: "SITTER" },
-                { headers: { Authorization: `Bearer ${accessToken}` } }
-              );
-              await SecureStore.setItemAsync("accessToken", res.data.accessToken);
               await SecureStore.setItemAsync("role", "sitter");
               router.push("/(tabs)/(home)");
             } catch (error) {
