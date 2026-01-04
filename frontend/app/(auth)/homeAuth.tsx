@@ -1,13 +1,19 @@
 import { Link, router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
-import { Image, Text, TouchableOpacity, View, Alert } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import axios from "axios";
-import { backendPath } from "@/config/backConfig";
 
 const HomeAuth = () => {
   const [name, setName] = useState("");
+  const [sitLoading, setSitLoading] = useState(false);
+  const [ownLoading, setOwnLoading] = useState(false);
 
   useEffect(() => {
     const getName = async () => {
@@ -32,34 +38,46 @@ const HomeAuth = () => {
         <TouchableOpacity
           className="w-[75%] bg-[#3944D5] h-16 rounded-full flex flex-row items-center justify-center my-5"
           onPress={async () => {
-              await SecureStore.setItemAsync("role", "owner");
-              router.push("/(tabs)/(home)");
+            setOwnLoading(true);
+            await SecureStore.setItemAsync("role", "owner");
+            setOwnLoading(false);
+            router.push("/(tabs)/(home)");
           }}
         >
-          <Image
-            source={require("../../assets/icons/house-filled.png")}
-            alt="logo"
-            className="w-6 h-6 mr-3"
-          />
-          <Text className="text-white text-lg font-bold">Pet Owner</Text>
+          {ownLoading ? (
+            <ActivityIndicator color={"#FFFFFF"} size={"small"} />
+          ) : (
+            <>
+              <Image
+                source={require("../../assets/icons/house-filled.png")}
+                alt="logo"
+                className="w-6 h-6 mr-3"
+              />
+              <Text className="text-white text-lg font-bold">Pet Owner</Text>
+            </>
+          )}
         </TouchableOpacity>
         <TouchableOpacity
           className="w-[75%] bg-[#0F1998] h-16 rounded-full flex flex-row items-center justify-center"
           onPress={async () => {
-            try {
-              await SecureStore.setItemAsync("role", "sitter");
-              router.push("/(tabs)/(home)");
-            } catch (error) {
-              Alert.alert("Error", "Failed to switch role. Please try again.");
-            }
+            setSitLoading(true);
+            await SecureStore.setItemAsync("role", "sitter");
+            setSitLoading(false);
+            router.push("/(tabs)/(home)");
           }}
         >
-          <Image
-            source={require("../../assets/icons/paw.png")}
-            alt="logo"
-            className="w-6 h-6 mr-3"
-          />
-          <Text className="text-white text-lg font-bold">Pet Sitter</Text>
+          {sitLoading ? (
+            <ActivityIndicator color={"#FFFFFF"} size={"small"} />
+          ) : (
+            <>
+              <Image
+                source={require("../../assets/icons/paw.png")}
+                alt="logo"
+                className="w-6 h-6 mr-3"
+              />
+              <Text className="text-white text-lg font-bold">Pet Sitter</Text>
+            </>
+          )}
         </TouchableOpacity>
 
         <View className="flex-grow" />

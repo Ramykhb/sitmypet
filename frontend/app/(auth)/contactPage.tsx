@@ -1,34 +1,47 @@
-import React, {useState} from "react";
+import api from "@/config/api";
+import { router } from "expo-router";
+import React, { useState } from "react";
 import {
-    Alert,
-    Image,
-    Keyboard,
-    Linking,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View,
+  ActivityIndicator,
+  Alert,
+  Image,
+  Keyboard,
+  Linking,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
-import axios from "axios";
-import {router} from "expo-router";
-import {backendPath} from "@/config/backConfig";
-import api from "@/config/api";
 
 const ContactPage = () => {
-    const [formData, setFormData] = useState({fullName: "", email: "", subject: "", message: ""});
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+  const [loading, setLoading] = useState(false);
 
-    const handleSubmit = async () => {
-        try {
-            const res = await api.post(`/contact`, formData);
-            Alert.alert("Message Sent!", "Thanks for reaching out. We’ve received your message and will get back to you shortly.");
-            router.push("/");
-        } catch (error) {
-            console.log(error);
-        }
+  const handleSubmit = async () => {
+    if (!loading) {
+      try {
+        setLoading(true);
+        const res = await api.post(`/contact`, formData);
+        Alert.alert(
+          "Message Sent!",
+          "Thanks for reaching out. We’ve received your message and will get back to you shortly."
+        );
+        router.push("/");
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
     }
+  };
 
   return (
     <SafeAreaView className="flex-1 py-10" edges={["left", "right", "bottom"]}>
@@ -49,10 +62,10 @@ const ContactPage = () => {
                 }
                 value={formData.fullName}
                 onChangeText={(text) => {
-                    setFormData((prevState) => ({
-                        ...prevState,
-                        fullName: text
-                    }));
+                  setFormData((prevState) => ({
+                    ...prevState,
+                    fullName: text,
+                  }));
                 }}
                 autoCapitalize={"none"}
               ></TextInput>
@@ -65,10 +78,10 @@ const ContactPage = () => {
                 }
                 value={formData.email}
                 onChangeText={(text) => {
-                    setFormData((prevState) => ({
-                        ...prevState,
-                        email: text
-                    }));
+                  setFormData((prevState) => ({
+                    ...prevState,
+                    email: text,
+                  }));
                 }}
                 autoCapitalize={"none"}
               ></TextInput>
@@ -81,10 +94,10 @@ const ContactPage = () => {
                 }
                 value={formData.subject}
                 onChangeText={(text) => {
-                    setFormData((prevState) => ({
-                        ...prevState,
-                        subject: text
-                    }));
+                  setFormData((prevState) => ({
+                    ...prevState,
+                    subject: text,
+                  }));
                 }}
                 autoCapitalize={"none"}
               ></TextInput>
@@ -98,10 +111,10 @@ const ContactPage = () => {
                 multiline={true}
                 value={formData.message}
                 onChangeText={(text) => {
-                    setFormData((prevState) => ({
-                        ...prevState,
-                        message: text
-                    }));
+                  setFormData((prevState) => ({
+                    ...prevState,
+                    message: text,
+                  }));
                 }}
                 textAlignVertical={"top"}
               ></TextInput>
@@ -110,7 +123,13 @@ const ContactPage = () => {
               className="w-[85%] bg-[#3944D5] h-14 rounded-full flex flex-row items-center justify-center mt-7"
               onPress={handleSubmit}
             >
-              <Text className="text-white text-lg font-bold">Send Message</Text>
+              {loading ? (
+                <ActivityIndicator size={"small"} color={"#FFFFFF"} />
+              ) : (
+                <Text className="text-white text-lg font-bold">
+                  Send Message
+                </Text>
+              )}
             </TouchableOpacity>
             <TouchableOpacity
               className="w-[85%] bg-[#26BE5A] h-14 rounded-full flex flex-row items-center justify-center my-5"
