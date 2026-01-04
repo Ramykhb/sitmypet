@@ -44,20 +44,22 @@ api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
                 isRefreshing = true;
 
                 try {
-                    const res = await api.post(
+                    const res = await axios.post(
                         `${backendPath}/auth/refresh`,
-                        { accessToken: token, refreshToken:  refresh},
+                        { refreshToken:  refresh},
                         { withCredentials: true }
                     );
-
                     const newToken = res.data.accessToken;
+                    const newRefreshToken = res.data.refreshToken;
                     await SecureStore.setItemAsync("accessToken", newToken);
+                    await SecureStore.setItemAsync("refreshToken", newRefreshToken);
                     api.defaults.headers.common[
                         "Authorization"
                         ] = `Bearer ${newToken}`;
                     processQueue(null, newToken);
                     config.headers.Authorization = `Bearer ${newToken}`;
                 } catch (err) {
+                    console.log("ERRRRR");
                     processQueue(err, null);
                     await SecureStore.deleteItemAsync("accessToken");
                     router.replace("/(auth)/signin");
