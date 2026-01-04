@@ -24,17 +24,18 @@ const ContactPage = () => {
     message: "",
   });
   const [loading, setLoading] = useState(false);
+  const [isSent, setIsSent] = useState(false);
 
   const handleSubmit = async () => {
+      if (isSent){
+          router.back();
+          return;
+      }
     if (!loading) {
       try {
         setLoading(true);
         const res = await api.post(`/contact`, formData);
-        Alert.alert(
-          "Message Sent!",
-          "Thanks for reaching out. We’ve received your message and will get back to you shortly."
-        );
-        router.push("/");
+        setIsSent(true);
       } catch (error) {
         console.log(error);
       } finally {
@@ -53,8 +54,8 @@ const ContactPage = () => {
           keyboardOpeningTime={100}
           keyboardShouldPersistTaps="handled"
         >
-          <View className="flex flex-col flex-1 w-full px-10 items-center">
-            <View className={"px-5 w-full text-[#0A0A0A] "}>
+          <View className="flex flex-col flex-1 w-full px-10 items-center" style={isSent ? {justifyContent: "center"} : {}}>
+            <View className={"px-5 w-full text-[#0A0A0A] "} style={isSent ? {display: "none"} : {}}>
               <Text className={"text-xl"}>Full Name</Text>
               <TextInput
                 className={
@@ -70,7 +71,7 @@ const ContactPage = () => {
                 autoCapitalize={"none"}
               ></TextInput>
             </View>
-            <View className={"px-5 w-full mt-5 text-[#0A0A0A]"}>
+            <View className={"px-5 w-full mt-5 text-[#0A0A0A]"} style={isSent ? {display: "none"} : {}}>
               <Text className={"text-xl"}>Email</Text>
               <TextInput
                 className={
@@ -86,7 +87,7 @@ const ContactPage = () => {
                 autoCapitalize={"none"}
               ></TextInput>
             </View>
-            <View className={"px-5 w-full mt-5 text-[#0A0A0A]"}>
+            <View className={"px-5 w-full mt-5 text-[#0A0A0A]"} style={isSent ? {display: "none"} : {}}>
               <Text className={"text-xl"}>Subject</Text>
               <TextInput
                 className={
@@ -102,7 +103,7 @@ const ContactPage = () => {
                 autoCapitalize={"none"}
               ></TextInput>
             </View>
-            <View className={"px-5 w-full mt-5 text-[#0A0A0A]"}>
+            <View className={"px-5 w-full mt-5 text-[#0A0A0A]"} style={isSent ? {display: "none"} : {}}>
               <Text className={"text-xl"}>Message</Text>
               <TextInput
                 className={
@@ -119,6 +120,10 @@ const ContactPage = () => {
                 textAlignVertical={"top"}
               ></TextInput>
             </View>
+              <View className={"w-full flex items-center"} style={!isSent ? {display: "none"} : {}}>
+                  <Text className={"text-3xl text-[#0A0A0A] font-bold text-center mb-6 w-full px-10"}>We have received your message</Text>
+                  <Text className={"w-full px-12 text-center text-lg"}>An agent will contact you by email within 24 hours.</Text>
+              </View>
             <TouchableOpacity
               className="w-[85%] bg-[#3944D5] h-14 rounded-full flex flex-row items-center justify-center mt-7"
               onPress={handleSubmit}
@@ -126,9 +131,14 @@ const ContactPage = () => {
               {loading ? (
                 <ActivityIndicator size={"small"} color={"#FFFFFF"} />
               ) : (
-                <Text className="text-white text-lg font-bold">
-                  Send Message
-                </Text>
+                  <View className="flex flex-row items-center">
+                      <Image
+                          source={require('../../assets/icons/back-arrow-white.png')}
+                          className="w-5 h-5 mr-1"
+                          style={!isSent ? {display: "none"} : {}}
+                      />
+                      <Text className="text-white text-lg font-bold">{isSent ? "Go Back" : "Send Message"}</Text>
+                  </View>
               )}
             </TouchableOpacity>
             <TouchableOpacity
