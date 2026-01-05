@@ -61,8 +61,6 @@ export default function Sitter() {
       setIsLoading(true);
       try {
         const res = await api.get("/sitter/home");
-        console.log(res.data);
-
         setNearYouFound(res.data.nearbyRequests);
         setClientFound(res.data.recentClients);
         setBookingFound(res.data.todaysBookings);
