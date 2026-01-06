@@ -2,6 +2,7 @@ import {Stack, useRouter} from "expo-router";
 import {Image, Text, TouchableOpacity, View} from "react-native";
 import React from "react";
 import Signin from "@/app/(auth)/signin";
+import * as SecureStore from "expo-secure-store";
 
 export default function AuthLayout() {
     const router = useRouter();
@@ -19,8 +20,10 @@ export default function AuthLayout() {
                 name="signup"
                 options={{
                     header: () => (
-                        <View style={{ height: 120, justifyContent: 'flex-end', paddingLeft: 15}}>
-                            <TouchableOpacity onPress={() => {router.back();}}>
+                        <View style={{height: 120, justifyContent: 'flex-end', paddingLeft: 15}}>
+                            <TouchableOpacity onPress={() => {
+                                router.back();
+                            }}>
                                 <View className="flex flex-row items-center">
                                     <Image
                                         source={require('../../assets/icons/back-arrow.png')}
@@ -37,8 +40,15 @@ export default function AuthLayout() {
                 name="contactPage"
                 options={{
                     header: () => (
-                        <View style={{ height: 120, justifyContent: 'flex-end', paddingLeft: 15}}>
-                            <TouchableOpacity onPress={() => {router.back();}}>
+                        <View style={{height: 120, justifyContent: 'flex-end', paddingLeft: 15}}>
+                            <TouchableOpacity onPress={async () => {
+                                const role = await SecureStore.getItemAsync("role");
+                                if (role) {
+                                    router.push("/");
+                                } else {
+                                    router.back();
+                                }
+                            }}>
                                 <View className="flex flex-row items-center">
                                     <Image
                                         source={require('../../assets/icons/back-arrow.png')}
@@ -63,8 +73,10 @@ export default function AuthLayout() {
                 name="forgotPassword"
                 options={{
                     header: () => (
-                        <View style={{ height: 120, justifyContent: 'flex-end', paddingLeft: 15}}>
-                            <TouchableOpacity onPress={() => {router.back();}}>
+                        <View style={{height: 120, justifyContent: 'flex-end', paddingLeft: 15}}>
+                            <TouchableOpacity onPress={() => {
+                                router.back();
+                            }}>
                                 <View className="flex flex-row items-center">
                                     <Image
                                         source={require('../../assets/icons/back-arrow.png')}
@@ -81,8 +93,10 @@ export default function AuthLayout() {
                 name="verifyPasswordReset"
                 options={{
                     header: () => (
-                        <View style={{ height: 120, justifyContent: 'flex-end', paddingLeft: 15}}>
-                            <TouchableOpacity onPress={() => {router.back();}}>
+                        <View style={{height: 120, justifyContent: 'flex-end', paddingLeft: 15}}>
+                            <TouchableOpacity onPress={() => {
+                                router.back();
+                            }}>
                                 <View className="flex flex-row items-center">
                                     <Image
                                         source={require('../../assets/icons/back-arrow.png')}
@@ -99,8 +113,10 @@ export default function AuthLayout() {
                 name="resetPassword"
                 options={{
                     header: () => (
-                        <View style={{ height: 120, justifyContent: 'flex-end', paddingLeft: 15}}>
-                            <TouchableOpacity onPress={() => {router.back();}}>
+                        <View style={{height: 120, justifyContent: 'flex-end', paddingLeft: 15}}>
+                            <TouchableOpacity onPress={() => {
+                                router.back();
+                            }}>
                                 <View className="flex flex-row items-center">
                                     <Image
                                         source={require('../../assets/icons/back-arrow.png')}

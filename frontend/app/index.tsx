@@ -8,7 +8,6 @@ export default function Index() {
   useEffect(() => {
     const checkAuth = async () => {
       const userLoggedIn = await fakeCheckAuth();
-
       if (userLoggedIn) {
         router.replace("/(tabs)/(home)");
       } else {

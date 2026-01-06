@@ -10,10 +10,12 @@ export default function Index() {
     async function clearAuthData() {
         try {
             await SecureStore.deleteItemAsync("accessToken");
-            // You can delete other keys similarly
             await SecureStore.deleteItemAsync("firstname");
             await SecureStore.deleteItemAsync("lastname");
             await SecureStore.deleteItemAsync("email");
+            await SecureStore.deleteItemAsync("refreshToken");
+            await SecureStore.deleteItemAsync("role");
+
             console.log("Auth data cleared");
             router.push("/(auth)/signin");
         } catch (error) {
