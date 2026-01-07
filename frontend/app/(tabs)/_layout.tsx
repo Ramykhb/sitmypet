@@ -228,7 +228,7 @@ export default function TabsLayout() {
           />
         )}
         <Tabs.Screen
-          name="profile"
+          name="(profile)"
           options={{
             title: "Home",
             headerShown: false,

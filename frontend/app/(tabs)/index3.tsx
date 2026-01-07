@@ -9,7 +9,6 @@ export default function Index() {
     async function clearAuthData() {
         try {
             await SecureStore.deleteItemAsync("accessToken");
-            // You can delete other keys similarly
             await SecureStore.deleteItemAsync("firstname");
             await SecureStore.deleteItemAsync("lastname");
             await SecureStore.deleteItemAsync("email");
