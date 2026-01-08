@@ -62,7 +62,7 @@ export default function OtpInput({
         router.push("/(auth)/signin");
       } catch (error: any) {
         console.log(error);
-        setError("An error has occured.");
+        setError("An error has occurred.");
       } finally {
         setLoading(false);
       }
@@ -105,6 +105,7 @@ export default function OtpInput({
                 textContentType="none"
                 importantForAutofill="no"
                 returnKeyType="next"
+                value={newPassword}
                 onChangeText={(text) => {
                   setNewPassword(text);
                 }}
@@ -122,6 +123,7 @@ export default function OtpInput({
                 textContentType="none"
                 importantForAutofill="no"
                 returnKeyType="done"
+                value={confirmPassword}
                 onChangeText={(text) => {
                   setConfirmPassword(text);
                 }}

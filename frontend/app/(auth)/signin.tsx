@@ -49,7 +49,6 @@ const Signin = () => {
         );
         router.push("/(auth)/homeAuth");
       } catch (error: any) {
-        console.error(error);
         if (error.status === 401) {
           setError("Invalid email or password.");
         } else if (error.status === 403) {
