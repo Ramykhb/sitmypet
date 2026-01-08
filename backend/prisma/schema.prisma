@@ -49,6 +49,32 @@ model User {
   bookingsAsOwner    Booking[]        @relation("OwnerBookings")
   requestsAsOwner    Request[]        @relation("OwnerRequests")
   savedRequests      SavedRequest[]
+  sitterProfile      SitterProfile?
+}
+
+model SitterProfile {
+  id              String            @id @default(uuid())
+  userId          String            @unique
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  location        String
+  bio             String?
+  idDocumentUrl   String?
+  services        ServiceOffering[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+model ServiceOffering {
+  id              String        @id @default(uuid())
+  sitterProfileId String
+  sitterProfile   SitterProfile @relation(fields: [sitterProfileId], references: [id], onDelete: Cascade)
+  serviceType     String
+  price           Decimal       @db.Decimal(10, 2)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([sitterProfileId])
+  @@index([serviceType])
 }
 
 model Pet {

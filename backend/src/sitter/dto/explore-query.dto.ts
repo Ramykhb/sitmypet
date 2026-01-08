@@ -15,6 +15,11 @@ export class ExploreQueryDto {
   @IsOptional()
   @IsString()
   services?: string;
+
+  @IsOptional()
+  @IsString()
+  location?: string;
+  
   @IsOptional()
   @IsEnum(SortBy)
   sortBy?: SortBy;
