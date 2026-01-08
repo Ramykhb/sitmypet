@@ -1,5 +1,5 @@
-import { IsOptional, IsString, IsEnum, IsNumber, Min } from 'class-validator';
 import { Type } from 'class-transformer';
+import { IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 export enum SortBy {
   PRICE_LOW_TO_HIGH = 'price_low',
@@ -10,25 +10,24 @@ export enum SortBy {
 export class ExploreQueryDto {
   @IsOptional()
   @IsString()
-  search?: string; // Search by name, location, or service type
+  search?: string;
 
   @IsOptional()
   @IsString()
-  services?: string; // Comma-separated services to filter by (e.g., "Pet Walking,Pet Sitting")
-
+  services?: string;
   @IsOptional()
   @IsEnum(SortBy)
-  sortBy?: SortBy; // Sort by price or rating
+  sortBy?: SortBy;
 
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(1)
-  page?: number = 1; // Pagination page number
+  page?: number = 1;
 
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(1)
-  limit?: number = 20; // Items per page
+  limit?: number = 20;
 }

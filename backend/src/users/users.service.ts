@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 
 const userSelect = {
@@ -17,7 +18,7 @@ const userSelect = {
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async createUser(data: {
     firstname: string;
@@ -266,6 +267,73 @@ export class UsersService {
         refreshTokenJti: null,
         refreshTokenExp: null,
       },
+    });
+  }
+  async updateProfileImage(userId: string, imageUrl: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { profileImageUrl: imageUrl },
+      select: userSelect,
+    });
+  }
+
+  async updateEmail(userId: string, newEmail: string, passwordVerification: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const isPasswordValid = await bcrypt.compare(passwordVerification, user.passwordHash);
+    if (!isPasswordValid) {
+      throw new ConflictException('Invalid password');
+    }
+
+    const emailExists = await this.prisma.user.findUnique({ where: { email: newEmail } });
+    if (emailExists && emailExists.id !== userId) {
+      throw new ConflictException('Email already in use');
+    }
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { email: newEmail, emailVerified: false },
+      select: userSelect,
+    });
+  }
+
+  async changePassword(userId: string, oldPassword: string, newPassword: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const isPasswordValid = await bcrypt.compare(oldPassword, user.passwordHash);
+    if (!isPasswordValid) {
+      throw new ConflictException('Invalid old password');
+    }
+
+    const newPasswordHash = await bcrypt.hash(newPassword, 10);
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash: newPasswordHash },
+      select: userSelect,
+    });
+  }
+
+  async deleteAccount(userId: string, passwordVerification: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const isPasswordValid = await bcrypt.compare(passwordVerification, user.passwordHash);
+    if (!isPasswordValid) {
+      throw new ConflictException('Invalid password');
+    }
+
+    return this.prisma.user.delete({
+      where: { id: userId },
+      select: userSelect,
     });
   }
 }
