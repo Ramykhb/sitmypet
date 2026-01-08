@@ -1,8 +1,8 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
-  FileTypeValidator,
   Get,
   MaxFileSizeValidator,
   ParseFilePipe,
@@ -11,7 +11,7 @@ import {
   Req,
   UploadedFile,
   UseGuards,
-  UseInterceptors,
+  UseInterceptors
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -51,12 +51,14 @@ export class UsersController {
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), // 5MB
-          new FileTypeValidator({ fileType: 'image' }),
         ],
       }),
     )
     file: Express.Multer.File,
   ) {
+    if (!file.mimetype.match(/^image\/(jpg|jpeg|png|webp)$/)) {
+      throw new BadRequestException('Invalid file type');
+    }
     const imageUrl = `/uploads/${file.filename}`;
     return this.usersService.updateProfileImage(req.user.sub, imageUrl);
   }
