@@ -1,27 +1,44 @@
 import {router} from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import React from "react";
-import {Image, Text, TextInput, TouchableOpacity, View, StyleSheet} from "react-native";
+import React, {useEffect, useState} from "react";
+import {Image, Text, TextInput, TouchableOpacity, View, StyleSheet, FlatList} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 import "../global.css";
 import {BlurView} from "expo-blur";
+import api from "@/config/api";
+import SitterNearYouCardLoading from "@/components/SitterNearYouCardLoading";
+import SitterNearYouCard from "@/components/SitterNearYouCard";
+
+type NearbyRequest = {
+    id: string;
+    title: string;
+    location: string;
+    duration: string;
+    imageUrl: string;
+    isSaved: boolean;
+    serviceType: string;
+    rating: number;
+    reviewCount: number;
+};
 
 export default function Index() {
-    async function clearAuthData() {
-        try {
-            await SecureStore.deleteItemAsync("accessToken");
-            await SecureStore.deleteItemAsync("firstname");
-            await SecureStore.deleteItemAsync("lastname");
-            await SecureStore.deleteItemAsync("email");
-            await SecureStore.deleteItemAsync("refreshToken");
-            await SecureStore.deleteItemAsync("role");
+    const [nearYouFound, setNearYouFound] = useState<NearbyRequest[]>([]);
+    const [loading, setLoading] = useState(false);
 
-            console.log("Auth data cleared");
-            router.push("/(auth)/signin");
-        } catch (error) {
-            console.error("Failed to clear auth data:", error);
-        }
-    }
+    useEffect(() => {
+        const getNearYou = async () => {
+            setLoading(true);
+            try {
+                const res = await api.get("/sitter/explore");
+                setNearYouFound(res.data.requests);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        getNearYou();
+    }, []);
 
     return (
         <SafeAreaView className="flex-1">
@@ -164,7 +181,30 @@ export default function Index() {
                     </View>
                 </View>
             </View>
-            <Text>HELLO</Text>
+            {loading ? (
+                <View className="flex mt-5">
+                    <View className={"w-full h-60 px-8 mb-6"}>
+                        <SitterNearYouCardLoading/>
+                    </View>
+                    <View className={"w-full h-60 px-8 mb-6"}>
+                        <SitterNearYouCardLoading/>
+                    </View>
+                    <View className={"w-full h-60 px-8 mb-6"}>
+                        <SitterNearYouCardLoading/>
+                    </View>
+                </View>
+            ) : (
+                <FlatList
+                    data={nearYouFound}
+                    className={"w-full mb-16 mt-2"}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({item}) => (
+                        <View className={"w-full h-60 px-8 mb-6"}>
+                            <SitterNearYouCard {...item} />
+                        </View>
+                    )}
+                />
+            )}
         </SafeAreaView>
     );
 }

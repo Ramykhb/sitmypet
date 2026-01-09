@@ -150,7 +150,7 @@ export default function TabsLayout() {
           />
         ) : (
           <Tabs.Screen
-            name="index2"
+            name="secondTab"
             options={{
               title: "Home",
               headerShown: false,
@@ -201,7 +201,7 @@ export default function TabsLayout() {
           />
         ) : (
           <Tabs.Screen
-            name="index3"
+            name="thirdTab"
             options={{
               title: "Home",
               headerShown: false,
