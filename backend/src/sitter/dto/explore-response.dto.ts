@@ -1,19 +1,20 @@
-export class SitterProfileDto {
+export class JobRequestDto {
   id: string;
-  name: string;
+  ownerName: string;
+  ownerImageUrl?: string;
+  title: string;
   location: string;
-  services: string[];
-  pricePerHour: number;
-  profileImageUrl?: string;
-  rating: number; // Average rating from reviews
-  reviewCount: number;
-  bio?: string;
-  isVerified: boolean; // Whether the sitter is verified
+  serviceType: string;
+  duration: string; // e.g., "Jan 12 - Jan 14"
+  createdAt: Date;
+  // Potentially useful fields:
+  // description?: string;
+  // price?: number;
 }
 
 export class ExploreResponseDto {
-  sitters: SitterProfileDto[];
-  total: number; // Total count of sitters matching the query
+  requests: JobRequestDto[];
+  total: number; // Total count of requests matching the query
   page: number;
   limit: number;
   totalPages: number;

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ExploreQueryDto, SortBy } from './dto/explore-query.dto';
-import { ExploreResponseDto, SitterProfileDto } from './dto/explore-response.dto';
+import { ExploreResponseDto } from './dto/explore-response.dto';
 import { SitterHomeFeedDto } from './dto/sitter-home.dto';
 
 @Injectable()
@@ -141,163 +141,68 @@ export class SitterService {
     } = query;
 
     const where: any = {
-      roles: {
-        has: 'SITTER',
-      },
-      sitterProfile: {
-        isNot: null,
-      },
+      status: 'OPEN',
     };
 
     if (search) {
       where.OR = [
-        { firstname: { contains: search, mode: 'insensitive' } },
-        { lastname: { contains: search, mode: 'insensitive' } },
+        { title: { contains: search, mode: 'insensitive' } },
+        { location: { contains: search, mode: 'insensitive' } },
         {
-          sitterProfile: {
-            location: { contains: search, mode: 'insensitive' },
+          owner: {
+            OR: [
+              { firstname: { contains: search, mode: 'insensitive' } },
+              { lastname: { contains: search, mode: 'insensitive' } },
+            ],
           },
         },
       ];
     }
 
-    if (services) {
-      where.sitterProfile = {
-        ...where.sitterProfile,
-        services: {
-          some: {
-            serviceType: { contains: services, mode: 'insensitive' },
-          },
-        },
-      };
+    if (location) {
+      where.location = { contains: location, mode: 'insensitive' };
     }
 
-    const total = await this.prisma.user.count({ where });
+    if (services) {
+      where.serviceType = { contains: services, mode: 'insensitive' };
+    }
+
+    const total = await this.prisma.request.count({ where });
     const totalPages = Math.ceil(total / limit);
 
     const skip = (page - 1) * limit;
-    
-    const allMatchingSitterIds = await this.prisma.user.findMany({
-      where,
-      select: {
-        id: true,
-        createdAt: true,
-        sitterProfile: {
-          select: {
-            services: {
-              select: {
-                price: true,
-              },
-            },
-          },
-        },
-        bookingsAsSitter: {
-          select: {
-            review: {
-              select: {
-                rating: true,
-              },
-            },
-          },
-        },
-      },
-    });
 
-    let sortedSitterIds = allMatchingSitterIds.map((user) => {
-      const profile = user.sitterProfile!;
-      const serviceOfferings = profile.services;
+    let orderBy: any = { createdAt: 'desc' };
 
-      const prices = serviceOfferings.map((s) => Number(s.price));
-      const minPrice = prices.length > 0 ? Math.min(...prices) : 0;
-
-      const reviews = user.bookingsAsSitter
-        .map((b) => b.review)
-        .filter((r) => r !== null);
-      const totalRating = reviews.reduce((acc, r) => acc + (r?.rating || 0), 0);
-      const avgRating = reviews.length > 0 ? totalRating / reviews.length : 0;
-
-      return {
-        id: user.id,
-        pricePerHour: minPrice,
-        rating: avgRating,
-        createdAt: user.createdAt,
-      };
-    });
-
-    if (sortBy === SortBy.PRICE_LOW_TO_HIGH) {
-      sortedSitterIds.sort((a, b) => a.pricePerHour - b.pricePerHour);
-    } else if (sortBy === SortBy.PRICE_HIGH_TO_LOW) {
-      sortedSitterIds.sort((a, b) => b.pricePerHour - a.pricePerHour);
+    if (sortBy === SortBy.PRICE_LOW_TO_HIGH || sortBy === SortBy.PRICE_HIGH_TO_LOW) {
     } else if (sortBy === SortBy.RATING_HIGH_TO_LOW) {
-      sortedSitterIds.sort((a, b) => b.rating - a.rating);
     } else {
-      sortedSitterIds.sort(
-        (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-      );
+       orderBy = { createdAt: 'desc' };
     }
 
-    const paginatedIds = sortedSitterIds
-      .slice(skip, skip + limit)
-      .map((s) => s.id);
+    const requests = await this.prisma.request.findMany({
+      where,
+      include: {
+        owner: true,
+      },
+      orderBy,
+      skip,
+      take: limit,
+    });
 
-    let sitters: SitterProfileDto[] = [];
-    if (paginatedIds.length > 0) {
-      const users = await this.prisma.user.findMany({
-        where: { id: { in: paginatedIds } },
-        include: {
-          sitterProfile: {
-            include: {
-              services: true,
-            },
-          },
-          bookingsAsSitter: {
-            include: {
-              review: true,
-            },
-          },
-        },
-      });
-
-      const userMap = new Map(users.map((u) => [u.id, u]));
-
-      sitters = paginatedIds
-        .map((id) => {
-          const user = userMap.get(id);
-          if (!user) return null;
-
-          const profile = user.sitterProfile!;
-          const serviceOfferings = profile.services;
-          const prices = serviceOfferings.map((s) => Number(s.price));
-          const minPrice = prices.length > 0 ? Math.min(...prices) : 0;
-
-          const reviews = user.bookingsAsSitter
-            .map((b) => b.review)
-            .filter((r) => r !== null);
-          const sumRating = reviews.reduce(
-            (acc, r) => acc + (r?.rating || 0),
-            0,
-          );
-          const avgRating =
-            reviews.length > 0 ? sumRating / reviews.length : 0;
-
-          return {
-            id: user.id,
-            name: `${user.firstname} ${user.lastname}`,
-            location: profile.location,
-            services: serviceOfferings.map((s) => s.serviceType),
-            pricePerHour: minPrice,
-            profileImageUrl: user.profileImageUrl ?? undefined,
-            rating: Number(avgRating.toFixed(1)),
-            reviewCount: reviews.length,
-            bio: profile.bio ?? undefined,
-            isVerified: user.emailVerified,
-          } as SitterProfileDto;
-        })
-        .filter((s): s is SitterProfileDto => s !== null);
-    }
+    const requestDtos = requests.map((req) => ({
+      id: req.id,
+      ownerName: `${req.owner.firstname} ${req.owner.lastname}`,
+      ownerImageUrl: req.owner.profileImageUrl ?? undefined,
+      title: req.title,
+      location: req.location,
+      serviceType: req.serviceType,
+      duration: req.duration,
+      createdAt: req.createdAt,
+    }));
 
     return {
-      sitters,
+      requests: requestDtos,
       total,
       page,
       limit,
