@@ -1,7 +1,7 @@
 export class JobRequestDto {
   id: string;
   ownerName: string;
-  ownerImageUrl?: string;
+  imageUrl?: string; // Image of the request/pet
   title: string;
   location: string;
   serviceType: string;

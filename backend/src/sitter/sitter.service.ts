@@ -193,7 +193,7 @@ export class SitterService {
     const requestDtos = requests.map((req) => ({
       id: req.id,
       ownerName: `${req.owner.firstname} ${req.owner.lastname}`,
-      ownerImageUrl: req.owner.profileImageUrl ?? undefined,
+      imageUrl: req.imageUrl ?? undefined,
       title: req.title,
       location: req.location,
       serviceType: req.serviceType,
