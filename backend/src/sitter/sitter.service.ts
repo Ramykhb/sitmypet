@@ -231,7 +231,6 @@ export class SitterService {
     } else if (sortBy === SortBy.RATING_HIGH_TO_LOW) {
       sortedSitterIds.sort((a, b) => b.rating - a.rating);
     } else {
-      // by default 3meltela sort by created date (newest first)
       sortedSitterIds.sort(
         (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
       );
