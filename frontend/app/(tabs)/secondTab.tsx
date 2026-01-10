@@ -37,8 +37,8 @@ export default function Index() {
     const [filter_toggled, setFilterToggled] = useState(false);
     const [sort_toggled, setSortToggled] = useState(false);
     const [sortOption, setSortOption] = useState("");
-    const [sortTempOption, setSortTempOption] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
+    const [filterOptions, setFilterOptions] = useState({minRating: 0, location: "", services: ""});
     const filterHeight = useRef(new Animated.Value(0)).current;
     const sortHeight = useRef(new Animated.Value(0)).current;
 
@@ -49,7 +49,9 @@ export default function Index() {
             try {
                 const res = await api.get("/sitter/explore", {
                     params: {
+                        search: searchTerm,
                         sortBy: sortOption,
+                        ...filterOptions
                     },
                 });
                 setNearYouFound(res.data.requests);
@@ -69,7 +71,9 @@ export default function Index() {
                 try {
                     const res = await api.get("/sitter/explore", {
                         params: {
+                            search: searchTerm,
                             sortBy: sortOption,
+                            ...filterOptions
                         },
                     });
                     setNearYouFound(res.data.requests);
@@ -85,11 +89,11 @@ export default function Index() {
         return () => {
             clearTimeout(timeoutId);
         };
-    }, [searchTerm, sortOption]);
+    }, [searchTerm, sortOption, filterOptions]);
 
     useEffect(() => {
         Animated.timing(filterHeight, {
-            toValue: filter_toggled ? 300 : 0,
+            toValue: filter_toggled ? 250 : 0,
             duration: 300,
             useNativeDriver: false,
         }).start();
@@ -97,7 +101,7 @@ export default function Index() {
 
     useEffect(() => {
         Animated.timing(sortHeight, {
-            toValue: sort_toggled ? 330 : 0,
+            toValue: sort_toggled ? 280 : 0,
             duration: 300,
             useNativeDriver: false,
         }).start();
@@ -160,6 +164,7 @@ export default function Index() {
                                         zIndex: 2,
                                     }}
                                     value={searchTerm}
+                                    autoCapitalize={"none"}
                                     onChangeText={(text) => setSearchTerm(text)}
                                 />
                             </BlurView>
@@ -277,40 +282,69 @@ export default function Index() {
 
                     <Text className="text-sm text-gray-500 mb-2">Service Type</Text>
                     <View className="flex-row mb-4">
-                        <View className="px-4 py-2 mr-2 rounded-full bg-gray-200">
-                            <Text>Walking</Text>
-                        </View>
-                        <View className="px-4 py-2 mr-2 rounded-full bg-gray-200">
-                            <Text>Sitting</Text>
-                        </View>
-                        <View className="px-4 py-2 rounded-full bg-gray-200">
-                            <Text>Boarding</Text>
-                        </View>
+                        <TouchableOpacity className="px-4 py-2 mr-2 rounded-full bg-gray-200" style={filterOptions.services === "walking" ? {backgroundColor: "#0A0A0A"} : {}} onPress={() => {setFilterOptions(prevState => (filterOptions.services === "walking" ? {
+                            ...prevState,
+                            services: ""
+                        } : {
+                            ...prevState,
+                            services: "walking"
+                        }))}}>
+                            <Text style={filterOptions.services === "walking" ? { color: "white" } : { color: "black" }}>Walking</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity className="px-4 py-2 mr-2 rounded-full bg-gray-200" style={filterOptions.services === "sitting" ? {backgroundColor: "#0A0A0A"} : {}} onPress={() => {setFilterOptions(prevState => (filterOptions.services === "sitting" ? {
+                            ...prevState,
+                            services: ""
+                        } : {
+                            ...prevState,
+                            services: "sitting"
+                        }))}}>
+                            <Text style={filterOptions.services === "sitting" ? { color: "white" } : { color: "black" }}>Sitting</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity className="px-4 py-2 rounded-full bg-gray-200" style={filterOptions.services === "boarding" ? {backgroundColor: "#0A0A0A"} : {}} onPress={() => {setFilterOptions(prevState => (filterOptions.services === "boarding" ? {
+                            ...prevState,
+                            services: ""
+                        } : {
+                            ...prevState,
+                            services: "boarding"
+                        }))}}>
+                            <Text style={filterOptions.services === "boarding" ? { color: "white" } : { color: "black" }}>Boarding</Text>
+                        </TouchableOpacity>
                     </View>
 
                     <Text className="text-sm text-gray-500 mb-2">Minimum Rating</Text>
                     <View className="flex-row mb-6">
-                        <View className="px-4 py-2 mr-2 rounded-full bg-gray-200">
-                            <Text>★ 3+</Text>
-                        </View>
-                        <View className="px-4 py-2 mr-2 rounded-full bg-gray-200">
-                            <Text>★ 4+</Text>
-                        </View>
-                        <View className="px-4 py-2 rounded-full bg-gray-200">
-                            <Text>★ 5</Text>
-                        </View>
+                        <TouchableOpacity style={filterOptions.minRating === 3 ? {backgroundColor: "#0A0A0A"} : {}} className="px-4 py-2 mr-2 rounded-full bg-gray-200" onPress={() => {setFilterOptions(prevState => (filterOptions.minRating === 3 ? {
+                            ...prevState,
+                            minRating: 0
+                        } : {
+                            ...prevState,
+                            minRating: 3
+                        }))}}>
+                            <Text style={filterOptions.minRating === 3 ? { color: "white" } : { color: "black" }}>★ 3+</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={filterOptions.minRating === 4 ? {backgroundColor: "#0A0A0A"} : {}} className="px-4 py-2 mr-2 rounded-full bg-gray-200" onPress={() => {setFilterOptions(prevState => (filterOptions.minRating === 4 ? {
+                            ...prevState,
+                            minRating: 0
+                        } : {
+                            ...prevState,
+                            minRating: 4
+                        }))}}>
+                            <Text style={filterOptions.minRating === 4 ? { color: "white" } : { color: "black" }}>★ 4+</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={filterOptions.minRating === 5 ? {backgroundColor: "#0A0A0A"} : {}} className="px-4 py-2 rounded-full bg-gray-200" onPress={() => {setFilterOptions(prevState => (filterOptions.minRating === 5 ? {
+                            ...prevState,
+                            minRating: 0
+                        } : {
+                            ...prevState,
+                            minRating: 5
+                        }))}}>
+                            <Text style={filterOptions.minRating === 5 ? { color: "white" } : { color: "black" }}>★ 5</Text>
+                        </TouchableOpacity>
                     </View>
 
-                    <View className="flex-row justify-between mt-auto">
-                        <TouchableOpacity onPress={() => setFilterToggled(false)}>
+                    <View className="flex-row justify-between mt-4">
+                        <TouchableOpacity onPress={() => setFilterOptions({minRating: 0, location: "", services: ""})}>
                             <Text className="text-gray-500">Reset</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            onPress={() => setFilterToggled(false)}
-                            className="px-6 py-3 rounded-full bg-black"
-                        >
-                            <Text className="text-white font-semibold">Apply</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -322,51 +356,48 @@ export default function Index() {
                     shadowRadius: 20,
                     elevation: 20,
                 }}
-                className="w-full overflow-hidden px-5"
+                className="w-full overflow-hidden px-5 "
             >
                 <View
                     style={{
-                        flex: 1,
                         padding: 20,
                         paddingTop: 0,
-
+                        paddingBottom:0
                     }}
                 >
                     <Text className="text-xl font-semibold mb-4">Sort By</Text>
 
-                    <TouchableOpacity className="py-3 border-b border-gray-200" onPress={() => setSortOption("nearest_first")}>
-                        <Text className="text-base">Nearest First</Text>
-                    </TouchableOpacity>
+                    {/*<TouchableOpacity className="py-3 border-b border-gray-200 flex flex-row items-center" onPress={() => setSortOption("nearest_first")}>*/}
+                    {/*    <Image source={require("../../assets/icons/tick.png")} className={"w-4 h-4 mr-4"} style={sortOption !== "nearest_first" ? {display: "none"} : {}} />*/}
+                    {/*    <Text className="text-base">Nearest First</Text>*/}
+                    {/*</TouchableOpacity>*/}
 
 
-                    <TouchableOpacity className="py-3 border-b border-gray-200" onPress={() => setSortOption("highest_rated")}>
+                    <TouchableOpacity className="py-3 border-b border-gray-200 flex flex-row items-center" onPress={() => setSortOption("highest_rated")}>
+                        <Image source={require("../../assets/icons/tick.png")} className={"w-4 h-4 mr-4"} style={sortOption !== "highest_rated" ? {display: "none"} : {}} />
                         <Text className="text-base">Highest Rated</Text>
                     </TouchableOpacity>
 
 
-                    <TouchableOpacity className="py-3 border-b border-gray-200" onPress={() => setSortOption("most_reviews")}>
+                    <TouchableOpacity className="py-3 border-b border-gray-200 flex flex-row items-center" onPress={() => setSortOption("most_reviews")}>
+                        <Image source={require("../../assets/icons/tick.png")} className={"w-4 h-4 mr-4"} style={sortOption !== "most_reviews" ? {display: "none"} : {}} />
                         <Text className="text-base">Most Reviews</Text>
                     </TouchableOpacity>
 
 
-                    <TouchableOpacity className="py-3 border-b border-gray-200" onPress={() => setSortOption("lowest_price")}>
+                    <TouchableOpacity className="py-3 border-b border-gray-200 flex flex-row items-center" onPress={() => setSortOption("lowest_price")}>
+                        <Image source={require("../../assets/icons/tick.png")} className={"w-4 h-4 mr-4"} style={sortOption !== "lowest_price" ? {display: "none"} : {}} />
                         <Text className="text-base">Lowest Price</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity className="py-3" onPress={() => setSortOption("highest_price")}>
+                    <TouchableOpacity className="py-3 flex flex-row items-center" onPress={() => setSortOption("highest_price")}>
+                        <Image source={require("../../assets/icons/tick.png")} className={"w-4 h-4 mr-4"} style={sortOption !== "highest_price" ? {display: "none"} : {}} />
                         <Text className="text-base">Highest Price</Text>
                     </TouchableOpacity>
                 </View>
-                <View className="flex-row justify-between mt-auto">
-                    <TouchableOpacity onPress={() => setFilterToggled(false)}>
+                <View className="flex-row justify-between px-5 mt-8">
+                    <TouchableOpacity onPress={() => setSortOption("")}>
                         <Text className="text-gray-500">Reset</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        onPress={() => setFilterToggled(false)}
-                        className="px-6 py-3 rounded-full bg-black"
-                    >
-                        <Text className="text-white font-semibold">Apply</Text>
                     </TouchableOpacity>
                 </View>
             </Animated.View>

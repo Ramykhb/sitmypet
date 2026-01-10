@@ -58,11 +58,12 @@ api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
                         ] = `Bearer ${newToken}`;
                     processQueue(null, newToken);
                     config.headers.Authorization = `Bearer ${newToken}`;
-                } catch (err) {
-                    console.log("ERRRRR");
-                    processQueue(err, null);
-                    await SecureStore.deleteItemAsync("accessToken");
-                    router.replace("/(auth)/signin");
+                } catch (err: any) {
+                    if (err.status === 401 || err.status === 403) {
+                        processQueue(err, null);
+                        await SecureStore.deleteItemAsync("accessToken");
+                        router.replace("/(auth)/signin");
+                    }
                 } finally {
                     isRefreshing = false;
                 }
