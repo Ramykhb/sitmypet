@@ -1,20 +1,18 @@
 export class JobRequestDto {
   id: string;
   ownerName: string;
-  imageUrl?: string; // Image of the request/pet
+  imageUrl?: string;
   title: string;
   location: string;
   serviceType: string;
-  duration: string; // e.g., "Jan 12 - Jan 14"
+  duration: string;
   createdAt: Date;
-  // Potentially useful fields:
-  // description?: string;
-  // price?: number;
+  price?: number;
 }
 
 export class ExploreResponseDto {
   requests: JobRequestDto[];
-  total: number; // Total count of requests matching the query
+  total: number;
   page: number;
   limit: number;
   totalPages: number;
