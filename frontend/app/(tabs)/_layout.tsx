@@ -174,7 +174,7 @@ export default function TabsLayout() {
         )}
         {role === "owner" ? (
           <Tabs.Screen
-            name="index3"
+            name="thirdTab"
             options={{
               title: "Home",
               headerShown: false,

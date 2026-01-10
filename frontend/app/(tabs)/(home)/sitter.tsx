@@ -244,7 +244,7 @@ export default function Sitter() {
                 showsHorizontalScrollIndicator={false}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
-                  <View className="w-[300px] h-52 pl-8">
+                  <View className="w-[300px] h-60 pl-8">
                     <SitterNearYouCard {...item} />
                   </View>
                 )}

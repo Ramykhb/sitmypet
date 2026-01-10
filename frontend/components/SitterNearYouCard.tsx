@@ -22,7 +22,7 @@ const SitterNearYouCard = (props: NearbyRequest) => {
                 "flex flex-col px-4 py-4 w-full h-full rounded-3xl border-gray-300 border"
             }
         >
-            <View className={"w-full h-[70%] rounded-2xl overflow-hidden relative"}>
+            <View className={"w-full h-[75%] rounded-2xl overflow-hidden relative"}>
                 {props.reviewCount > 0 && (
                     <View className={"rounded-full absolute top-3 left-3 z-10 overflow-hidden"}>
                         <BlurView
