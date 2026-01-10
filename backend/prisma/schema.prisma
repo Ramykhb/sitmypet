@@ -116,6 +116,7 @@ model Request {
   title         String
   location      String
   serviceType   String
+  price         Decimal?        @db.Decimal(10, 2)
   duration      String
   imageUrl      String?
   status        RequestStatus   @default(OPEN)
