@@ -132,6 +132,7 @@ export class SitterService {
 
   async explore(query: ExploreQueryDto, userId: string): Promise<ExploreResponseDto> {
     const {
+      search,
       services,
       location,
       sortBy,
@@ -144,10 +145,25 @@ export class SitterService {
       where: { userId },
     });
     const sitterLocation = sitterProfile?.location || '';
-
+    
     const where: any = {
       status: 'OPEN',
     };
+
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { location: { contains: search, mode: 'insensitive' } },
+        {
+          owner: {
+            OR: [
+              { firstname: { contains: search, mode: 'insensitive' } },
+              { lastname: { contains: search, mode: 'insensitive' } },
+            ],
+          },
+        },
+      ];
+    }
 
     if (location) {
       where.location = { contains: location, mode: 'insensitive' };
@@ -157,38 +173,76 @@ export class SitterService {
       where.serviceType = { contains: services, mode: 'insensitive' };
     }
 
-    const total = await this.prisma.request.count({ where });
-    const totalPages = Math.ceil(total / limit);
-
-    const skip = (page - 1) * limit;
-
-    let orderBy: any = { createdAt: 'desc' };
-
-    if (sortBy === SortBy.PRICE_LOW_TO_HIGH || sortBy === SortBy.PRICE_HIGH_TO_LOW) {
-    } else if (sortBy === SortBy.RATING_HIGH_TO_LOW) {
-    } else {
-       orderBy = { createdAt: 'desc' };
-    }
-
     const requests = await this.prisma.request.findMany({
       where,
       include: {
-        owner: true,
+        owner: {
+          include: {
+            bookingsAsOwner: {
+              where: { status: 'COMPLETED' },
+              include: { review: true },
+            },
+          },
+        },
       },
-      orderBy,
-      skip,
-      take: limit,
     });
 
-    const requestDtos = requests.map((req) => ({
+    let processedRequests = requests.map((req) => {
+      const reviews = req.owner.bookingsAsOwner
+        .map((b) => b.review)
+        .filter((r) => r !== null);
+      
+      const totalRating = reviews.reduce((sum, r) => sum + (r?.rating || 0), 0);
+      const avgRating = reviews.length > 0 ? totalRating / reviews.length : 0;
+      const reviewCount = reviews.length;
+
+      const isNear = sitterLocation && req.location.toLowerCase().includes(sitterLocation.toLowerCase());
+
+      return {
+        ...req,
+        avgRating,
+        reviewCount,
+        isNear,
+      };
+    });
+
+    if (minRating !== undefined) {
+      processedRequests = processedRequests.filter((r) => r.avgRating >= minRating);
+    }
+
+    if (sortBy === SortBy.NEAREST_FIRST) {
+      processedRequests.sort((a, b) => {
+        if (a.isNear === b.isNear) return b.createdAt.getTime() - a.createdAt.getTime();
+        return a.isNear ? -1 : 1;
+      });
+    } else if (sortBy === SortBy.HIGHEST_RATED || sortBy === SortBy.RATING_HIGH_TO_LOW) {
+      processedRequests.sort((a, b) => b.avgRating - a.avgRating);
+    } else if (sortBy === SortBy.MOST_REVIEWS) {
+      processedRequests.sort((a, b) => b.reviewCount - a.reviewCount);
+    } else if (sortBy === SortBy.LOWEST_PRICE || sortBy === SortBy.PRICE_LOW_TO_HIGH) {
+      processedRequests.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
+    } else if (sortBy === SortBy.HIGHEST_PRICE || sortBy === SortBy.PRICE_HIGH_TO_LOW) {
+      processedRequests.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0));
+    } else {
+      processedRequests.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    }
+
+    const total = processedRequests.length;
+    const totalPages = Math.ceil(total / limit);
+    const start = (page - 1) * limit;
+    const end = start + limit;
+    const paginatedRequests = processedRequests.slice(start, end);
+
+    const requestDtos = paginatedRequests.map((req) => ({
       id: req.id,
       ownerName: `${req.owner.firstname} ${req.owner.lastname}`,
-      ownerImageUrl: req.owner.profileImageUrl ?? undefined,
+      imageUrl: req.imageUrl ?? undefined,
       title: req.title,
       location: req.location,
       serviceType: req.serviceType,
       duration: req.duration,
       createdAt: req.createdAt,
+      price: req.price ? Number(req.price) : undefined,
     }));
 
     return {
