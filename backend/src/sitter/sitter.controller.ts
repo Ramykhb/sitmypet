@@ -1,9 +1,9 @@
 import {
-  Controller,
-  Get,
-  Query,
-  Req,
-  UseGuards,
+    Controller,
+    Get,
+    Query,
+    Req,
+    UseGuards,
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -30,7 +30,16 @@ export class SitterController {
   }
 
   @Get('explore')
-  async explore(@Query() query: ExploreQueryDto) {
-    return this.sitterService.explore(query);
+  async explore(
+    @Query() query: ExploreQueryDto,
+    @Req()
+    req: {
+      user: {
+        sub: string;
+      };
+    },
+  ) {
+    const userId = req.user.sub;
+    return this.sitterService.explore(query, userId);
   }
 }

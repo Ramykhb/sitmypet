@@ -130,34 +130,24 @@ export class SitterService {
     };
   }
 
-  async explore(query: ExploreQueryDto): Promise<ExploreResponseDto> {
+  async explore(query: ExploreQueryDto, userId: string): Promise<ExploreResponseDto> {
     const {
-      search,
       services,
       location,
       sortBy,
+      minRating,
       page = 1,
       limit = 20,
     } = query;
 
+    const sitterProfile = await this.prisma.sitterProfile.findUnique({
+      where: { userId },
+    });
+    const sitterLocation = sitterProfile?.location || '';
+
     const where: any = {
       status: 'OPEN',
     };
-
-    if (search) {
-      where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { location: { contains: search, mode: 'insensitive' } },
-        {
-          owner: {
-            OR: [
-              { firstname: { contains: search, mode: 'insensitive' } },
-              { lastname: { contains: search, mode: 'insensitive' } },
-            ],
-          },
-        },
-      ];
-    }
 
     if (location) {
       where.location = { contains: location, mode: 'insensitive' };
@@ -193,7 +183,7 @@ export class SitterService {
     const requestDtos = requests.map((req) => ({
       id: req.id,
       ownerName: `${req.owner.firstname} ${req.owner.lastname}`,
-      imageUrl: req.imageUrl ?? undefined,
+      ownerImageUrl: req.owner.profileImageUrl ?? undefined,
       title: req.title,
       location: req.location,
       serviceType: req.serviceType,
