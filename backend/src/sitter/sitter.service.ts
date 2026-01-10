@@ -209,13 +209,7 @@ export class SitterService {
     if (minRating !== undefined) {
       processedRequests = processedRequests.filter((r) => r.avgRating >= minRating);
     }
-
-    if (sortBy === SortBy.NEAREST_FIRST) {
-      processedRequests.sort((a, b) => {
-        if (a.isNear === b.isNear) return b.createdAt.getTime() - a.createdAt.getTime();
-        return a.isNear ? -1 : 1;
-      });
-    } else if (sortBy === SortBy.HIGHEST_RATED || sortBy === SortBy.RATING_HIGH_TO_LOW) {
+    if (sortBy === SortBy.HIGHEST_RATED || sortBy === SortBy.RATING_HIGH_TO_LOW) {
       processedRequests.sort((a, b) => b.avgRating - a.avgRating);
     } else if (sortBy === SortBy.MOST_REVIEWS) {
       processedRequests.sort((a, b) => b.reviewCount - a.reviewCount);
