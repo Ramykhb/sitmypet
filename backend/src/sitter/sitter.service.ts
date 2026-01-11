@@ -166,7 +166,7 @@ export class SitterService {
     }
 
     if (location) {
-      where.location = { contains: location, mode: 'insensitive' };
+      where.location = { equals: location, mode: 'insensitive' };
     }
 
     if (services) {
@@ -237,6 +237,8 @@ export class SitterService {
       duration: req.duration,
       createdAt: req.createdAt,
       price: req.price ? Number(req.price) : undefined,
+      rating: Number(req.avgRating.toFixed(1)),
+      reviewCount: req.reviewCount,
     }));
 
     return {
