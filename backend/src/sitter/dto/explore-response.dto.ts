@@ -8,6 +8,8 @@ export class JobRequestDto {
   duration: string;
   createdAt: Date;
   price?: number;
+  rating: number;
+  reviewCount: number;
 }
 
 export class ExploreResponseDto {
