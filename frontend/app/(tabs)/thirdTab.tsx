@@ -64,7 +64,7 @@ export default function Saved() {
                     keyExtractor={(item) => item.id}
                     renderItem={({item}) => (
                         <View className={"w-full h-60 px-8 mb-6"}>
-                            <SitterNearYouCard {...item} />
+                            {/*<SitterNearYouCard {...item} />*/}
                         </View>
                     )}
                 />

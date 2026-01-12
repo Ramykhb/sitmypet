@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Image, ScrollView, Text, TouchableOpacity, View} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 import "../../global.css";
@@ -6,6 +6,9 @@ import {Link, router} from "expo-router";
 import * as SecureStore from "expo-secure-store";
 
 export default function Index() {
+    const [role, setRole] = useState<String>("");
+    const [name, setName] = useState<String>("");
+
     async function clearAuthData() {
         try {
             await SecureStore.deleteItemAsync("accessToken");
@@ -21,6 +24,21 @@ export default function Index() {
         }
     }
 
+    useEffect(() => {
+        const getUser = async () => {
+            try {
+                const userRole =  await SecureStore.getItemAsync("role");
+                setRole(userRole as String);
+                const fname = await SecureStore.getItemAsync("firstname");
+                const lname = await SecureStore.getItemAsync("lastname");
+                setName(fname + " " + lname);
+            } catch (e) {
+                console.log(e);
+            }
+        }
+        getUser();
+    })
+
     return (
         <SafeAreaView className="home-auth flex-1 ">
             <ScrollView className={"w-full mb-20"}>
@@ -30,10 +48,6 @@ export default function Index() {
                         <Image source={require("../../../assets/images/pfp.jpg")}
                                className={"w-44 h-44 my-5 mt-10 rounded-full"}/>
                         <Text className="text-[#0A0A0A] text-2xl font-bold">Ramy Khachab</Text>
-                        <View
-                            className={"flex justify-center items-center bg-green-500 rounded-full w-16 h-16 absolute right-24 bottom-14 border-4 border-white"}>
-                            <Image source={require("../../../assets/icons/pencil.png")} className={"w-8 h-8"}/>
-                        </View>
                     </View>
                     <TouchableOpacity
                         className={"w-full h-[60px] bg-[#dfe4e8] mt-5 rounded-full flex flex-row justify-center items-center"}>
@@ -102,6 +116,24 @@ export default function Index() {
                                    tintColor={"#555555"}/>
                         </TouchableOpacity>
                         <View className={"w-[75%] self-center h-[1px] bg-gray-300"}/>
+                        {role === "owner" ? <></> : <>
+                            <TouchableOpacity
+                                className={"w-full h-16 flex flex-row justify-between items-center pl-7 pr-2"}
+                                onPress={() => {
+                                    router.push("/(tabs)/(profile)/myDocuments")
+                                }}>
+                                <View className={"flex flex-row justify-center items-center"}>
+                                    <Image source={require("../../../assets/icons/document.png")}
+                                           className={"w-8 h-8 mr-4"}
+                                           tintColor={"#555555"}/>
+                                    <Text className={"text-[#0A0A0A] font-bold text-xl"}>My Documents</Text>
+                                </View>
+                                <Image source={require("../../../assets/icons/right-arrow.png")}
+                                       className={"w-4 h-4 mr-4 "}
+                                       tintColor={"#555555"}/>
+                            </TouchableOpacity>
+                            <View className={"w-[75%] self-center h-[1px] bg-gray-300"}/>
+                        </>}
                         <TouchableOpacity
                             className={"w-full h-16 flex flex-row justify-between items-center pl-7 pr-2"}
                             onPress={() => {
