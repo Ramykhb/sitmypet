@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingHorizontal: 20,
         overflow: 'hidden',
-        backgroundColor: "rgba(200,200,200,0.2)",
+        backgroundColor: "#e5e7eb",
     },
     buttonText: {
         fontSize: 13,
