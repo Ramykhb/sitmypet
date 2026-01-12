@@ -220,6 +220,12 @@ export class SitterService {
       processedRequests.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
     } else if (sortBy === SortBy.HIGHEST_PRICE || sortBy === SortBy.PRICE_HIGH_TO_LOW) {
       processedRequests.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0));
+    } else if (sortBy === SortBy.NEAREST_FIRST) {
+      processedRequests.sort((a, b) => {
+        if (a.isNear && !b.isNear) return -1;
+        if (!a.isNear && b.isNear) return 1;
+        return b.createdAt.getTime() - a.createdAt.getTime();
+      });
     } else {
       processedRequests.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     }
