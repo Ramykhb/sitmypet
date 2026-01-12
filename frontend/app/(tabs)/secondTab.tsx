@@ -301,45 +301,75 @@ export default function Index() {
 
                         <Text className="text-sm text-gray-500 mb-2">Service Type</Text>
                         <View className="flex-row mb-4">
-                            <TouchableOpacity className="px-4 py-2 mr-2 rounded-full bg-gray-200"
-                                              style={filterOptions.services === "walking" ? {backgroundColor: "#0A0A0A"} : {}}
-                                              onPress={() => {
-                                                  setFilterOptions(prevState => (filterOptions.services === "walking" ? {
-                                                      ...prevState,
-                                                      services: ""
-                                                  } : {
-                                                      ...prevState,
-                                                      services: "walking"
-                                                  }))
-                                              }}>
+                            <TouchableOpacity
+                                className="px-4 py-2 mr-2 rounded-full bg-gray-200"
+                                style={[
+                                    {
+                                        shadowColor: "#000",
+                                        shadowOffset: { width: 0, height: 1 },
+                                        shadowOpacity: 0.08,
+                                        shadowRadius: 3,
+                                        elevation: 2,
+                                    },
+                                    filterOptions.services === "walking" ? { backgroundColor: "#0A0A0A" } : {},
+                                ]}
+                                onPress={() => {
+                                    setFilterOptions(prevState => (filterOptions.services === "walking" ? {
+                                        ...prevState,
+                                        services: ""
+                                    } : {
+                                        ...prevState,
+                                        services: "walking"
+                                    }))
+                                }}>
                                 <Text
                                     style={filterOptions.services === "walking" ? {color: "white"} : {color: "black"}}>Walking</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity className="px-4 py-2 mr-2 rounded-full bg-gray-200"
-                                              style={filterOptions.services === "sitting" ? {backgroundColor: "#0A0A0A"} : {}}
-                                              onPress={() => {
-                                                  setFilterOptions(prevState => (filterOptions.services === "sitting" ? {
-                                                      ...prevState,
-                                                      services: ""
-                                                  } : {
-                                                      ...prevState,
-                                                      services: "sitting"
-                                                  }))
-                                              }}>
+                            <TouchableOpacity
+                                className="px-4 py-2 mr-2 rounded-full bg-gray-200"
+                                style={[
+                                    {
+                                        shadowColor: "#000",
+                                        shadowOffset: { width: 0, height: 1 },
+                                        shadowOpacity: 0.08,
+                                        shadowRadius: 3,
+                                        elevation: 2,
+                                    },
+                                    filterOptions.services === "sitting" ? { backgroundColor: "#0A0A0A" } : {},
+                                ]}
+                                onPress={() => {
+                                    setFilterOptions(prevState => (filterOptions.services === "sitting" ? {
+                                        ...prevState,
+                                        services: ""
+                                    } : {
+                                        ...prevState,
+                                        services: "sitting"
+                                    }))
+                                }}>
                                 <Text
                                     style={filterOptions.services === "sitting" ? {color: "white"} : {color: "black"}}>Sitting</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity className="px-4 py-2 rounded-full bg-gray-200"
-                                              style={filterOptions.services === "boarding" ? {backgroundColor: "#0A0A0A"} : {}}
-                                              onPress={() => {
-                                                  setFilterOptions(prevState => (filterOptions.services === "boarding" ? {
-                                                      ...prevState,
-                                                      services: ""
-                                                  } : {
-                                                      ...prevState,
-                                                      services: "boarding"
-                                                  }))
-                                              }}>
+                            <TouchableOpacity
+                                className="px-4 py-2 rounded-full bg-gray-200"
+                                style={[
+                                    {
+                                        shadowColor: "#000",
+                                        shadowOffset: { width: 0, height: 1 },
+                                        shadowOpacity: 0.08,
+                                        shadowRadius: 3,
+                                        elevation: 2,
+                                    },
+                                    filterOptions.services === "boarding" ? { backgroundColor: "#0A0A0A" } : {},
+                                ]}
+                                onPress={() => {
+                                    setFilterOptions(prevState => (filterOptions.services === "boarding" ? {
+                                        ...prevState,
+                                        services: ""
+                                    } : {
+                                        ...prevState,
+                                        services: "boarding"
+                                    }))
+                                }}>
                                 <Text
                                     style={filterOptions.services === "boarding" ? {color: "white"} : {color: "black"}}>Boarding</Text>
                             </TouchableOpacity>
@@ -347,42 +377,75 @@ export default function Index() {
 
                         <Text className="text-sm text-gray-500 mb-2">Minimum Rating</Text>
                         <View className="flex-row mb-6">
-                            <TouchableOpacity style={filterOptions.minRating === 3 ? {backgroundColor: "#0A0A0A"} : {}}
-                                              className="px-4 py-2 mr-2 rounded-full bg-gray-200" onPress={() => {
-                                setFilterOptions(prevState => (filterOptions.minRating === 3 ? {
-                                    ...prevState,
-                                    minRating: 0
-                                } : {
-                                    ...prevState,
-                                    minRating: 3
-                                }))
-                            }}>
+                            <TouchableOpacity
+                                className="px-4 py-2 mr-2 rounded-full bg-gray-200"
+                                style={[
+                                    {
+                                        shadowColor: "#000",
+                                        shadowOffset: { width: 0, height: 1 },
+                                        shadowOpacity: 0.08,
+                                        shadowRadius: 3,
+                                        elevation: 2,
+                                    },
+                                    filterOptions.minRating === 3 ? { backgroundColor: "#0A0A0A" } : {},
+                                ]}
+                                onPress={() => {
+                                    setFilterOptions(prevState => (filterOptions.minRating === 3 ? {
+                                        ...prevState,
+                                        minRating: 0
+                                    } : {
+                                        ...prevState,
+                                        minRating: 3
+                                    }))
+                                }}>
                                 <Text style={filterOptions.minRating === 3 ? {color: "white"} : {color: "black"}}>★
                                     3+</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={filterOptions.minRating === 4 ? {backgroundColor: "#0A0A0A"} : {}}
-                                              className="px-4 py-2 mr-2 rounded-full bg-gray-200" onPress={() => {
-                                setFilterOptions(prevState => (filterOptions.minRating === 4 ? {
-                                    ...prevState,
-                                    minRating: 0
-                                } : {
-                                    ...prevState,
-                                    minRating: 4
-                                }))
-                            }}>
+                            <TouchableOpacity
+                                className="px-4 py-2 mr-2 rounded-full bg-gray-200"
+                                style={[
+                                    {
+                                        shadowColor: "#000",
+                                        shadowOffset: { width: 0, height: 1 },
+                                        shadowOpacity: 0.08,
+                                        shadowRadius: 3,
+                                        elevation: 2,
+                                    },
+                                    filterOptions.minRating === 4 ? { backgroundColor: "#0A0A0A" } : {},
+                                ]}
+                                onPress={() => {
+                                    setFilterOptions(prevState => (filterOptions.minRating === 4 ? {
+                                        ...prevState,
+                                        minRating: 0
+                                    } : {
+                                        ...prevState,
+                                        minRating: 4
+                                    }))
+                                }}>
                                 <Text style={filterOptions.minRating === 4 ? {color: "white"} : {color: "black"}}>★
                                     4+</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={filterOptions.minRating === 5 ? {backgroundColor: "#0A0A0A"} : {}}
-                                              className="px-4 py-2 rounded-full bg-gray-200" onPress={() => {
-                                setFilterOptions(prevState => (filterOptions.minRating === 5 ? {
-                                    ...prevState,
-                                    minRating: 0
-                                } : {
-                                    ...prevState,
-                                    minRating: 5
-                                }))
-                            }}>
+                            <TouchableOpacity
+                                className="px-4 py-2 rounded-full bg-gray-200"
+                                style={[
+                                    {
+                                        shadowColor: "#000",
+                                        shadowOffset: { width: 0, height: 1 },
+                                        shadowOpacity: 0.08,
+                                        shadowRadius: 3,
+                                        elevation: 2,
+                                    },
+                                    filterOptions.minRating === 5 ? { backgroundColor: "#0A0A0A" } : {},
+                                ]}
+                                onPress={() => {
+                                    setFilterOptions(prevState => (filterOptions.minRating === 5 ? {
+                                        ...prevState,
+                                        minRating: 0
+                                    } : {
+                                        ...prevState,
+                                        minRating: 5
+                                    }))
+                                }}>
                                 <Text style={filterOptions.minRating === 5 ? {color: "white"} : {color: "black"}}>★
                                     5</Text>
                             </TouchableOpacity>
