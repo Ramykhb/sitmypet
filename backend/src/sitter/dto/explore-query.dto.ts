@@ -7,7 +7,7 @@ export enum SortBy {
   PRICE_HIGH_TO_LOW = 'price_high',
   RATING_HIGH_TO_LOW = 'rating',
   MOST_REVIEWS = 'most_reviews',
-  //NEAREST_FIRST = 'nearest_first',
+  NEAREST_FIRST = 'nearest_first',
   HIGHEST_RATED = 'highest_rated',
   LOWEST_PRICE = 'lowest_price',
   HIGHEST_PRICE = 'highest_price',
