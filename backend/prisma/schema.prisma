@@ -7,6 +7,140 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id                       String         @id @default(uuid())
+  email                    String         @unique @db.Citext
+  passwordHash             String
+  roles                    Role[]
+  createdAt                DateTime       @default(now())
+  updatedAt                DateTime       @updatedAt
+  firstname                String
+  lastname                 String
+  refreshTokenExp          DateTime?
+  refreshTokenHash         String?
+  refreshTokenJti          String?
+  emailVerified            Boolean        @default(false)
+  emailOtpAttempts         Int            @default(0)
+  emailOtpExpires          DateTime?
+  emailOtpHash             String?
+  passwordResetOtpAttempts Int            @default(0)
+  passwordResetOtpExpires  DateTime?
+  passwordResetOtpHash     String?
+  profileImageUrl          String?
+  bookingsAsOwner          Booking[]      @relation("OwnerBookings")
+  bookingsAsSitter         Booking[]      @relation("SitterBookings")
+  ownedPets                Pet[]          @relation("PetOwner")
+  requestsAsOwner          Request[]      @relation("OwnerRequests")
+  savedRequests            SavedRequest[]
+  sitterProfile            SitterProfile?
+}
+
+model SitterProfile {
+  id            String            @id @default(uuid())
+  userId        String            @unique
+  location      String
+  bio           String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  idDocumentUrl String?
+  services      ServiceOffering[]
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ServiceOffering {
+  id              String        @id @default(uuid())
+  sitterProfileId String
+  serviceType     String
+  price           Decimal       @db.Decimal(10, 2)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  sitterProfile   SitterProfile @relation(fields: [sitterProfileId], references: [id], onDelete: Cascade)
+
+  @@index([sitterProfileId])
+  @@index([serviceType])
+}
+
+model Pet {
+  id        String    @id @default(uuid())
+  name      String
+  breed     String?
+  imageUrl  String?
+  ownerId   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  bookings  Booking[]
+  owner     User      @relation("PetOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+}
+
+model Booking {
+  id            String        @id @default(uuid())
+  sitterId      String
+  ownerId       String
+  petId         String
+  serviceType   String
+  location      String
+  scheduledTime DateTime
+  status        BookingStatus @default(CONFIRMED)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  owner         User          @relation("OwnerBookings", fields: [ownerId], references: [id], onDelete: Cascade)
+  pet           Pet           @relation(fields: [petId], references: [id], onDelete: Cascade)
+  sitter        User          @relation("SitterBookings", fields: [sitterId], references: [id], onDelete: Cascade)
+  review        Review?
+
+  @@index([sitterId, scheduledTime])
+  @@index([ownerId])
+}
+
+model Request {
+  id          String         @id @default(uuid())
+  ownerId     String
+  title       String
+  location    String
+  serviceType String
+  duration    String
+  imageUrl    String?
+  status      RequestStatus  @default(OPEN)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  price       Decimal?       @db.Decimal(10, 2)
+  owner       User           @relation("OwnerRequests", fields: [ownerId], references: [id], onDelete: Cascade)
+  savedBy     SavedRequest[]
+
+  @@index([status, createdAt])
+}
+
+model SavedRequest {
+  id        String   @id @default(uuid())
+  userId    String
+  requestId String
+  createdAt DateTime @default(now())
+  request   Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, requestId])
+  @@index([userId])
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  bookingId String   @unique
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+}
+
+model Location {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 enum Role {
   OWNER
   SITTER
@@ -21,139 +155,4 @@ enum BookingStatus {
 enum RequestStatus {
   OPEN
   CLOSED
-}
-
-model User {
-  id                 String    @id @default(uuid())
-  firstname          String
-  lastname           String
-  email              String    @unique @db.Citext
-  emailVerified      Boolean   @default(false)
-  emailOtpHash       String?
-  emailOtpExpires    DateTime?
-  emailOtpAttempts   Int       @default(0)
-  passwordHash       String
-  passwordResetOtpHash       String?
-  passwordResetOtpExpires    DateTime?
-  passwordResetOtpAttempts   Int      @default(0)
-  roles              Role[]
-  profileImageUrl    String?
-  refreshTokenHash   String?
-  refreshTokenJti    String?
-  refreshTokenExp    DateTime?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-
-  ownedPets          Pet[]            @relation("PetOwner")
-  bookingsAsSitter   Booking[]        @relation("SitterBookings")
-  bookingsAsOwner    Booking[]        @relation("OwnerBookings")
-  requestsAsOwner    Request[]        @relation("OwnerRequests")
-  savedRequests      SavedRequest[]
-  sitterProfile      SitterProfile?
-}
-
-model SitterProfile {
-  id              String            @id @default(uuid())
-  userId          String            @unique
-  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  location        String
-  bio             String?
-  idDocumentUrl   String?
-  services        ServiceOffering[]
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-}
-
-model ServiceOffering {
-  id              String        @id @default(uuid())
-  sitterProfileId String
-  sitterProfile   SitterProfile @relation(fields: [sitterProfileId], references: [id], onDelete: Cascade)
-  serviceType     String
-  price           Decimal       @db.Decimal(10, 2)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-
-  @@index([sitterProfileId])
-  @@index([serviceType])
-}
-
-model Pet {
-  id          String    @id @default(uuid())
-  name        String
-  breed       String?
-  imageUrl    String?
-  ownerId     String
-  owner       User      @relation("PetOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  bookings    Booking[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-}
-
-model Booking {
-  id              String        @id @default(uuid())
-  sitterId        String
-  sitter          User          @relation("SitterBookings", fields: [sitterId], references: [id], onDelete: Cascade)
-  ownerId         String
-  owner           User          @relation("OwnerBookings", fields: [ownerId], references: [id], onDelete: Cascade)
-  petId           String
-  pet             Pet           @relation(fields: [petId], references: [id], onDelete: Cascade)
-  serviceType     String
-  location        String
-  scheduledTime   DateTime
-  status          BookingStatus @default(CONFIRMED)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  review          Review?
-
-  @@index([sitterId, scheduledTime])
-  @@index([ownerId])
-}
-
-model Request {
-  id            String          @id @default(uuid())
-  ownerId       String
-  owner         User            @relation("OwnerRequests", fields: [ownerId], references: [id], onDelete: Cascade)
-  title         String
-  location      String
-  serviceType   String
-  price         Decimal?        @db.Decimal(10, 2)
-  duration      String
-  imageUrl      String?
-  status        RequestStatus   @default(OPEN)
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  savedBy       SavedRequest[]
-
-  @@index([status, createdAt])
-}
-
-model SavedRequest {
-  id         String   @id @default(uuid())
-  userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  requestId  String
-  request    Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  createdAt  DateTime @default(now())
-
-  @@unique([userId, requestId])
-  @@index([userId])
-}
-
-model Review {
-  id         String   @id @default(uuid())
-  bookingId  String   @unique
-  booking    Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  rating     Int      // 1-5 stars (whole numbers only)
-  comment    String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  @@index([bookingId])
-}
-
-model Location {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
