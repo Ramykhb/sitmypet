@@ -166,7 +166,7 @@ export class SitterService {
     }
 
     if (location) {
-      where.location = { equals: location, mode: 'insensitive' };
+      where.location = { contains: location, mode: 'insensitive' };
     }
 
     if (services) {
