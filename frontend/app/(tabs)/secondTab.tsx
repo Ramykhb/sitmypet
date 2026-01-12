@@ -9,7 +9,6 @@ import {
     View,
     StyleSheet,
     FlatList,
-    TouchableWithoutFeedback
 } from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 import "../global.css";
@@ -18,6 +17,8 @@ import api from "@/config/api";
 import SitterNearYouCardLoading from "@/components/SitterNearYouCardLoading";
 import SitterNearYouCard from "@/components/SitterNearYouCard";
 import {Animated} from "react-native";
+import {Button, Menu, PaperProvider} from "react-native-paper";
+import CustomDropdown from "@/components/CustomDropdown";
 
 type NearbyRequest = {
     id: string;
@@ -31,8 +32,16 @@ type NearbyRequest = {
     reviewCount: number;
 };
 
+type Location = {
+    id: string;
+    createdAt: string;
+    name: string;
+    updatedAt: string;
+};
+
 export default function Index() {
     const [nearYouFound, setNearYouFound] = useState<NearbyRequest[]>([]);
+    const [locations, setLocations] = useState<Location[]>([]);
     const [loading, setLoading] = useState(false);
     const [filter_toggled, setFilterToggled] = useState(false);
     const [sort_toggled, setSortToggled] = useState(false);
@@ -55,6 +64,15 @@ export default function Index() {
                     },
                 });
                 setNearYouFound(res.data.requests);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+
+            try {
+                const res = await api.get("/locations");
+                setLocations(res.data);
             } catch (error) {
                 console.error(error);
             } finally {
@@ -93,7 +111,7 @@ export default function Index() {
 
     useEffect(() => {
         Animated.timing(filterHeight, {
-            toValue: filter_toggled ? 250 : 0,
+            toValue: filter_toggled ? 290 : 0,
             duration: 300,
             useNativeDriver: false,
         }).start();
@@ -108,323 +126,384 @@ export default function Index() {
     }, [sort_toggled]);
 
     return (
-        <SafeAreaView className="flex-1">
-            <View className="flex flex-col w-full p-10 items-center pb-5">
-                <Text className="text-[#0A0A0A] text-4xl self-start">Explore</Text>
-                <View className={"flex flex-row w-full items-center mt-6 justify-between"}>
-                    <View
-                        style={{
-                            shadowColor: "#000",
-                            shadowOffset: {width: 0, height: 8},
-                            shadowOpacity: 0.18,
-                            shadowRadius: 20,
-                            elevation: 12,
-                        }}
-                    >
+        <PaperProvider>
+            <SafeAreaView className="flex-1">
+                <View className="flex flex-col w-full p-10 items-center pb-5">
+                    <Text className="text-[#0A0A0A] text-4xl self-start">Explore</Text>
+                    <View className={"flex flex-row w-full items-center mt-6 justify-between"}>
                         <View
                             style={{
-                                borderRadius: 50,
-                                overflow: "hidden",
-                                width: 200,
-                                height: 50,
+                                shadowColor: "#000",
+                                shadowOffset: {width: 0, height: 8},
+                                shadowOpacity: 0.18,
+                                shadowRadius: 20,
+                                elevation: 12,
                             }}
                         >
-                            <BlurView
-                                intensity={30}
-                                tint="light"
+                            <View
                                 style={{
-                                    flex: 1,
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                    paddingHorizontal: 14,
-                                    borderWidth: 1,
-                                    borderColor: "rgba(255,255,255,0.25)",
+                                    borderRadius: 50,
+                                    overflow: "hidden",
+                                    width: 200,
+                                    height: 50,
+                                }}
+                            >
+                                <BlurView
+                                    intensity={30}
+                                    tint="light"
+                                    style={{
+                                        flex: 1,
+                                        flexDirection: "row",
+                                        alignItems: "center",
+                                        paddingHorizontal: 14,
+                                        borderWidth: 1,
+                                        borderColor: "rgba(255,255,255,0.25)",
+                                    }}
+                                >
+                                    <View
+                                        style={{
+                                            ...StyleSheet.absoluteFillObject,
+                                            backgroundColor: "rgba(210,210,210,0.15)",
+                                        }}
+                                    />
+
+                                    <Image
+                                        source={require("../../assets/icons/search.png")}
+                                        tintColor="#666666"
+                                        style={{width: 18, height: 18, marginRight: 8, zIndex: 2}}
+                                    />
+
+                                    <TextInput
+                                        placeholder="Search"
+                                        placeholderTextColor="#666666"
+                                        style={{
+                                            flex: 1,
+                                            color: "#666666",
+                                            fontSize: 14,
+                                            zIndex: 2,
+                                        }}
+                                        value={searchTerm}
+                                        autoCapitalize={"none"}
+                                        onChangeText={(text) => setSearchTerm(text)}
+                                    />
+                                </BlurView>
+                            </View>
+                        </View>
+                        <TouchableOpacity onPress={() => {
+                            setFilterToggled(!filter_toggled)
+                            setSortToggled(false);
+                        }}>
+                            <View
+                                style={{
+                                    shadowColor: "#000",
+                                    shadowOffset: {width: 0, height: 6},
+                                    shadowOpacity: 0.2,
+                                    shadowRadius: 14,
+                                    elevation: 10,
                                 }}
                             >
                                 <View
                                     style={{
-                                        ...StyleSheet.absoluteFillObject,
-                                        backgroundColor: "rgba(210,210,210,0.15)",
+                                        borderRadius: 50,
+                                        overflow: "hidden",
+                                        width: 50,
+                                        height: 50,
                                     }}
-                                />
+                                >
+                                    <BlurView
+                                        intensity={30}
+                                        tint="light"
+                                        style={{
+                                            flex: 1,
+                                            flexDirection: "row",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            borderWidth: 1,
+                                            borderColor: "rgba(255,255,255,0.25)",
+                                        }}
+                                    >
+                                        <View
+                                            style={{
+                                                ...StyleSheet.absoluteFillObject,
+                                                backgroundColor: "rgba(210,210,210,0.15)",
+                                            }}
+                                        />
+                                        <Image source={require("../../assets/icons/filter.png")} className={"w-8 h-8"}/>
 
-                                <Image
-                                    source={require("../../assets/icons/search.png")}
-                                    tintColor="#666666"
-                                    style={{width: 18, height: 18, marginRight: 8, zIndex: 2}}
-                                />
-
-                                <TextInput
-                                    placeholder="Search"
-                                    placeholderTextColor="#666666"
+                                    </BlurView>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => {
+                            setSortToggled(!sort_toggled);
+                            setFilterToggled(false)
+                        }}>
+                            <View
+                                style={{
+                                    shadowColor: "#000",
+                                    shadowOffset: {width: 0, height: 6},
+                                    shadowOpacity: 0.2,
+                                    shadowRadius: 14,
+                                    elevation: 10,
+                                }}
+                            >
+                                <View
                                     style={{
-                                        flex: 1,
-                                        color: "#666666",
-                                        fontSize: 14,
-                                        zIndex: 2,
+                                        borderRadius: 50,
+                                        overflow: "hidden",
+                                        width: 50,
+                                        height: 50,
                                     }}
-                                    value={searchTerm}
-                                    autoCapitalize={"none"}
-                                    onChangeText={(text) => setSearchTerm(text)}
-                                />
-                            </BlurView>
-                        </View>
+                                >
+                                    <BlurView
+                                        intensity={30}
+                                        tint="light"
+                                        style={{
+                                            flex: 1,
+                                            flexDirection: "row",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            borderWidth: 1,
+                                            borderColor: "rgba(255,255,255,0.25)",
+                                        }}
+                                    >
+                                        <View
+                                            style={{
+                                                ...StyleSheet.absoluteFillObject,
+                                                backgroundColor: "rgba(210,210,210,0.15)",
+                                            }}
+                                        />
+                                        <Image source={require("../../assets/icons/sort.png")} className={"w-8 h-8"}/>
+                                    </BlurView>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
                     </View>
-                    <TouchableOpacity onPress={() => {
-                        setFilterToggled(!filter_toggled)
-                        setSortToggled(false);
-                    }}>
-                        <View
-                            style={{
-                                shadowColor: "#000",
-                                shadowOffset: {width: 0, height: 6},
-                                shadowOpacity: 0.2,
-                                shadowRadius: 14,
-                                elevation: 10,
-                            }}
-                        >
-                            <View
-                                style={{
-                                    borderRadius: 50,
-                                    overflow: "hidden",
-                                    width: 50,
-                                    height: 50,
-                                }}
-                            >
-                                <BlurView
-                                    intensity={30}
-                                    tint="light"
-                                    style={{
-                                        flex: 1,
-                                        flexDirection: "row",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        borderWidth: 1,
-                                        borderColor: "rgba(255,255,255,0.25)",
-                                    }}
-                                >
-                                    <View
-                                        style={{
-                                            ...StyleSheet.absoluteFillObject,
-                                            backgroundColor: "rgba(210,210,210,0.15)",
-                                        }}
-                                    />
-                                    <Image source={require("../../assets/icons/filter.png")} className={"w-8 h-8"}/>
-
-                                </BlurView>
-                            </View>
-                        </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => {
-                        setSortToggled(!sort_toggled);
-                        setFilterToggled(false)
-                    }}>
-                        <View
-                            style={{
-                                shadowColor: "#000",
-                                shadowOffset: {width: 0, height: 6},
-                                shadowOpacity: 0.2,
-                                shadowRadius: 14,
-                                elevation: 10,
-                            }}
-                        >
-                            <View
-                                style={{
-                                    borderRadius: 50,
-                                    overflow: "hidden",
-                                    width: 50,
-                                    height: 50,
-                                }}
-                            >
-                                <BlurView
-                                    intensity={30}
-                                    tint="light"
-                                    style={{
-                                        flex: 1,
-                                        flexDirection: "row",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        borderWidth: 1,
-                                        borderColor: "rgba(255,255,255,0.25)",
-                                    }}
-                                >
-                                    <View
-                                        style={{
-                                            ...StyleSheet.absoluteFillObject,
-                                            backgroundColor: "rgba(210,210,210,0.15)",
-                                        }}
-                                    />
-                                    <Image source={require("../../assets/icons/sort.png")} className={"w-8 h-8"}/>
-                                </BlurView>
-                            </View>
-                        </View>
-                    </TouchableOpacity>
                 </View>
-            </View>
 
-            <Animated.View
-                style={{
-                    height: filterHeight,
-                    shadowOpacity: 0.25,
-                    shadowRadius: 20,
-                    elevation: 20,
-                }}
-                className="w-full overflow-hidden px-5"
-            >
-                <View
+                <Animated.View
                     style={{
-                        flex: 1,
-                        paddingTop: 0,
-                        padding: 20,
+                        height: filterHeight,
+                        shadowOpacity: 0.25,
+                        shadowRadius: 20,
+                        elevation: 20,
                     }}
+                    className="w-full overflow-hidden px-5"
                 >
-                    <Text className="text-xl font-semibold mb-4">Filters</Text>
+                    <View
+                        style={{
+                            flex: 1,
+                            paddingTop: 0,
+                            padding: 20,
+                        }}
+                    >
+                        <Text className="text-xl font-semibold mb-4">Filters</Text>
 
-                    <Text className="text-sm text-gray-500 mb-2">Service Type</Text>
-                    <View className="flex-row mb-4">
-                        <TouchableOpacity className="px-4 py-2 mr-2 rounded-full bg-gray-200" style={filterOptions.services === "walking" ? {backgroundColor: "#0A0A0A"} : {}} onPress={() => {setFilterOptions(prevState => (filterOptions.services === "walking" ? {
-                            ...prevState,
-                            services: ""
-                        } : {
-                            ...prevState,
-                            services: "walking"
-                        }))}}>
-                            <Text style={filterOptions.services === "walking" ? { color: "white" } : { color: "black" }}>Walking</Text>
+                        <Text className="text-sm text-gray-500 mb-2">Service Type</Text>
+                        <View className="flex-row mb-4">
+                            <TouchableOpacity className="px-4 py-2 mr-2 rounded-full bg-gray-200"
+                                              style={filterOptions.services === "walking" ? {backgroundColor: "#0A0A0A"} : {}}
+                                              onPress={() => {
+                                                  setFilterOptions(prevState => (filterOptions.services === "walking" ? {
+                                                      ...prevState,
+                                                      services: ""
+                                                  } : {
+                                                      ...prevState,
+                                                      services: "walking"
+                                                  }))
+                                              }}>
+                                <Text
+                                    style={filterOptions.services === "walking" ? {color: "white"} : {color: "black"}}>Walking</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity className="px-4 py-2 mr-2 rounded-full bg-gray-200"
+                                              style={filterOptions.services === "sitting" ? {backgroundColor: "#0A0A0A"} : {}}
+                                              onPress={() => {
+                                                  setFilterOptions(prevState => (filterOptions.services === "sitting" ? {
+                                                      ...prevState,
+                                                      services: ""
+                                                  } : {
+                                                      ...prevState,
+                                                      services: "sitting"
+                                                  }))
+                                              }}>
+                                <Text
+                                    style={filterOptions.services === "sitting" ? {color: "white"} : {color: "black"}}>Sitting</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity className="px-4 py-2 rounded-full bg-gray-200"
+                                              style={filterOptions.services === "boarding" ? {backgroundColor: "#0A0A0A"} : {}}
+                                              onPress={() => {
+                                                  setFilterOptions(prevState => (filterOptions.services === "boarding" ? {
+                                                      ...prevState,
+                                                      services: ""
+                                                  } : {
+                                                      ...prevState,
+                                                      services: "boarding"
+                                                  }))
+                                              }}>
+                                <Text
+                                    style={filterOptions.services === "boarding" ? {color: "white"} : {color: "black"}}>Boarding</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        <Text className="text-sm text-gray-500 mb-2">Minimum Rating</Text>
+                        <View className="flex-row mb-6">
+                            <TouchableOpacity style={filterOptions.minRating === 3 ? {backgroundColor: "#0A0A0A"} : {}}
+                                              className="px-4 py-2 mr-2 rounded-full bg-gray-200" onPress={() => {
+                                setFilterOptions(prevState => (filterOptions.minRating === 3 ? {
+                                    ...prevState,
+                                    minRating: 0
+                                } : {
+                                    ...prevState,
+                                    minRating: 3
+                                }))
+                            }}>
+                                <Text style={filterOptions.minRating === 3 ? {color: "white"} : {color: "black"}}>★
+                                    3+</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={filterOptions.minRating === 4 ? {backgroundColor: "#0A0A0A"} : {}}
+                                              className="px-4 py-2 mr-2 rounded-full bg-gray-200" onPress={() => {
+                                setFilterOptions(prevState => (filterOptions.minRating === 4 ? {
+                                    ...prevState,
+                                    minRating: 0
+                                } : {
+                                    ...prevState,
+                                    minRating: 4
+                                }))
+                            }}>
+                                <Text style={filterOptions.minRating === 4 ? {color: "white"} : {color: "black"}}>★
+                                    4+</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={filterOptions.minRating === 5 ? {backgroundColor: "#0A0A0A"} : {}}
+                                              className="px-4 py-2 rounded-full bg-gray-200" onPress={() => {
+                                setFilterOptions(prevState => (filterOptions.minRating === 5 ? {
+                                    ...prevState,
+                                    minRating: 0
+                                } : {
+                                    ...prevState,
+                                    minRating: 5
+                                }))
+                            }}>
+                                <Text style={filterOptions.minRating === 5 ? {color: "white"} : {color: "black"}}>★
+                                    5</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <Text className="text-sm text-gray-500 mb-2">Location</Text>
+                        <CustomDropdown
+                            data={locations}
+                            value={filterOptions.location}
+                            onChange={(value: any) =>
+                                setFilterOptions(prevState => ({
+                                    ...prevState,
+                                    location: value,
+                                }))
+                            }
+                            placeholder="Select location"
+                        />
+
+                        <View className="flex-row justify-between mt-6">
+                            <TouchableOpacity
+                                onPress={() => setFilterOptions({minRating: 0, location: "", services: ""})}>
+                                <Text className="text-gray-500">Reset</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Animated.View>
+                <Animated.View
+                    style={{
+                        height: sortHeight,
+                        shadowOpacity: 0.25,
+                        shadowRadius: 20,
+                        elevation: 20,
+                    }}
+                    className="w-full overflow-hidden px-5 "
+                >
+                    <View
+                        style={{
+                            padding: 20,
+                            paddingTop: 0,
+                            paddingBottom: 0
+                        }}
+                    >
+                        <Text className="text-xl font-semibold mb-4">Sort By</Text>
+
+                        {/*<TouchableOpacity className="py-3 border-b border-gray-200 flex flex-row items-center" onPress={() => setSortOption("nearest_first")}>*/}
+                        {/*    <Image source={require("../../assets/icons/tick.png")} className={"w-4 h-4 mr-4"} style={sortOption !== "nearest_first" ? {display: "none"} : {}} />*/}
+                        {/*    <Text className="text-base">Nearest First</Text>*/}
+                        {/*</TouchableOpacity>*/}
+
+
+                        <TouchableOpacity className="py-3 border-b border-gray-200 flex flex-row items-center"
+                                          onPress={() => setSortOption("highest_rated")}>
+                            <Image source={require("../../assets/icons/tick.png")} className={"w-4 h-4 mr-4"}
+                                   style={sortOption !== "highest_rated" ? {display: "none"} : {}}/>
+                            <Text className="text-base">Highest Rated</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity className="px-4 py-2 mr-2 rounded-full bg-gray-200" style={filterOptions.services === "sitting" ? {backgroundColor: "#0A0A0A"} : {}} onPress={() => {setFilterOptions(prevState => (filterOptions.services === "sitting" ? {
-                            ...prevState,
-                            services: ""
-                        } : {
-                            ...prevState,
-                            services: "sitting"
-                        }))}}>
-                            <Text style={filterOptions.services === "sitting" ? { color: "white" } : { color: "black" }}>Sitting</Text>
+
+
+                        <TouchableOpacity className="py-3 border-b border-gray-200 flex flex-row items-center"
+                                          onPress={() => setSortOption("most_reviews")}>
+                            <Image source={require("../../assets/icons/tick.png")} className={"w-4 h-4 mr-4"}
+                                   style={sortOption !== "most_reviews" ? {display: "none"} : {}}/>
+                            <Text className="text-base">Most Reviews</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity className="px-4 py-2 rounded-full bg-gray-200" style={filterOptions.services === "boarding" ? {backgroundColor: "#0A0A0A"} : {}} onPress={() => {setFilterOptions(prevState => (filterOptions.services === "boarding" ? {
-                            ...prevState,
-                            services: ""
-                        } : {
-                            ...prevState,
-                            services: "boarding"
-                        }))}}>
-                            <Text style={filterOptions.services === "boarding" ? { color: "white" } : { color: "black" }}>Boarding</Text>
+
+
+                        <TouchableOpacity className="py-3 border-b border-gray-200 flex flex-row items-center"
+                                          onPress={() => setSortOption("lowest_price")}>
+                            <Image source={require("../../assets/icons/tick.png")} className={"w-4 h-4 mr-4"}
+                                   style={sortOption !== "lowest_price" ? {display: "none"} : {}}/>
+                            <Text className="text-base">Lowest Price</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity className="py-3 flex flex-row items-center"
+                                          onPress={() => setSortOption("highest_price")}>
+                            <Image source={require("../../assets/icons/tick.png")} className={"w-4 h-4 mr-4"}
+                                   style={sortOption !== "highest_price" ? {display: "none"} : {}}/>
+                            <Text className="text-base">Highest Price</Text>
                         </TouchableOpacity>
                     </View>
-
-                    <Text className="text-sm text-gray-500 mb-2">Minimum Rating</Text>
-                    <View className="flex-row mb-6">
-                        <TouchableOpacity style={filterOptions.minRating === 3 ? {backgroundColor: "#0A0A0A"} : {}} className="px-4 py-2 mr-2 rounded-full bg-gray-200" onPress={() => {setFilterOptions(prevState => (filterOptions.minRating === 3 ? {
-                            ...prevState,
-                            minRating: 0
-                        } : {
-                            ...prevState,
-                            minRating: 3
-                        }))}}>
-                            <Text style={filterOptions.minRating === 3 ? { color: "white" } : { color: "black" }}>★ 3+</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={filterOptions.minRating === 4 ? {backgroundColor: "#0A0A0A"} : {}} className="px-4 py-2 mr-2 rounded-full bg-gray-200" onPress={() => {setFilterOptions(prevState => (filterOptions.minRating === 4 ? {
-                            ...prevState,
-                            minRating: 0
-                        } : {
-                            ...prevState,
-                            minRating: 4
-                        }))}}>
-                            <Text style={filterOptions.minRating === 4 ? { color: "white" } : { color: "black" }}>★ 4+</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={filterOptions.minRating === 5 ? {backgroundColor: "#0A0A0A"} : {}} className="px-4 py-2 rounded-full bg-gray-200" onPress={() => {setFilterOptions(prevState => (filterOptions.minRating === 5 ? {
-                            ...prevState,
-                            minRating: 0
-                        } : {
-                            ...prevState,
-                            minRating: 5
-                        }))}}>
-                            <Text style={filterOptions.minRating === 5 ? { color: "white" } : { color: "black" }}>★ 5</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    <View className="flex-row justify-between mt-4">
-                        <TouchableOpacity onPress={() => setFilterOptions({minRating: 0, location: "", services: ""})}>
+                    <View className="flex-row justify-between px-5 mt-8">
+                        <TouchableOpacity onPress={() => setSortOption("")}>
                             <Text className="text-gray-500">Reset</Text>
                         </TouchableOpacity>
                     </View>
-                </View>
-            </Animated.View>
-            <Animated.View
-                style={{
-                    height: sortHeight,
-                    shadowOpacity: 0.25,
-                    shadowRadius: 20,
-                    elevation: 20,
-                }}
-                className="w-full overflow-hidden px-5 "
-            >
-                <View
-                    style={{
-                        padding: 20,
-                        paddingTop: 0,
-                        paddingBottom:0
-                    }}
-                >
-                    <Text className="text-xl font-semibold mb-4">Sort By</Text>
-
-                    {/*<TouchableOpacity className="py-3 border-b border-gray-200 flex flex-row items-center" onPress={() => setSortOption("nearest_first")}>*/}
-                    {/*    <Image source={require("../../assets/icons/tick.png")} className={"w-4 h-4 mr-4"} style={sortOption !== "nearest_first" ? {display: "none"} : {}} />*/}
-                    {/*    <Text className="text-base">Nearest First</Text>*/}
-                    {/*</TouchableOpacity>*/}
-
-
-                    <TouchableOpacity className="py-3 border-b border-gray-200 flex flex-row items-center" onPress={() => setSortOption("highest_rated")}>
-                        <Image source={require("../../assets/icons/tick.png")} className={"w-4 h-4 mr-4"} style={sortOption !== "highest_rated" ? {display: "none"} : {}} />
-                        <Text className="text-base">Highest Rated</Text>
-                    </TouchableOpacity>
-
-
-                    <TouchableOpacity className="py-3 border-b border-gray-200 flex flex-row items-center" onPress={() => setSortOption("most_reviews")}>
-                        <Image source={require("../../assets/icons/tick.png")} className={"w-4 h-4 mr-4"} style={sortOption !== "most_reviews" ? {display: "none"} : {}} />
-                        <Text className="text-base">Most Reviews</Text>
-                    </TouchableOpacity>
-
-
-                    <TouchableOpacity className="py-3 border-b border-gray-200 flex flex-row items-center" onPress={() => setSortOption("lowest_price")}>
-                        <Image source={require("../../assets/icons/tick.png")} className={"w-4 h-4 mr-4"} style={sortOption !== "lowest_price" ? {display: "none"} : {}} />
-                        <Text className="text-base">Lowest Price</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity className="py-3 flex flex-row items-center" onPress={() => setSortOption("highest_price")}>
-                        <Image source={require("../../assets/icons/tick.png")} className={"w-4 h-4 mr-4"} style={sortOption !== "highest_price" ? {display: "none"} : {}} />
-                        <Text className="text-base">Highest Price</Text>
-                    </TouchableOpacity>
-                </View>
-                <View className="flex-row justify-between px-5 mt-8">
-                    <TouchableOpacity onPress={() => setSortOption("")}>
-                        <Text className="text-gray-500">Reset</Text>
-                    </TouchableOpacity>
-                </View>
-            </Animated.View>
-            {loading ? (
-                <View className="flex mt-5">
-                    <View className={"w-full h-60 px-8 mb-6"}>
-                        <SitterNearYouCardLoading/>
-                    </View>
-                    <View className={"w-full h-60 px-8 mb-6"}>
-                        <SitterNearYouCardLoading/>
-                    </View>
-                    <View className={"w-full h-60 px-8 mb-6"}>
-                        <SitterNearYouCardLoading/>
-                    </View>
-                </View>
-            ) : (
-                <FlatList
-                    data={nearYouFound}
-                    className={"w-full mb-16 mt-2"}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({item}) => (
-                        <View className={"w-full h-72 px-8 mb-6"}>
-                            <SitterNearYouCard {...item} />
+                </Animated.View>
+                {loading ? (
+                    <View className="flex mt-5">
+                        <View className={"w-full h-60 px-8 mb-6"}>
+                            <SitterNearYouCardLoading/>
                         </View>
-                    )}
-                />
-            )}
-        </SafeAreaView>
+                        <View className={"w-full h-60 px-8 mb-6"}>
+                            <SitterNearYouCardLoading/>
+                        </View>
+                        <View className={"w-full h-60 px-8 mb-6"}>
+                            <SitterNearYouCardLoading/>
+                        </View>
+                    </View>
+                ) : (
+                    <FlatList
+                        data={nearYouFound}
+                        className={"w-full mb-16 mt-2"}
+                        keyExtractor={(item) => item.id}
+                        renderItem={({item}) => (
+                            <View className={"w-full h-72 px-8 mb-6"}>
+                                <SitterNearYouCard {...item} />
+                            </View>
+                        )}
+                    />
+                )}
+            </SafeAreaView>
+        </PaperProvider>
     );
 }
+
+const styles = StyleSheet.create({
+    dropdown: {
+        height: 50,
+        borderColor: 'gray',
+        borderWidth: 0.5,
+        borderRadius: 8,
+        paddingHorizontal: 8,
+        backgroundColor: '#fefefe',
+    },
+});
