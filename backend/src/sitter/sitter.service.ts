@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ExploreQueryDto, SortBy } from './dto/explore-query.dto';
 import { ExploreResponseDto } from './dto/explore-response.dto';
@@ -184,6 +184,9 @@ export class SitterService {
             },
           },
         },
+        savedBy: {
+          where: { userId },
+        },
       },
     });
 
@@ -239,6 +242,7 @@ export class SitterService {
       price: req.price ? Number(req.price) : undefined,
       rating: Number(req.avgRating.toFixed(1)),
       reviewCount: req.reviewCount,
+      isSaved: req.savedBy.length > 0,
     }));
 
     return {
@@ -247,6 +251,89 @@ export class SitterService {
       page,
       limit,
       totalPages,
+    };
+  }
+
+  async toggleSavedPost(userId: string, requestId: string) {
+    const request = await this.prisma.request.findUnique({
+      where: { id: requestId },
+    });
+
+    if (!request) {
+      throw new NotFoundException('Post not found');
+    }
+
+    const existingSave = await this.prisma.savedRequest.findUnique({
+      where: {
+        userId_requestId: {
+          userId,
+          requestId,
+        },
+      },
+    });
+
+    if (existingSave) {
+      await this.prisma.savedRequest.delete({
+        where: { id: existingSave.id },
+      });
+      return { saved: false };
+    } else {
+      await this.prisma.savedRequest.create({
+        data: {
+          userId,
+          requestId,
+        },
+      });
+      return { saved: true };
+    }
+  }
+
+  async getSavedPosts(userId: string) {
+    const savedRequests = await this.prisma.savedRequest.findMany({
+      where: { userId },
+      include: {
+        request: {
+          include: {
+            owner: {
+              include: {
+                bookingsAsOwner: {
+                  where: { status: 'COMPLETED' },
+                  include: { review: true },
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return {
+      requests: savedRequests.map((sr) => {
+        const req = sr.request;
+        const reviews = req.owner.bookingsAsOwner
+          .map((b) => b.review)
+          .filter((r) => r !== null);
+        
+        const totalRating = reviews.reduce((sum, r) => sum + (r?.rating || 0), 0);
+        const avgRating = reviews.length > 0 ? totalRating / reviews.length : 0;
+        const reviewCount = reviews.length;
+
+        return {
+          id: req.id,
+          title: req.title,
+          location: req.location,
+          serviceType: req.serviceType,
+          duration: req.duration,
+          imageUrl: req.imageUrl ?? undefined,
+          ownerName: `${req.owner.firstname} ${req.owner.lastname}`,
+          price: req.price ? Number(req.price) : undefined,
+          rating: Number(avgRating.toFixed(1)),
+          reviewCount: reviewCount,
+          isSaved: true,
+          createdAt: req.createdAt,
+        };
+      }),
     };
   }
 }
