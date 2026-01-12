@@ -203,7 +203,7 @@ export default function TabsLayout() {
           <Tabs.Screen
             name="thirdTab"
             options={{
-              title: "Home",
+              title: "Saved",
               headerShown: false,
               tabBarIcon: ({ focused }) => (
                 <TabIcon

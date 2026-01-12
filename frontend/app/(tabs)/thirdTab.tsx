@@ -15,10 +15,10 @@ type postRequest = {
     location: string;
     duration: string;
     imageUrl: string;
-    isSaved: boolean;
     serviceType: string;
     rating: number;
     reviewCount: number;
+    ownerName: string;
 };
 
 export default function Saved() {
@@ -30,8 +30,7 @@ export default function Saved() {
             setLoading(true);
             try {
                 const res = await api.get("/sitter/explore");
-                console.log(res.data)
-                setPosts(res.data.nearbyRequests);
+                setPosts(res.data.requests);
             } catch (error) {
                 console.error(error);
             } finally {
@@ -42,7 +41,10 @@ export default function Saved() {
     }, []);
 
     return (
-        <SafeAreaView className="flex-1">
+        <SafeAreaView className="flex-1 ">
+            <View className="flex flex-col w-full p-10 items-center pb-3">
+                <Text className="text-[#0A0A0A] text-4xl self-start">Saved posts</Text>
+            </View>
             {loading ? (
                 <View className="flex mt-5">
                     <View className={"w-full h-60 px-8 mb-6"}>
