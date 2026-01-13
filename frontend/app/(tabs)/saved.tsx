@@ -1,6 +1,6 @@
-import {router} from "expo-router";
+import {router, useFocusEffect} from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {Image, Text, TextInput, TouchableOpacity, View, StyleSheet, FlatList} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 import "../global.css";
@@ -9,7 +9,7 @@ import api from "@/config/api";
 import SitterNearYouCardLoading from "@/components/SitterNearYouCardLoading";
 import SitterNearYouCard from "@/components/SitterNearYouCard";
 
-type postRequest = {
+export type SavedPost = {
     id: string;
     title: string;
     location: string;
@@ -19,26 +19,35 @@ type postRequest = {
     rating: number;
     reviewCount: number;
     ownerName: string;
+    isSaved: boolean;
+    createdAt: string;
 };
 
 export default function Saved() {
-    const [posts, setPosts] = useState<postRequest[]>([]);
+    const [posts, setPosts] = useState<SavedPost[]>([]);
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        const getNearYou = async () => {
-            setLoading(true);
-            try {
-                const res = await api.get("/sitter/explore");
-                setPosts(res.data.requests);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        getNearYou();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            const getNearYou = async () => {
+                setLoading(true);
+                try {
+                    const res = await api.get("/sitter/saved-posts");
+                    setPosts(res.data.requests);
+                } catch (error) {
+                    console.error(error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            getNearYou();
+        }, [])
+    );
+
+    const handleRemove = (postId: string) => {
+        setPosts(prev => prev.filter(p => p.id !== postId));
+    };
 
     return (
         <SafeAreaView className="flex-1 ">
@@ -57,18 +66,25 @@ export default function Saved() {
                         <SitterNearYouCardLoading/>
                     </View>
                 </View>
-            ) : (
+            ) : posts.length === 0 ? <View className={"flex-1 flex items-center justify-center px-10"}>
+                <Text className="text-xl font-semibold text-[#0A0A0A] mb-2">
+                    No saved posts yet
+                </Text>
+                <Text className="text-center text-base text-gray-500">
+                    You haven’t saved any posts. When you find a post you like, tap the save icon and it will appear here.
+                </Text>
+                </View> :
                 <FlatList
                     data={posts}
                     className={"w-full mb-16 mt-5"}
                     keyExtractor={(item) => item.id}
                     renderItem={({item}) => (
                         <View className={"w-full h-60 px-8 mb-6"}>
-                            {/*<SitterNearYouCard {...item} />*/}
+                            <SitterNearYouCard {...item} onUnsave={() => handleRemove(item.id)} />
                         </View>
                     )}
                 />
-            )}
+            }
         </SafeAreaView>
     );
 }

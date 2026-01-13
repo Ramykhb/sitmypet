@@ -5,7 +5,7 @@ import SitterNearYouCardLoading from "@/components/SitterNearYouCardLoading";
 import TodaysBookingCard from "@/components/TodaysBookingCard";
 import TodaysBookingCardLoading from "@/components/TodaysBookingCardLoading";
 import api from "@/config/api";
-import { Link } from "expo-router";
+import {Link, useFocusEffect} from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
 import {
@@ -54,24 +54,27 @@ export default function Sitter() {
   const [nearYouFound, setNearYouFound] = useState<NearbyRequest[]>([]);
   const [loading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const getName = async () => {
-      const fname: string | null = await SecureStore.getItemAsync("firstname");
-      fname ? setName(fname as string) : setName("Guest");
-      setIsLoading(true);
-      try {
-        const res = await api.get("/sitter/home");
-        setNearYouFound(res.data.nearbyRequests);
-        setClientFound(res.data.recentClients);
-        setBookingFound(res.data.todaysBookings);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    getName();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      const getName = async () => {
+        const fname: string | null = await SecureStore.getItemAsync("firstname");
+        fname ? setName(fname as string) : setName("Guest");
+        setIsLoading(true);
+        try {
+          const res = await api.get("/sitter/home");
+          setNearYouFound(res.data.nearbyRequests);
+          setClientFound(res.data.recentClients);
+          setBookingFound(res.data.todaysBookings);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      getName();
+    }, [])
+  );
 
   return (
     <SafeAreaView className="flex-1">

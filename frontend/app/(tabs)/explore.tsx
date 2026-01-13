@@ -306,12 +306,12 @@ export default function Index() {
                                 style={[
                                     {
                                         shadowColor: "#000",
-                                        shadowOffset: { width: 0, height: 1 },
+                                        shadowOffset: {width: 0, height: 1},
                                         shadowOpacity: 0.08,
                                         shadowRadius: 3,
                                         elevation: 2,
                                     },
-                                    filterOptions.services === "walking" ? { backgroundColor: "#0A0A0A" } : {},
+                                    filterOptions.services === "walking" ? {backgroundColor: "#0A0A0A"} : {},
                                 ]}
                                 onPress={() => {
                                     setFilterOptions(prevState => (filterOptions.services === "walking" ? {
@@ -330,12 +330,12 @@ export default function Index() {
                                 style={[
                                     {
                                         shadowColor: "#000",
-                                        shadowOffset: { width: 0, height: 1 },
+                                        shadowOffset: {width: 0, height: 1},
                                         shadowOpacity: 0.08,
                                         shadowRadius: 3,
                                         elevation: 2,
                                     },
-                                    filterOptions.services === "sitting" ? { backgroundColor: "#0A0A0A" } : {},
+                                    filterOptions.services === "sitting" ? {backgroundColor: "#0A0A0A"} : {},
                                 ]}
                                 onPress={() => {
                                     setFilterOptions(prevState => (filterOptions.services === "sitting" ? {
@@ -354,12 +354,12 @@ export default function Index() {
                                 style={[
                                     {
                                         shadowColor: "#000",
-                                        shadowOffset: { width: 0, height: 1 },
+                                        shadowOffset: {width: 0, height: 1},
                                         shadowOpacity: 0.08,
                                         shadowRadius: 3,
                                         elevation: 2,
                                     },
-                                    filterOptions.services === "boarding" ? { backgroundColor: "#0A0A0A" } : {},
+                                    filterOptions.services === "boarding" ? {backgroundColor: "#0A0A0A"} : {},
                                 ]}
                                 onPress={() => {
                                     setFilterOptions(prevState => (filterOptions.services === "boarding" ? {
@@ -382,12 +382,12 @@ export default function Index() {
                                 style={[
                                     {
                                         shadowColor: "#000",
-                                        shadowOffset: { width: 0, height: 1 },
+                                        shadowOffset: {width: 0, height: 1},
                                         shadowOpacity: 0.08,
                                         shadowRadius: 3,
                                         elevation: 2,
                                     },
-                                    filterOptions.minRating === 3 ? { backgroundColor: "#0A0A0A" } : {},
+                                    filterOptions.minRating === 3 ? {backgroundColor: "#0A0A0A"} : {},
                                 ]}
                                 onPress={() => {
                                     setFilterOptions(prevState => (filterOptions.minRating === 3 ? {
@@ -406,12 +406,12 @@ export default function Index() {
                                 style={[
                                     {
                                         shadowColor: "#000",
-                                        shadowOffset: { width: 0, height: 1 },
+                                        shadowOffset: {width: 0, height: 1},
                                         shadowOpacity: 0.08,
                                         shadowRadius: 3,
                                         elevation: 2,
                                     },
-                                    filterOptions.minRating === 4 ? { backgroundColor: "#0A0A0A" } : {},
+                                    filterOptions.minRating === 4 ? {backgroundColor: "#0A0A0A"} : {},
                                 ]}
                                 onPress={() => {
                                     setFilterOptions(prevState => (filterOptions.minRating === 4 ? {
@@ -430,12 +430,12 @@ export default function Index() {
                                 style={[
                                     {
                                         shadowColor: "#000",
-                                        shadowOffset: { width: 0, height: 1 },
+                                        shadowOffset: {width: 0, height: 1},
                                         shadowOpacity: 0.08,
                                         shadowRadius: 3,
                                         elevation: 2,
                                     },
-                                    filterOptions.minRating === 5 ? { backgroundColor: "#0A0A0A" } : {},
+                                    filterOptions.minRating === 5 ? {backgroundColor: "#0A0A0A"} : {},
                                 ]}
                                 onPress={() => {
                                     setFilterOptions(prevState => (filterOptions.minRating === 5 ? {
@@ -489,10 +489,12 @@ export default function Index() {
                     >
                         <Text className="text-xl font-semibold mb-4">Sort By</Text>
 
-                        {/*<TouchableOpacity className="py-3 border-b border-gray-200 flex flex-row items-center" onPress={() => setSortOption("nearest_first")}>*/}
-                        {/*    <Image source={require("../../assets/icons/tick.png")} className={"w-4 h-4 mr-4"} style={sortOption !== "nearest_first" ? {display: "none"} : {}} />*/}
-                        {/*    <Text className="text-base">Nearest First</Text>*/}
-                        {/*</TouchableOpacity>*/}
+                        <TouchableOpacity className="py-3 border-b border-gray-200 flex flex-row items-center"
+                                          onPress={() => setSortOption("nearest_first")}>
+                            <Image source={require("../../assets/icons/tick.png")} className={"w-4 h-4 mr-4"}
+                                   style={sortOption !== "nearest_first" ? {display: "none"} : {}}/>
+                            <Text className="text-base">Nearest First</Text>
+                        </TouchableOpacity>
 
 
                         <TouchableOpacity className="py-3 border-b border-gray-200 flex flex-row items-center"
@@ -543,7 +545,15 @@ export default function Index() {
                             <SitterNearYouCardLoading/>
                         </View>
                     </View>
-                ) : (
+                ) : nearYouFound.length === 0 ? <View className={"flex-1 flex items-center justify-center px-10"}>
+                    <Text className="text-xl font-semibold text-[#0A0A0A] mb-2">
+                        No saved posts yet
+                    </Text>
+                    <Text className="text-center text-base text-gray-500">
+                        You haven’t saved any posts. When you find a post you like, tap the save icon and it will appear
+                        here.
+                    </Text>
+                </View> : (
                     <FlatList
                         data={nearYouFound}
                         className={"w-full mb-16 mt-2"}

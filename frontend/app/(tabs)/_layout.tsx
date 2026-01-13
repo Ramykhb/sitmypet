@@ -127,7 +127,7 @@ export default function TabsLayout() {
         />
         {role === "owner" ? (
           <Tabs.Screen
-            name="index2"
+            name="explore"
             options={{
               title: "Home",
               headerShown: false,
@@ -150,7 +150,7 @@ export default function TabsLayout() {
           />
         ) : (
           <Tabs.Screen
-            name="secondTab"
+            name="explore"
             options={{
               title: "Home",
               headerShown: false,
@@ -174,7 +174,7 @@ export default function TabsLayout() {
         )}
         {role === "owner" ? (
           <Tabs.Screen
-            name="thirdTab"
+            name="saved"
             options={{
               title: "Home",
               headerShown: false,
@@ -201,7 +201,7 @@ export default function TabsLayout() {
           />
         ) : (
           <Tabs.Screen
-            name="thirdTab"
+            name="saved"
             options={{
               title: "Saved",
               headerShown: false,

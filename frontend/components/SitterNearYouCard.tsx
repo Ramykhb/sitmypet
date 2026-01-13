@@ -1,6 +1,7 @@
 import {BlurView} from "expo-blur";
 import React, {useState} from "react";
 import {Image, Pressable, Text, View} from "react-native";
+import api from "@/config/api";
 
 type NearbyRequest = {
     id: string;
@@ -12,10 +13,23 @@ type NearbyRequest = {
     serviceType: string;
     rating: number;
     reviewCount: number;
+    onUnsave?: () => void;
 };
 
 const SitterNearYouCard = (props: NearbyRequest) => {
     const [isSaved, setIsSaved] = useState(props.isSaved);
+
+    const handleSave = async () => {
+        setIsSaved(!isSaved);
+        try {
+            const res = await api.post(`/sitter/posts/${props.id}/toggle-save`);
+        } catch (e) {
+            console.log(e);
+        } finally {
+            props.onUnsave && props.onUnsave();
+        }
+    }
+
     return (
         <View
             className={
@@ -45,9 +59,7 @@ const SitterNearYouCard = (props: NearbyRequest) => {
                     resizeMode={"cover"}
                 />
                 <Pressable
-                    onPress={() => {
-                        setIsSaved(!isSaved);
-                    }}
+                    onPress={handleSave}
                     className="absolute top-1 right-1 z-50 p-2"
                 >
                     {isSaved ? (
