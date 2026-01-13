@@ -547,11 +547,10 @@ export default function Index() {
                     </View>
                 ) : nearYouFound.length === 0 ? <View className={"flex-1 flex items-center justify-center px-10"}>
                     <Text className="text-xl font-semibold text-[#0A0A0A] mb-2">
-                        No saved posts yet
+                        No posts found
                     </Text>
                     <Text className="text-center text-base text-gray-500">
-                        You haven’t saved any posts. When you find a post you like, tap the save icon and it will appear
-                        here.
+                        There are no posts matching your search or filters right now. Try adjusting your filters or check back later.
                     </Text>
                 </View> : (
                     <FlatList
