@@ -7,7 +7,6 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ContactModule } from './contact/contact.module';
 import { LocationsModule } from './locations/locations.module';
-import { OwnerModule } from './owner/owner.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { SitterModule } from './sitter/sitter.module';
 import { UsersModule } from './users/users.module';
@@ -25,7 +24,6 @@ import { UsersModule } from './users/users.module';
     ContactModule,
     LocationsModule,
     SitterModule,
-    OwnerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
