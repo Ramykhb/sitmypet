@@ -43,6 +43,7 @@ export default function Index() {
     const [nearYouFound, setNearYouFound] = useState<NearbyRequest[]>([]);
     const [locations, setLocations] = useState<Location[]>([]);
     const [loading, setLoading] = useState(false);
+    const [loadingMore, setLoadingMore] = useState(false);
     const [filter_toggled, setFilterToggled] = useState(false);
     const [sort_toggled, setSortToggled] = useState(false);
     const [sortOption, setSortOption] = useState("");
@@ -50,64 +51,57 @@ export default function Index() {
     const [filterOptions, setFilterOptions] = useState({minRating: 0, location: "", services: ""});
     const filterHeight = useRef(new Animated.Value(0)).current;
     const sortHeight = useRef(new Animated.Value(0)).current;
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
 
+    const fetchData = async (pageNumber: number, isLoadMore = false) => {
+        if ((loading && !isLoadMore) || (loadingMore && isLoadMore) || !hasMore) return;
 
-    useEffect(() => {
-        const getNearYou = async () => {
-            setLoading(true);
-            try {
-                const res = await api.get("/sitter/explore", {
-                    params: {
-                        search: searchTerm,
-                        sortBy: sortOption,
-                        ...filterOptions
-                    },
-                });
+        isLoadMore ? setLoadingMore(true) : setLoading(true);
+
+        try {
+            const res = await api.get("/sitter/explore", {
+                params: {
+                    search: searchTerm,
+                    sortBy: sortOption,
+                    ...filterOptions,
+                    page: pageNumber,
+                    limit: 5,
+                },
+            });
+
+            if (isLoadMore) {
+                setNearYouFound(prev => [...prev, ...res.data.requests]);
+            } else {
                 setNearYouFound(res.data.requests);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
             }
 
+            setHasMore(res.data.requests.length > 0);
+            setPage(pageNumber + 1);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            isLoadMore ? setLoadingMore(false) : setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        setPage(1);
+        setHasMore(true);
+        fetchData(1, false);
+    }, [searchTerm, sortOption, filterOptions]);
+
+    useEffect(() => {
+        const fetchLocations = async () => {
             try {
                 const res = await api.get("/locations");
                 setLocations(res.data);
             } catch (error) {
                 console.error(error);
-            } finally {
-                setLoading(false);
             }
         };
-        getNearYou();
+        fetchLocations();
     }, []);
-
-    useEffect(() => {
-        const timeoutId = setTimeout(() => {
-            const getNearYou = async () => {
-                setLoading(true);
-                try {
-                    const res = await api.get("/sitter/explore", {
-                        params: {
-                            search: searchTerm,
-                            sortBy: sortOption,
-                            ...filterOptions
-                        },
-                    });
-                    setNearYouFound(res.data.requests);
-                } catch (error) {
-                    console.error(error);
-                } finally {
-                    setLoading(false);
-                }
-            };
-            getNearYou();
-        }, 300);
-
-        return () => {
-            clearTimeout(timeoutId);
-        };
-    }, [searchTerm, sortOption, filterOptions]);
 
     useEffect(() => {
         Animated.timing(filterHeight, {
@@ -124,6 +118,11 @@ export default function Index() {
             useNativeDriver: false,
         }).start();
     }, [sort_toggled]);
+
+    const renderFooter = () => {
+        if (!loadingMore) return null;
+        return <SitterNearYouCardLoading />;
+    };
 
     return (
         <PaperProvider>
@@ -533,35 +532,40 @@ export default function Index() {
                         </TouchableOpacity>
                     </View>
                 </Animated.View>
-                {loading ? (
+                {loading && !loadingMore ? (
                     <View className="flex mt-5">
                         <View className={"w-full h-60 px-8 mb-6"}>
-                            <SitterNearYouCardLoading/>
+                            <SitterNearYouCardLoading />
                         </View>
                         <View className={"w-full h-60 px-8 mb-6"}>
-                            <SitterNearYouCardLoading/>
+                            <SitterNearYouCardLoading />
                         </View>
                         <View className={"w-full h-60 px-8 mb-6"}>
-                            <SitterNearYouCardLoading/>
+                            <SitterNearYouCardLoading />
                         </View>
                     </View>
-                ) : nearYouFound.length === 0 ? <View className={"flex-1 flex items-center justify-center px-10"}>
-                    <Text className="text-xl font-semibold text-[#0A0A0A] mb-2">
-                        No posts found
-                    </Text>
-                    <Text className="text-center text-base text-gray-500">
-                        There are no posts matching your search or filters right now. Try adjusting your filters or check back later.
-                    </Text>
-                </View> : (
+                ) : nearYouFound.length === 0 ? (
+                    <View className="flex-1 flex items-center justify-center px-10">
+                        <Text className="text-xl font-semibold text-[#0A0A0A] mb-2">
+                            No posts found
+                        </Text>
+                        <Text className="text-center text-base text-gray-500">
+                            There are no posts matching your search or filters right now. Try adjusting your filters or check back later.
+                        </Text>
+                    </View>
+                ) : (
                     <FlatList
                         data={nearYouFound}
-                        className={"w-full mb-16 mt-2"}
+                        className="w-full mb-16 mt-2"
                         keyExtractor={(item) => item.id}
                         renderItem={({item}) => (
-                            <View className={"w-full h-72 px-8 mb-6"}>
+                            <View className="w-full h-72 px-8 mb-6">
                                 <SitterNearYouCard {...item} />
                             </View>
                         )}
+                        onEndReached={() => fetchData(page, true)}
+                        onEndReachedThreshold={0.5}
+                        ListFooterComponent={renderFooter}
                     />
                 )}
             </SafeAreaView>
