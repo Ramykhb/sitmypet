@@ -88,11 +88,30 @@ export class UsersService {
 
   async updateProfile(
     userId: string,
-    data: { firstname?: string; lastname?: string },
+    data: { firstname?: string; lastname?: string; email?: string; password?: string },
   ) {
+    const { firstname, lastname, email, password } = data;
+    const updateData: any = {};
+
+    if (firstname) updateData.firstname = firstname;
+    if (lastname) updateData.lastname = lastname;
+
+    if (email) {
+      const user = await this.prisma.user.findUnique({ where: { id: userId } });
+      if (!user) throw new NotFoundException('User not found');
+
+      const emailExists = await this.prisma.user.findUnique({ where: { email } });
+      if (emailExists && emailExists.id !== userId) {
+        throw new ConflictException('Email already in use');
+      }
+
+      updateData.email = email;
+      updateData.emailVerified = false;
+    }
+
     return this.prisma.user.update({
       where: { id: userId },
-      data,
+      data: updateData,
       select: userSelect,
     });
   }
@@ -277,29 +296,6 @@ export class UsersService {
     });
   }
 
-  async updateEmail(userId: string, newEmail: string, passwordVerification: string) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    const isPasswordValid = await bcrypt.compare(passwordVerification, user.passwordHash);
-    if (!isPasswordValid) {
-      throw new ConflictException('Invalid password');
-    }
-
-    const emailExists = await this.prisma.user.findUnique({ where: { email: newEmail } });
-    if (emailExists && emailExists.id !== userId) {
-      throw new ConflictException('Email already in use');
-    }
-
-    return this.prisma.user.update({
-      where: { id: userId },
-      data: { email: newEmail, emailVerified: false },
-      select: userSelect,
-    });
-  }
-
   async changePassword(userId: string, oldPassword: string, newPassword: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
@@ -334,6 +330,21 @@ export class UsersService {
     return this.prisma.user.delete({
       where: { id: userId },
       select: userSelect,
+    });
+  }
+
+  async updateIdDocument(userId: string, documentUrl: string) {
+    const sitterProfile = await this.prisma.sitterProfile.findUnique({
+      where: { userId },
+    });
+
+    if (!sitterProfile) {
+      throw new NotFoundException('Sitter profile not found. Please create a sitter profile first.');
+    }
+
+    return this.prisma.sitterProfile.update({
+      where: { userId },
+      data: { idDocumentUrl: documentUrl },
     });
   }
 }
