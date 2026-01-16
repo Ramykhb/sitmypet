@@ -1,7 +1,7 @@
 import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
+    ConflictException,
+    Injectable,
+    NotFoundException,
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
@@ -334,15 +334,15 @@ export class UsersService {
   }
 
   async updateIdDocument(userId: string, documentUrl: string) {
-    const sitterProfile = await this.prisma.sitterProfile.findUnique({
+    const profile = await this.prisma.profile.findUnique({
       where: { userId },
     });
 
-    if (!sitterProfile) {
-      throw new NotFoundException('Sitter profile not found. Please create a sitter profile first.');
+    if (!profile) {
+      throw new NotFoundException('Profile not found. Please create a profile first.');
     }
 
-    return this.prisma.sitterProfile.update({
+    return this.prisma.profile.update({
       where: { userId },
       data: { idDocumentUrl: documentUrl },
     });
