@@ -10,6 +10,7 @@ import { LocationsModule } from './locations/locations.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { SitterModule } from './sitter/sitter.module';
 import { UsersModule } from './users/users.module';
+import { OcrModule } from './ocr/ocr.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { UsersModule } from './users/users.module';
     ContactModule,
     LocationsModule,
     SitterModule,
+    OcrModule,
   ],
   controllers: [AppController],
   providers: [AppService],

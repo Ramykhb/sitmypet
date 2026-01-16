@@ -141,10 +141,10 @@ export class SitterService {
       limit = 20,
     } = query;
 
-    const sitterProfile = await this.prisma.sitterProfile.findUnique({
+    const profile = await this.prisma.profile.findUnique({
       where: { userId },
     });
-    const sitterLocation = sitterProfile?.location || '';
+    const sitterLocation = profile?.location || '';
     
     const where: any = {
       status: 'OPEN',

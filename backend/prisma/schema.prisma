@@ -33,10 +33,11 @@ model User {
   requestsAsOwner          Request[]      @relation("OwnerRequests")
   savedRequests            SavedRequest[]
   savedSitters             SavedSitter[]
-  sitterProfile            SitterProfile?
+  profile                  Profile?
+  document                 Document?
 }
 
-model SitterProfile {
+model Profile {
   id            String            @id @default(uuid())
   userId        String            @unique
   location      String
@@ -50,13 +51,13 @@ model SitterProfile {
 }
 
 model ServiceOffering {
-  id              String        @id @default(uuid())
+  id              String   @id @default(uuid())
   sitterProfileId String
   serviceType     String
-  price           Decimal       @db.Decimal(10, 2)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  sitterProfile   SitterProfile @relation(fields: [sitterProfileId], references: [id], onDelete: Cascade)
+  price           Decimal  @db.Decimal(10, 2)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  profile         Profile  @relation(fields: [sitterProfileId], references: [id], onDelete: Cascade)
 
   @@index([sitterProfileId])
   @@index([serviceType])
@@ -144,12 +145,12 @@ model Location {
 }
 
 model SavedSitter {
-  id              String        @id @default(uuid())
+  id              String   @id @default(uuid())
   userId          String
   sitterProfileId String
-  createdAt       DateTime      @default(now())
-  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sitterProfile   SitterProfile @relation(fields: [sitterProfileId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile         Profile  @relation(fields: [sitterProfileId], references: [id], onDelete: Cascade)
 
   @@unique([userId, sitterProfileId])
   @@index([userId])
@@ -166,7 +167,20 @@ enum BookingStatus {
   CANCELLED
 }
 
+
 enum RequestStatus {
   OPEN
   CLOSED
+}
+
+model Document {
+  id         String   @id @default(uuid())
+  userId     String   @unique
+  filePath   String
+  rawText    String
+  idNumber   String?
+  dob        String?
+  status     String   @default("PENDING")
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
