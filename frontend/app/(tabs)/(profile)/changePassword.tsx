@@ -44,12 +44,13 @@ export default function OtpInput({
             }
             setLoading(true);
             try {
-                await api.patch(`/users/password`, {
+                await api.patch(`/users/me/password`, {
                     oldPassword: oldPassword,
                     newPassword: newPassword,
                 });
                 setUpdated(true);
             } catch (error: any) {
+
                 if (error.status === 401 || error.status === 403 || error.status === 409) {
                     setError("Old password is incorrect.");
                 } else {

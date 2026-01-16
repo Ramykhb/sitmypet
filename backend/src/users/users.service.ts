@@ -14,6 +14,7 @@ const userSelect = {
   email: true,
   roles: true,
   createdAt: true,
+    profileImageUrl: true,
 };
 
 @Injectable()
