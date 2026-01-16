@@ -26,7 +26,7 @@ model User {
   passwordResetOtpAttempts Int            @default(0)
   passwordResetOtpExpires  DateTime?
   passwordResetOtpHash     String?
-  profileImageUrl          String?
+  profileImageUrl          String?        @default("uploads/pfps/default_pfp.png")
   bookingsAsOwner          Booking[]      @relation("OwnerBookings")
   bookingsAsSitter         Booking[]      @relation("SitterBookings")
   ownedPets                Pet[]          @relation("PetOwner")
@@ -34,7 +34,6 @@ model User {
   savedRequests            SavedRequest[]
   savedSitters             SavedSitter[]
   profile                  Profile?
-  document                 Document?
 }
 
 model Profile {
@@ -44,10 +43,11 @@ model Profile {
   bio           String?
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
-  idDocumentUrl String?
   services      ServiceOffering[]
   user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   savedBy       SavedSitter[]
+  document      Document?
+  profilePicture ProfilePicture?
 }
 
 model ServiceOffering {
@@ -175,12 +175,21 @@ enum RequestStatus {
 
 model Document {
   id         String   @id @default(uuid())
-  userId     String   @unique
+  profileId  String   @unique
   filePath   String
   rawText    String
   idNumber   String?
   dob        String?
-  status     String   @default("PENDING")
+  status     String   @default("UNVERIFIED")
   createdAt  DateTime @default(now())
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile    Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model ProfilePicture {
+  id        String   @id @default(uuid())
+  profileId String   @unique
+  url       String   @default("uploads/pfps/default_pfp.png")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }

@@ -39,9 +39,29 @@ export class OcrService {
             const dbStatus = 'UNVERIFIED';
             const clientStatus = detected ? 'VERIFIED' : 'UNVERIFIED';
 
-            const doc = await this.prisma.document.create({
-              data: {
-                userId,
+            // Ensure Profile exists for the user
+            let profile = await this.prisma.profile.findUnique({ where: { userId } });
+            if (!profile) {
+                profile = await this.prisma.profile.create({
+                    data: {
+                        userId,
+                        location: 'Unknown',
+                    }
+                });
+            }
+
+            // Upsert the document using profileId (replaces old one if exists)
+            const doc = await this.prisma.document.upsert({
+              where: { profileId: profile.id },
+              update: {
+                filePath,
+                rawText: ocrResult.text,
+                idNumber: parsed.idNumber,
+                dob: parsed.dateOfBirth,
+                status: dbStatus
+              },
+              create: {
+                profileId: profile.id,
                 filePath,
                 rawText: ocrResult.text,
                 idNumber: parsed.idNumber,
@@ -94,16 +114,19 @@ export class OcrService {
   }
 
   async getVerificationStatus(userId: string) {
-    const document = await this.prisma.document.findUnique({
+    const profile = await this.prisma.profile.findUnique({
       where: { userId },
+      include: { document: true },
     });
 
-    if (!document) {
+    if (!profile || !profile.document) {
       throw new HttpException({
         status: 'NONE',
         message: 'No document uploaded',
       }, 410);
     }
+    
+    const document = profile.document;
 
     if (document.status === 'UNVERIFIED') {
        throw new HttpException({
@@ -122,17 +145,18 @@ export class OcrService {
   }
 
   async confirmDocument(userId: string) {
-    const document = await this.prisma.document.findUnique({
+    const profile = await this.prisma.profile.findUnique({
       where: { userId },
+      include: { document: true },
     });
 
-    if (!document) {
+    if (!profile || !profile.document) {
       throw new Error('No document found to verify');
     }
 
     return this.prisma.document.update({
-      where: { userId },
+      where: { profileId: profile.id },
       data: { status: 'VERIFIED' },
     });
-    }
+  }
 }
