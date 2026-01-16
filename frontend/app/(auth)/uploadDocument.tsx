@@ -1,7 +1,7 @@
 import api from "@/config/api";
-import { Link, router } from "expo-router";
+import {Link, router} from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import React, { useState } from "react";
+import React, {useState} from "react";
 import * as DocumentPicker from "expo-document-picker";
 import {
     ActivityIndicator,
@@ -13,11 +13,11 @@ import {
     TouchableWithoutFeedback,
     View,
 } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
+import {SafeAreaView} from "react-native-safe-area-context";
 
 const UploadDocument = () => {
-    const [formData, setFormData] = useState({ email: "", password: "" });
+    const [formData, setFormData] = useState({email: "", password: ""});
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [docLoading, setDocLoading] = useState(false);
@@ -34,8 +34,11 @@ const UploadDocument = () => {
             });
 
             if (!result.canceled && result.assets && result.assets.length > 0) {
-                setDocument(result.assets[0]);
+                const picked = result.assets[0];
+                setDocument(picked);
                 setError("");
+
+                await uploadIdDocument(picked);
             }
         } catch (e) {
             setError("Failed to pick document");
@@ -44,11 +47,34 @@ const UploadDocument = () => {
         }
     };
 
+    const uploadIdDocument = async (doc: DocumentPicker.DocumentPickerAsset) => {
+        try {
+            setLoading(true);
+            const formData = new FormData();
+            formData.append("file", {
+                uri: doc.uri,
+                name: doc.name,
+                type: doc.mimeType || "application/octet-stream",
+            } as any);
+
+            const res = await api.post("/users/me/id-document", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            console.log(res.data);
+        } catch (err: any) {
+            setError("Failed to upload document");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView style={{flex: 1}}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <KeyboardAwareScrollView
-                    contentContainerStyle={{ flexGrow: 1 }}
+                    contentContainerStyle={{flexGrow: 1}}
                     enableOnAndroid={true}
                     extraScrollHeight={35}
                     keyboardOpeningTime={100}
@@ -63,18 +89,21 @@ const UploadDocument = () => {
                             resizeMode="contain"/>
                         <View className={"px-5 w-full mt-10 text-[#0A0A0A]"}>
                             <Text className={"text-4xl text-center px-2"}>Please upload your ID Document</Text>
-                            <Text className={"text-base text-center text-gray-400 mt-5"}>JPG, JPEG, PNG, PDF, up to 10MB</Text>
+                            <Text className={"text-base text-center text-gray-400 mt-5"}>JPG, JPEG, PNG, PDF, up to
+                                10MB</Text>
                         </View>
                         <TouchableOpacity
                             onPress={pickDocument}
                             className="w-[85%] bg-gray-300 h-16 rounded-full flex flex-row items-center justify-center mt-12 mb-3"
                         >
                             {docLoading ? (
-                                <ActivityIndicator color={"#000000"} size={"small"} />
+                                <ActivityIndicator color={"#000000"} size={"small"}/>
                             ) : (
                                 <>
-                                    <Image source={require("../../assets/icons/upload-cloud.png")} className={"w-6 h-6 mr-3"} />
-                                    <Text className="text-[#0A0A0A] text-lg font-bold">{document ? `${document.name}` : "Upload Document"}</Text>
+                                    <Image source={require("../../assets/icons/upload-cloud.png")}
+                                           className={"w-6 h-6 mr-3"}/>
+                                    <Text
+                                        className="text-[#0A0A0A] text-lg font-bold">{document ? `${document.name}` : "Upload Document"}</Text>
 
                                 </>
                             )}
@@ -85,14 +114,14 @@ const UploadDocument = () => {
                             className={`w-[85%] bg-[#3944D5] ${document ? "" : "opacity-30"} h-16 rounded-full flex flex-row items-center justify-center mt-3 mb-5`}
                         >
                             {loading ? (
-                                <ActivityIndicator color={"#FFFFFF"} size={"small"} />
+                                <ActivityIndicator color={"#FFFFFF"} size={"small"}/>
                             ) : (
                                 <Text className={`text-white text-lg font-bold`}>Continue</Text>
                             )}
                         </TouchableOpacity>
                         <Text className={"text-base text-red-500 mt-5"}>{error}</Text>
 
-                        <View className="flex-grow" />
+                        <View className="flex-grow"/>
 
                         <View className="flex flex-col items-center justify-center">
                             <Text className="text-text-gray-600 text-sm">Need help?</Text>

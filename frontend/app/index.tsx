@@ -10,7 +10,7 @@ export default function Index() {
       const userLoggedIn = await fakeCheckAuth();
       if (userLoggedIn) {
         // router.replace("/(tabs)/(home)");
-          router.replace("/(auth)/uploadPFP")
+          router.replace("/(auth)/uploadDocument")
       } else {
         router.replace("/(auth)/signin");
       }
