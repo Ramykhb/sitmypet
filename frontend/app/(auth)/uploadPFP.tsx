@@ -1,0 +1,105 @@
+import { Link, router } from "expo-router";
+import React, { useState } from "react";
+import {
+    ActivityIndicator,
+    Image,
+    Keyboard,
+    Text,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View,
+} from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { SafeAreaView } from "react-native-safe-area-context";
+import * as ImagePicker from "expo-image-picker";
+
+export enum MediaTypeOptions {
+    All = "All",
+    Videos = "Videos",
+    Images = "Images",
+}
+
+const UploadPFP = () => {
+    const [formData, setFormData] = useState({ email: "", password: "" });
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [docLoading, setDocLoading] = useState(false);
+
+    const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
+
+    const pickImage = async () => {
+        setDocLoading(true);
+        const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (!permission.granted) {
+            alert("Permission required");
+            setDocLoading(false);
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: MediaTypeOptions.Images,
+            allowsEditing: true,
+            quality: 0.8,
+        });
+        setDocLoading(false);
+        if (!result.canceled) {
+            setImage(result.assets[0]);
+        }
+    };
+
+    return (
+        <SafeAreaView style={{ flex: 1 }} edges={["right", "left", "bottom"]}>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <KeyboardAwareScrollView
+                    contentContainerStyle={{ flexGrow: 1 }}
+                    enableOnAndroid={true}
+                    extraScrollHeight={35}
+                    keyboardOpeningTime={100}
+                    keyboardShouldPersistTaps="handled"
+                >
+                    <View className="flex flex-col flex-1 w-full p-10 items-center">
+                        <Image
+                            source={require("../../assets/images/pfp.jpg")}
+                            alt="logo"
+                            className="w-44 h-44 rounded-full mt-10"
+                            resizeMode="cover"/>
+                        <View className={"px-5 w-full mt-10 text-[#0A0A0A]"}>
+                            <Text className={"text-4xl text-center"}>No profile is complete without YOU!</Text>
+                            <Text className={"text-base text-center text-gray-400 mt-5"}>Add a profile picture to complete your profile</Text>
+                            <Text className={"text-base text-center text-gray-400 "}>JPG, JPEG, PNG, PDF, up to 5MB</Text>
+                        </View>
+                        <TouchableOpacity
+                            onPress={pickImage}
+                            className="w-[85%] bg-gray-300 h-16 rounded-full flex flex-row items-center justify-center mt-8 mb-3">
+                            {docLoading ? (
+                                <ActivityIndicator color={"#000000"} size={"small"} />
+                            ) : (
+                                <>
+                                    <Image source={require("../../assets/icons/upload-cloud.png")} className={"w-6 h-6 mr-3"} />
+                                    <Text className="text-[#0A0A0A] text-lg font-bold">{image ? "Change photo" : "Upload PFP"}</Text>
+
+                                </>
+                            )}
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            disabled={image ? false : true}
+                            onPress={() => router.replace("/(auth)/homeAuth")}
+                            className={`w-[85%] h-16 rounded-full flex flex-row items-center justify-center mt-3 mb-5 bg-[#3944D5] ${image ? "" : "opacity-30"}`}
+                        >
+                            {loading ? (
+                                <ActivityIndicator color={"#FFFFFF"} size={"small"} />
+                            ) : (
+                                <Text className={`text-white text-lg font-bold`}>Continue</Text>
+                            )}
+                        </TouchableOpacity>
+                        <Link href={"/(auth)/homeAuth"} className={"mt-3"}>
+                            <Text className={"text-[#0A0A0A] text-base underline font-bold"}>Skip this step for now</Text>
+
+                        </Link>
+                    </View>
+                </KeyboardAwareScrollView>
+            </TouchableWithoutFeedback>
+        </SafeAreaView>
+    );
+};
+export default UploadPFP;

@@ -66,6 +66,10 @@ export default function AuthLayout() {
                 options={{headerShown: false}}
             />
             <Stack.Screen
+                name="uploadDocument"
+                options={{headerShown: false}}
+            />
+            <Stack.Screen
                 name="verifyEmail"
                 options={{headerShown: false}}
             />
@@ -83,6 +87,26 @@ export default function AuthLayout() {
                                         className="w-7 h-7 mr-3"
                                     />
                                     <Text className="text-[#0A0A0A] text-2xl font-bold">Forgot Password</Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                    ),
+                }}
+            />
+            <Stack.Screen
+                name="uploadPFP"
+                options={{
+                    header: () => (
+                        <View style={{height: 120, justifyContent: 'flex-end', paddingLeft: 15}}>
+                            <TouchableOpacity onPress={() => {
+                                router.back();
+                            }}>
+                                <View className="flex flex-row items-center">
+                                    <Image
+                                        source={require('../../assets/icons/back-arrow.png')}
+                                        className="w-7 h-7 mr-3"
+                                    />
+                                    <Text className="text-[#0A0A0A] text-2xl font-bold">Complete Profile</Text>
                                 </View>
                             </TouchableOpacity>
                         </View>
