@@ -1,7 +1,7 @@
 import {
-    ConflictException,
-    Injectable,
-    NotFoundException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
@@ -289,6 +289,21 @@ export class UsersService {
     });
   }
   async updateProfileImage(userId: string, imageUrl: string) {
+    const profile = await this.prisma.profile.upsert({
+        where: { userId },
+        create: { userId, location: 'Unknown' },
+        update: {}
+    });
+
+    await this.prisma.profilePicture.upsert({
+        where: { profileId: profile.id },
+        update: { url: imageUrl },
+        create: {
+            profileId: profile.id,
+            url: imageUrl
+        }
+    });
+
     return this.prisma.user.update({
       where: { id: userId },
       data: { profileImageUrl: imageUrl },
@@ -342,9 +357,15 @@ export class UsersService {
       throw new NotFoundException('Profile not found. Please create a profile first.');
     }
 
-    return this.prisma.profile.update({
-      where: { userId },
-      data: { idDocumentUrl: documentUrl },
+    return this.prisma.document.upsert({
+      where: { profileId: profile.id },
+      update: { filePath: documentUrl },
+      create: {
+        profileId: profile.id,
+        filePath: documentUrl,
+        rawText: '', // Placeholder for manual update
+        status: 'UNVERIFIED',
+      },
     });
   }
 }
