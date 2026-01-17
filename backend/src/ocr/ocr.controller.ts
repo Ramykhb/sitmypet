@@ -19,9 +19,4 @@ export class OcrController {
   async getStatus(@Req() req) {
     return this.ocrService.getVerificationStatus(req.user.sub);
   }
-
-  @Post("confirm")
-  async confirm(@Req() req) {
-    return this.ocrService.confirmDocument(req.user.sub);
-  }
 }

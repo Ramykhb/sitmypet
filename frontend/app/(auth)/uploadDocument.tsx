@@ -21,6 +21,7 @@ const UploadDocument = () => {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [docLoading, setDocLoading] = useState(false);
+    const [isVerified, setIsVerified] = useState(false);
 
     const [document, setDocument] = useState<DocumentPicker.DocumentPickerAsset | null>(null);
 
@@ -57,17 +58,28 @@ const UploadDocument = () => {
                 type: doc.mimeType || "application/octet-stream",
             } as any);
 
-            const res = await api.post("/users/me/id-document", formData, {
+            const res = await api.post("/ocr/upload", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
             });
-            console.log(res.data);
+            
+            if (res.data.status === "VERIFIED") {
+                setIsVerified(true);
+                setError("");
+            } else {
+                setIsVerified(false);
+                setError("Document not recognized. Use a clearer photo of your Lebanese ID/Passport.");
+            }
         } catch (err: any) {
-            setError("Failed to upload document");
+            setError("Failed to upload document. Please check your connection.");
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleContinue = async () => {
+        router.push("/(auth)/uploadPFP");
     };
 
     return (
@@ -109,9 +121,9 @@ const UploadDocument = () => {
                             )}
                         </TouchableOpacity>
                         <TouchableOpacity
-                            onPress={() => router.push("/(auth)/uploadPFP")}
-                            disabled={document ? false : true}
-                            className={`w-[85%] bg-[#3944D5] ${document ? "" : "opacity-30"} h-16 rounded-full flex flex-row items-center justify-center mt-3 mb-5`}
+                            onPress={handleContinue}
+                            disabled={!isVerified || loading}
+                            className={`w-[85%] bg-[#3944D5] ${isVerified ? "" : "opacity-30"} h-16 rounded-full flex flex-row items-center justify-center mt-3 mb-5`}
                         >
                             {loading ? (
                                 <ActivityIndicator color={"#FFFFFF"} size={"small"}/>

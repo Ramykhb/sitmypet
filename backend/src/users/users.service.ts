@@ -364,7 +364,6 @@ export class UsersService {
       create: {
         profileId: profile.id,
         filePath: documentUrl,
-        rawText: '', // Placeholder for manual update
         status: 'UNVERIFIED',
       },
     });

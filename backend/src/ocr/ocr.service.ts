@@ -25,7 +25,7 @@ export class OcrService {
 
     return new Promise((resolve, reject) => {
       const scriptPath = 'scripts/ocr.py'; 
-      exec(`python3 ${scriptPath} "${filePath}"`, async (err, stdout) => {
+      exec(`python3.13 ${scriptPath} "${filePath}"`, async (err, stdout) => {
         if (err) {
           console.error(err);
           return reject('OCR failed: ' + err.message);
@@ -36,10 +36,9 @@ export class OcrService {
             const parsed = this.parseText(ocrResult.text);
             const detected = parsed.documentType !== 'UNKNOWN';
             
-            const dbStatus = 'UNVERIFIED';
-            const clientStatus = detected ? 'VERIFIED' : 'UNVERIFIED';
+            const dbStatus = detected ? 'VERIFIED' : 'UNVERIFIED';
+            const clientStatus = dbStatus;
 
-            // Ensure Profile exists for the user
             let profile = await this.prisma.profile.findUnique({ where: { userId } });
             if (!profile) {
                 profile = await this.prisma.profile.create({
@@ -50,22 +49,15 @@ export class OcrService {
                 });
             }
 
-            // Upsert the document using profileId (replaces old one if exists)
             const doc = await this.prisma.document.upsert({
               where: { profileId: profile.id },
               update: {
                 filePath,
-                rawText: ocrResult.text,
-                idNumber: parsed.idNumber,
-                dob: parsed.dateOfBirth,
                 status: dbStatus
               },
               create: {
                 profileId: profile.id,
                 filePath,
-                rawText: ocrResult.text,
-                idNumber: parsed.idNumber,
-                dob: parsed.dateOfBirth,
                 status: dbStatus
               }
             });
@@ -88,28 +80,28 @@ export class OcrService {
 
     const keywords = [
       'الجمهورية اللبنانية',
+      'لبنانية',
+      'جمهورية',
       'بطاقة هوية',
+      'هوية',
       'جواز سفر',
       'Passport',
       'رخصة سوق',
+      'DRIVING LICENSE',
+      'PERMIS DE CONDUIRE'
     ];
 
-    const detectedType = keywords.find(k => cleanedText.includes(k)) 
-      ? 'LEBANESE_DOCUMENT' 
-      : 'UNKNOWN';
-
-    const idMatch = text.match(/\b\d{8,15}\b/); 
-    const dateMatch = text.match(/\b\d{1,2}[/-]\d{1,2}[/-]\d{4}\b/);
+    const detectedType = keywords.some(k => 
+      cleanedText.toLowerCase().includes(k.toLowerCase())
+    ) ? 'LEBANESE_DOCUMENT' : 'UNKNOWN';
 
     let specificType = detectedType;
-    if (cleanedText.includes('بطاقة هوية')) specificType = 'ID_CARD';
-    if (cleanedText.includes('جواز سفر') || cleanedText.includes('Passport')) specificType = 'PASSPORT';
-    if (cleanedText.includes('رخصة سوق')) specificType = 'DRIVING_LICENSE';
+    if (cleanedText.includes('بطاقة هوية') || cleanedText.includes('هوية')) specificType = 'ID_CARD';
+    if (cleanedText.includes('جواز سفر') || cleanedText.toLowerCase().includes('passport')) specificType = 'PASSPORT';
+    if (cleanedText.includes('رخصة سوق') || cleanedText.toLowerCase().includes('driving license')) specificType = 'DRIVING_LICENSE';
 
     return {
-      documentType: specificType,
-      idNumber: idMatch?.[0] || null,
-      dateOfBirth: dateMatch?.[0] || null
+      documentType: specificType
     };
   }
 
@@ -142,21 +134,5 @@ export class OcrService {
       uploadedAt: document.createdAt,
       rejectionReason: null,
     };
-  }
-
-  async confirmDocument(userId: string) {
-    const profile = await this.prisma.profile.findUnique({
-      where: { userId },
-      include: { document: true },
-    });
-
-    if (!profile || !profile.document) {
-      throw new Error('No document found to verify');
-    }
-
-    return this.prisma.document.update({
-      where: { profileId: profile.id },
-      data: { status: 'VERIFIED' },
-    });
   }
 }

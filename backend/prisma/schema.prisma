@@ -177,9 +177,6 @@ model Document {
   id         String   @id @default(uuid())
   profileId  String   @unique
   filePath   String
-  rawText    String
-  idNumber   String?
-  dob        String?
   status     String   @default("UNVERIFIED")
   createdAt  DateTime @default(now())
   profile    Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
