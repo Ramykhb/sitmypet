@@ -131,7 +131,7 @@ const UploadDocument = () => {
                                 <Text className={`text-white text-lg font-bold`}>Continue</Text>
                             )}
                         </TouchableOpacity>
-                        <Text className={"text-base text-red-500 mt-5"}>{error}</Text>
+                        <Text className={"text-base text-rose-600 mt-1 text-center px-8"}>{error}</Text>
 
                         <View className="flex-grow"/>
 
