@@ -50,7 +50,6 @@ const UploadDocument = () => {
 
     const uploadIdDocument = async (doc: DocumentPicker.DocumentPickerAsset) => {
         try {
-            setLoading(true);
             const formData = new FormData();
             formData.append("file", {
                 uri: doc.uri,
@@ -66,7 +65,7 @@ const UploadDocument = () => {
             
             if (res.data.status === "VERIFIED") {
                 setIsVerified(true);
-                setError("");
+                setError("Document uploaded successfully.");
             } else {
                 setIsVerified(false);
                 setError("Document not recognized. Use a clearer photo of your Lebanese ID/Passport.");
@@ -74,7 +73,7 @@ const UploadDocument = () => {
         } catch (err: any) {
             setError("Failed to upload document. Please check your connection.");
         } finally {
-            setLoading(false);
+            setDocLoading(false);
         }
     };
 
@@ -106,7 +105,7 @@ const UploadDocument = () => {
                         </View>
                         <TouchableOpacity
                             onPress={pickDocument}
-                            className="w-[85%] bg-gray-300 h-16 rounded-full flex flex-row items-center justify-center mt-12 mb-3"
+                            className="w-[85%] bg-gray-300 h-16 rounded-full flex flex-row items-center justify-center mt-12 mb-3 px-20"
                         >
                             {docLoading ? (
                                 <ActivityIndicator color={"#000000"} size={"small"}/>
@@ -115,6 +114,7 @@ const UploadDocument = () => {
                                     <Image source={require("../../assets/icons/upload-cloud.png")}
                                            className={"w-6 h-6 mr-3"}/>
                                     <Text
+                                        numberOfLines={1}
                                         className="text-[#0A0A0A] text-lg font-bold">{document ? `${document.name}` : "Upload Document"}</Text>
 
                                 </>
@@ -131,7 +131,7 @@ const UploadDocument = () => {
                                 <Text className={`text-white text-lg font-bold`}>Continue</Text>
                             )}
                         </TouchableOpacity>
-                        <Text className={"text-base text-rose-600 mt-1 text-center px-8"}>{error}</Text>
+                        <Text className={`text-base ${isVerified ? "text-green-600" : "text-rose-600"} mt-1 text-center px-8`}>{error}</Text>
 
                         <View className="flex-grow"/>
 
