@@ -27,20 +27,20 @@ export default function Saved() {
     const [posts, setPosts] = useState<SavedPost[]>([]);
     const [loading, setLoading] = useState(false);
 
+    const getNearYou = async () => {
+        setLoading(true);
+        try {
+            const res = await api.get("/sitter/saved-posts");
+            setPosts(res.data.requests);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useFocusEffect(
         useCallback(() => {
-            const getNearYou = async () => {
-                setLoading(true);
-                try {
-                    const res = await api.get("/sitter/saved-posts");
-                    setPosts(res.data.requests);
-                } catch (error) {
-                    console.error(error);
-                } finally {
-                    setLoading(false);
-                }
-            };
-
             getNearYou();
         }, [])
     );

@@ -59,7 +59,7 @@ export default function Index() {
                     <View className={"w-full bg-[#dfe4e8] rounded-2xl"}>
                         <TouchableOpacity className={"w-full h-16 flex flex-row justify-between items-center pl-7 pr-2"}
                                           onPress={() => {
-                                              router.push("/(auth)/contactPage");
+                                              router.push("/contactPage");
                                           }}>
                             <View className={"flex flex-row justify-center items-center"}>
                                 <Image source={require("../../../assets/icons/contact.png")} className={"w-8 h-8 mr-4"}
@@ -73,7 +73,7 @@ export default function Index() {
                         <TouchableOpacity
                             className={"w-full h-16 flex flex-row justify-between items-center pl-7 pr-2"}
                             onPress={() => {
-                                router.push("/(policy)/termsAndConditions");
+                                router.push("/termsAndConditions");
                             }}>
                             <View className={"flex flex-row justify-center items-center"}>
                                 <Image source={require("../../../assets/icons/terms.png")} className={"w-8 h-8 mr-4"}
@@ -87,7 +87,7 @@ export default function Index() {
                         <TouchableOpacity
                             className={"w-full h-16 flex flex-row justify-between items-center pl-7 pr-2"}
                             onPress={() => {
-                                router.push("/(policy)/privacyPolicy");
+                                router.push("/privacyPolicy");
                             }}>
                             <View className={"flex flex-row justify-center items-center"}>
                                 <Image source={require("../../../assets/icons/privacy.png")} className={"w-8 h-8 mr-4"}

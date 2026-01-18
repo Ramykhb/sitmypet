@@ -133,7 +133,7 @@ const ContactPage = () => {
               ) : (
                   <View className="flex flex-row items-center">
                       <Image
-                          source={require('../../assets/icons/back-arrow-white.png')}
+                          source={require('../assets/icons/back-arrow-white.png')}
                           className="w-5 h-5 mr-1"
                           style={!isSent ? {display: "none"} : {}}
                       />
@@ -146,7 +146,7 @@ const ContactPage = () => {
               onPress={() => Linking.openURL("https://wa.me/96170820520")}
             >
               <Image
-                source={require("../../assets/icons/whatsapp.png")}
+                source={require("../assets/icons/whatsapp.png")}
                 alt="logo"
                 className="w-6 h-6 mr-3"
               />

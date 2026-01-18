@@ -143,7 +143,7 @@ const Signin = () => {
             <View className={"flex flex-row justify-around w-full mb-5"}>
               <View className="flex flex-col items-center justify-center">
                 <Text className="text-text-gray-600 text-sm">Need help?</Text>
-                <Link href={"/(auth)/contactPage"}>
+                <Link href={"/contactPage"}>
                   <Text className="text-[#0A0A0A] text-lg font-bold">
                     Contact us
                   </Text>

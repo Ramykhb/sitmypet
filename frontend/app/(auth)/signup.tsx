@@ -201,11 +201,11 @@ const SignUp = () => {
               />
               <Text className={"text-sm text-gray-600"}>
                 I agree to the{" "}
-                <Link href={"/(policy)/termsAndConditions"}>
+                <Link href={"/termsAndConditions"}>
                   <Text className={"font-bold underline"}>terms of use</Text>
                 </Link>{" "}
                 and acknowledge the{" "}
-                <Link href={"/(policy)/privacyPolicy"}>
+                <Link href={"/privacyPolicy"}>
                   <Text className={"font-bold underline"}>privacy policy</Text>
                 </Link>
                 .
@@ -229,7 +229,7 @@ const SignUp = () => {
 
             <View className="flex flex-col items-center justify-center mb-5">
               <Text className="text-text-gray-600 text-sm">Need help?</Text>
-              <Link href={"/(auth)/contactPage"}>
+              <Link href={"/contactPage"}>
                 <Text className="text-[#0A0A0A] text-lg font-bold">
                   Contact us
                 </Text>
