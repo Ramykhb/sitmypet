@@ -1,7 +1,6 @@
 import {Stack, useRouter} from "expo-router";
 import {Image, Text, TouchableOpacity, View} from "react-native";
 import React from "react";
-import Signin from "@/app/(auth)/signin";
 import * as SecureStore from "expo-secure-store";
 
 export default function AuthLayout() {

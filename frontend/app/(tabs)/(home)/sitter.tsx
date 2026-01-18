@@ -101,7 +101,7 @@ export default function Sitter() {
               </Text>
             </View>
             <TouchableOpacity
-              onPress={() => router.push("/(tabs)/(home)/notifications")}
+              onPress={() => router.push("/notifications")}
             >
               <Image
                 source={require("../../../assets/icons/bell-red.png")}

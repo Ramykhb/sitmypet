@@ -1,22 +1,27 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React from "react";
+import React, {useCallback} from "react";
+import {useFocusEffect, useNavigation} from "expo-router";
 
-const notifications = () => {
-  return (
-    <SafeAreaView edges={["bottom", "left", "right"]} className={"pt-10 px-10"}>
+export const unstable_settings = {
+    tabBarStyle: { display: 'none' },
+};
+
+const Notifications = () => {
+    return (
+    <SafeAreaView edges={["bottom", "left", "right"]} className={"pt-14 px-10"}>
       <View className={"flex"}>
         <View className={"flex flex-row items-center"}>
           <Image
-            source={require("../../../assets/icons/tray-filled.png")}
+            source={require("../assets/icons/tray-filled.png")}
             className={"w-8 h-8 mr-3"}
           />
           <Text className={"text-2xl text-[#0a0a0a]"}>Inbox</Text>
         </View>
         <View className={"flex w-full"}>
-          <View className={"flex flex-row items-center mt-4"}>
+          <View className={"flex flex-row items-center mt-6"}>
             <Image
-              source={require("../../../assets/images/pfp.jpg")}
+              source={require("../assets/images/pfp.jpg")}
               className={"w-16 h-16 mr-3 rounded-full"}
             />
             <View className={"flex justify-between flex-1"}>
@@ -34,9 +39,9 @@ const notifications = () => {
               <Text className={"text-white"}>1</Text>
             </View>
           </View>
-          <View className={"flex flex-row items-center mt-4"}>
+          <View className={"flex flex-row items-center mt-6"}>
             <Image
-              source={require("../../../assets/images/pfp.jpg")}
+              source={require("../assets/images/pfp.jpg")}
               className={"w-16 h-16 mr-3 rounded-full"}
             />
             <View className={"flex justify-between flex-1"}>
@@ -54,9 +59,9 @@ const notifications = () => {
               <Text className={"text-white"}>1</Text>
             </View>
           </View>
-          <View className={"flex flex-row items-center mt-4"}>
+          <View className={"flex flex-row items-center mt-6"}>
             <Image
-              source={require("../../../assets/images/pfp.jpg")}
+              source={require("../assets/images/pfp.jpg")}
               className={"w-16 h-16 mr-3 rounded-full"}
             />
             <View className={"flex justify-between flex-1"}>
@@ -75,20 +80,20 @@ const notifications = () => {
             </View>
           </View>
         </View>
-        <TouchableOpacity className="w-[36%] ml-[32%] bg-[#3944D5] h-10 rounded-full flex flex-row items-center justify-center mt-3 mb-2">
+        <TouchableOpacity className="w-[36%] ml-[32%] bg-[#3944D5] h-10 rounded-full flex flex-row items-center justify-center mt-6 mb-4">
           <Text className="text-white text-md font-bold">View All</Text>
         </TouchableOpacity>
         <View className={"flex flex-row items-center"}>
           <Image
-            source={require("../../../assets/icons/half-review.png")}
+            source={require("../assets/icons/half-review.png")}
             className={"w-8 h-8 mr-3"}
           />
           <Text className={"text-2xl text-[#0a0a0a]"}>Inbox</Text>
         </View>
         <View className={"flex w-full"}>
-          <View className={"flex flex-row items-center mt-4"}>
+          <View className={"flex flex-row items-center mt-6"}>
             <Image
-              source={require("../../../assets/images/pfp.jpg")}
+              source={require("../assets/images/pfp.jpg")}
               className={"w-16 h-16 mr-6 rounded-full"}
             />
             <View className={"flex justify-between flex-1"}>
@@ -97,13 +102,13 @@ const notifications = () => {
               </Text>
             </View>
             <Image
-              source={require("../../../assets/icons/right-arrow.png")}
+              source={require("../assets/icons/right-arrow.png")}
               className={"w-4 ml-6 h-4"}
             />
           </View>
-          <View className={"flex flex-row items-center mt-4"}>
+          <View className={"flex flex-row items-center mt-6"}>
             <Image
-              source={require("../../../assets/images/pfp.jpg")}
+              source={require("../assets/images/pfp.jpg")}
               className={"w-16 h-16 mr-6 rounded-full"}
             />
             <View className={"flex justify-between flex-1"}>
@@ -112,13 +117,13 @@ const notifications = () => {
               </Text>
             </View>
             <Image
-              source={require("../../../assets/icons/right-arrow.png")}
+              source={require("../assets/icons/right-arrow.png")}
               className={"w-4 ml-6 h-4"}
             />
           </View>
-          <View className={"flex flex-row items-center mt-4"}>
+          <View className={"flex flex-row items-center mt-6"}>
             <Image
-              source={require("../../../assets/images/pfp.jpg")}
+              source={require("../assets/images/pfp.jpg")}
               className={"w-16 h-16 mr-6 rounded-full"}
             />
             <View className={"flex justify-between flex-1"}>
@@ -127,12 +132,12 @@ const notifications = () => {
               </Text>
             </View>
             <Image
-              source={require("../../../assets/icons/right-arrow.png")}
+              source={require("../assets/icons/right-arrow.png")}
               className={"w-4 ml-6 h-4"}
             />
           </View>
         </View>
-        <TouchableOpacity className="w-[36%] ml-[32%] bg-[#3944D5] h-10 rounded-full flex flex-row items-center justify-center mt-5 mb-5">
+        <TouchableOpacity className="w-[36%] ml-[32%] bg-[#3944D5] h-10 rounded-full flex flex-row items-center justify-center mt-6">
           <Text className="text-white text-md font-bold">View All</Text>
         </TouchableOpacity>
       </View>
@@ -140,4 +145,4 @@ const notifications = () => {
   );
 };
 
-export default notifications;
+export default Notifications;
