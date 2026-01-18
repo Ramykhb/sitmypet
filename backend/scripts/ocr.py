@@ -4,12 +4,33 @@ import sys
 import json
 import numpy as np
 import time
+try:
+    import fitz # PyMuPDF
+    PYMUPDF_AVAILABLE = True
+except ImportError:
+    PYMUPDF_AVAILABLE = False
 
 def preprocess_image(image_path):
     stats = {}
     
     start_time = time.time()
-    img = cv2.imread(image_path)
+    
+    if image_path.lower().endswith(".pdf"):
+        if not PYMUPDF_AVAILABLE:
+            return None, {"error": "PyMuPDF not installed"}
+        try:
+            doc = fitz.open(image_path)
+            page = doc.load_page(0)
+            pix = page.get_pixmap(matrix=fitz.Matrix(2, 2)) # upscale 2x during conversion
+            img_data = pix.tobytes("png")
+            nparr = np.frombuffer(img_data, np.uint8)
+            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            doc.close()
+        except Exception as e:
+            return None, {"error": str(e)}
+    else:
+        img = cv2.imread(image_path)
+
     if img is None:
         return None, stats
     

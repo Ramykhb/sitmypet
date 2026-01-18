@@ -12,7 +12,7 @@ export class OcrService {
       throw new Error('No file uploaded');
     }
 
-    if (!file.mimetype.includes('image')) {
+    if (!file.mimetype.includes('image') && file.mimetype !== 'application/pdf') {
       throw new Error('Invalid file type');
     }
 
