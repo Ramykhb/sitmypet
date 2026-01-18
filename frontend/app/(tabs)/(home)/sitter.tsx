@@ -5,7 +5,7 @@ import SitterNearYouCardLoading from "@/components/SitterNearYouCardLoading";
 import TodaysBookingCard from "@/components/TodaysBookingCard";
 import TodaysBookingCardLoading from "@/components/TodaysBookingCardLoading";
 import api from "@/config/api";
-import {Link, useFocusEffect} from "expo-router";
+import { Link, router, useFocusEffect } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
 import {
@@ -57,7 +57,8 @@ export default function Sitter() {
   useFocusEffect(
     React.useCallback(() => {
       const getName = async () => {
-        const fname: string | null = await SecureStore.getItemAsync("firstname");
+        const fname: string | null =
+          await SecureStore.getItemAsync("firstname");
         fname ? setName(fname as string) : setName("Guest");
         setIsLoading(true);
         try {
@@ -73,7 +74,7 @@ export default function Sitter() {
       };
 
       getName();
-    }, [])
+    }, []),
   );
 
   return (
@@ -99,12 +100,16 @@ export default function Sitter() {
                 How do you feel today?
               </Text>
             </View>
-            <Image
-              source={require("../../../assets/icons/bell-red.png")}
-              alt="Home Image"
-              className={"w-8 h-8 rounded-full"}
-              resizeMode={"cover"}
-            />
+            <TouchableOpacity
+              onPress={() => router.push("/(tabs)/(home)/notifications")}
+            >
+              <Image
+                source={require("../../../assets/icons/bell-red.png")}
+                alt="Home Image"
+                className={"w-8 h-8 rounded-full"}
+                resizeMode={"cover"}
+              />
+            </TouchableOpacity>
           </View>
           <View className={"w-full"}>
             <View

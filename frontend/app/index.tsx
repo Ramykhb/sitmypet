@@ -9,8 +9,7 @@ export default function Index() {
     const checkAuth = async () => {
       const userLoggedIn = await fakeCheckAuth();
       if (userLoggedIn) {
-        // router.replace("/(tabs)/(home)");
-          router.replace("/(auth)/uploadDocument")
+        router.replace("/(tabs)/(home)");
       } else {
         router.replace("/(auth)/signin");
       }

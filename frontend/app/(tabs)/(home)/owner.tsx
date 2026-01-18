@@ -1,7 +1,7 @@
 import ClientHistoryCard from "@/components/ClientHistoryCard";
 import SitterNearYouCard from "@/components/SitterNearYouCard";
 import TodaysBookingCard from "@/components/TodaysBookingCard";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
@@ -46,12 +46,16 @@ export default function Sitter() {
                 How do you feel today?
               </Text>
             </View>
-            <Image
-              source={require("../../../assets/icons/bell-red.png")}
-              alt="Home Image"
-              className={"w-8 h-8 rounded-full"}
-              resizeMode={"cover"}
-            />
+            <TouchableOpacity
+              onPress={() => router.push("/(tabs)/(home)/notifications")}
+            >
+              <Image
+                source={require("../../../assets/icons/bell-red.png")}
+                alt="Home Image"
+                className={"w-8 h-8 rounded-full"}
+                resizeMode={"cover"}
+              />
+            </TouchableOpacity>
           </View>
           <View className={"w-full"}>
             <View
@@ -63,7 +67,10 @@ export default function Sitter() {
                 {"Today's Bookings"}
               </Text>
               <Link href={"/"} className={"mr-8"} disabled={!bookingFound}>
-                <Text className={"text-lg font-bold  text-[#3944D5]"} style={bookingFound ? {} : {color: "#AAAAAA"}}>
+                <Text
+                  className={"text-lg font-bold  text-[#3944D5]"}
+                  style={bookingFound ? {} : { color: "#AAAAAA" }}
+                >
                   See all
                 </Text>
               </Link>
@@ -87,7 +94,7 @@ export default function Sitter() {
                   No Bookings Found.
                 </Text>
                 <Text className="text-lg text-[#0a0a0a]">
-                    Search for nearby sitters to get started.
+                  Search for nearby sitters to get started.
                 </Text>
                 <TouchableOpacity className="w-[60%] bg-[#3944D5] h-14 rounded-full flex flex-row items-center justify-center my-5">
                   <Text className="text-white text-xl">Browse Sitters</Text>
@@ -105,7 +112,10 @@ export default function Sitter() {
                 Pet Sitters History
               </Text>
               <Link href={"/"} className={"mr-8"} disabled={!sitterFound}>
-                <Text className={"text-lg font-bold  text-[#3944D5]"} style={sitterFound ? {} : {color: "#AAAAAA"}}>
+                <Text
+                  className={"text-lg font-bold  text-[#3944D5]"}
+                  style={sitterFound ? {} : { color: "#AAAAAA" }}
+                >
                   See all
                 </Text>
               </Link>
@@ -130,7 +140,7 @@ export default function Sitter() {
                 }
               >
                 <Text className="text-xl text-[#0a0a0a] font-bold mb-1">
-                    {"You haven't worked with any sitters."}
+                  {"You haven't worked with any sitters."}
                 </Text>
                 <Text className="text-lg text-[#0a0a0a]">
                   Search for nearby sitters to get started.
@@ -147,9 +157,18 @@ export default function Sitter() {
                 "flex w-full flex-row justify-between items-center my-5"
               }
             >
-              <Text className={"text-2xl ml-8 text-[#0A0A0A]"}>Pet Sitters Near You</Text>
-              <Link href={"/(tabs)/(home)/ownerNearYou"} className={"mr-8"} disabled={!nearYouFound}>
-                <Text className={"text-lg font-bold  text-[#3944D5]"} style={nearYouFound ? {} : {color: "#AAAAAA"}}>
+              <Text className={"text-2xl ml-8 text-[#0A0A0A]"}>
+                Pet Sitters Near You
+              </Text>
+              <Link
+                href={"/(tabs)/(home)/ownerNearYou"}
+                className={"mr-8"}
+                disabled={!nearYouFound}
+              >
+                <Text
+                  className={"text-lg font-bold  text-[#3944D5]"}
+                  style={nearYouFound ? {} : { color: "#AAAAAA" }}
+                >
                   See all
                 </Text>
               </Link>
@@ -177,7 +196,7 @@ export default function Sitter() {
                   No current sitters available. 👀
                 </Text>
                 <Text className="text-lg text-[#0a0a0a]">
-                    {"We'll notify you when someone shows up."}
+                  {"We'll notify you when someone shows up."}
                 </Text>
               </View>
             )}
