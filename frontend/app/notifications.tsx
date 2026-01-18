@@ -88,7 +88,7 @@ const Notifications = () => {
             source={require("../assets/icons/half-review.png")}
             className={"w-8 h-8 mr-3"}
           />
-          <Text className={"text-2xl text-[#0a0a0a]"}>Inbox</Text>
+          <Text className={"text-2xl text-[#0a0a0a]"}>Reviews</Text>
         </View>
         <View className={"flex w-full"}>
           <View className={"flex flex-row items-center mt-6"}>
