@@ -15,7 +15,7 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function OtpInput({
+export default function ResetPassword({
   onChange,
 }: {
   onChange?: (otp: string) => void;

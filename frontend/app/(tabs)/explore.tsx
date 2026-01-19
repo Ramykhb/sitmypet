@@ -39,7 +39,7 @@ type Location = {
     updatedAt: string;
 };
 
-export default function Index() {
+export default function Explore() {
     const [nearYouFound, setNearYouFound] = useState<NearbyRequest[]>([]);
     const [locations, setLocations] = useState<Location[]>([]);
     const [loading, setLoading] = useState(false);

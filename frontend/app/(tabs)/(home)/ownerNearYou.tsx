@@ -4,7 +4,7 @@ import {ScrollView, View} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 import OwnerNearYouCard from "@/components/OwnerNearYouCard";
 
-const SitterNearYou = () => {
+const OwnerNearYou = () => {
     return (
         <SafeAreaView className={"flex-1"} edges={["right", "bottom", "left"]}>
             <ScrollView
@@ -28,4 +28,4 @@ const SitterNearYou = () => {
         </SafeAreaView>
     );
 };
-export default SitterNearYou;
+export default OwnerNearYou;

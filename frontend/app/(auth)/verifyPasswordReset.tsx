@@ -18,7 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const OTP_LENGTH = 6;
 
-export default function OtpInput({
+export default function VerifyPasswordReset({
   onChange,
 }: {
   onChange?: (otp: string) => void;

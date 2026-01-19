@@ -9,7 +9,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import "../../global.css";
 import OwnerNearYouCard from "@/components/OwnerNearYouCard";
 
-export default function Sitter() {
+export default function Owner() {
   const [name, setName] = useState("");
   const [bookingFound, setBookingFound] = useState(false);
   const [sitterFound, setSitterFound] = useState(false);
@@ -47,7 +47,7 @@ export default function Sitter() {
               </Text>
             </View>
             <TouchableOpacity
-              onPress={() => router.push("/(tabs)/(home)/notifications")}
+              onPress={() => router.push("/notifications")}
             >
               <Image
                 source={require("../../../assets/icons/bell-red.png")}

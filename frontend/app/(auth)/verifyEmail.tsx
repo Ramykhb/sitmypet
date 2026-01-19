@@ -19,7 +19,7 @@ import {Href} from "expo-router";
 
 const OTP_LENGTH = 6;
 
-export default function OtpInput({
+export default function VerifyEmail({
                                      onChange,
                                  }: {
     onChange?: (otp: string) => void;
