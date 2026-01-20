@@ -14,12 +14,12 @@ const userSelect = {
   email: true,
   roles: true,
   createdAt: true,
-    profileImageUrl: true,
+  profileImageUrl: true,
 };
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async createUser(data: {
     firstname: string;
@@ -89,7 +89,12 @@ export class UsersService {
 
   async updateProfile(
     userId: string,
-    data: { firstname?: string; lastname?: string; email?: string; password?: string },
+    data: {
+      firstname?: string;
+      lastname?: string;
+      email?: string;
+      password?: string;
+    },
   ) {
     const { firstname, lastname, email, password } = data;
     const updateData: any = {};
@@ -101,7 +106,9 @@ export class UsersService {
       const user = await this.prisma.user.findUnique({ where: { id: userId } });
       if (!user) throw new NotFoundException('User not found');
 
-      const emailExists = await this.prisma.user.findUnique({ where: { email } });
+      const emailExists = await this.prisma.user.findUnique({
+        where: { email },
+      });
       if (emailExists && emailExists.id !== userId) {
         throw new ConflictException('Email already in use');
       }
@@ -141,6 +148,7 @@ export class UsersService {
         lastname: true,
         email: true,
         roles: true,
+        profileImageUrl: true,
       },
     });
 
@@ -291,18 +299,18 @@ export class UsersService {
   }
   async updateProfileImage(userId: string, imageUrl: string) {
     const profile = await this.prisma.profile.upsert({
-        where: { userId },
-        create: { userId, location: 'Unknown' },
-        update: {}
+      where: { userId },
+      create: { userId, location: 'Unknown' },
+      update: {},
     });
 
     await this.prisma.profilePicture.upsert({
-        where: { profileId: profile.id },
-        update: { url: imageUrl },
-        create: {
-            profileId: profile.id,
-            url: imageUrl
-        }
+      where: { profileId: profile.id },
+      update: { url: imageUrl },
+      create: {
+        profileId: profile.id,
+        url: imageUrl,
+      },
     });
 
     return this.prisma.user.update({
@@ -312,13 +320,20 @@ export class UsersService {
     });
   }
 
-  async changePassword(userId: string, oldPassword: string, newPassword: string) {
+  async changePassword(
+    userId: string,
+    oldPassword: string,
+    newPassword: string,
+  ) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    const isPasswordValid = await bcrypt.compare(oldPassword, user.passwordHash);
+    const isPasswordValid = await bcrypt.compare(
+      oldPassword,
+      user.passwordHash,
+    );
     if (!isPasswordValid) {
       throw new ConflictException('Invalid old password');
     }
@@ -338,7 +353,10 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    const isPasswordValid = await bcrypt.compare(passwordVerification, user.passwordHash);
+    const isPasswordValid = await bcrypt.compare(
+      passwordVerification,
+      user.passwordHash,
+    );
     if (!isPasswordValid) {
       throw new ConflictException('Invalid password');
     }
@@ -355,7 +373,9 @@ export class UsersService {
     });
 
     if (!profile) {
-      throw new NotFoundException('Profile not found. Please create a profile first.');
+      throw new NotFoundException(
+        'Profile not found. Please create a profile first.',
+      );
     }
 
     return this.prisma.document.upsert({
