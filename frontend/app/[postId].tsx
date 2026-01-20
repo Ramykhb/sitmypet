@@ -18,15 +18,6 @@ type NearbyRequest = {
     reviewCount: number;
 };
 
-const mockDescription = `
-I am looking for a responsible and caring pet sitter to take care of my pet during my absence. The job involves daily feeding, ensuring fresh water is always available, and spending quality
-time with the pet to keep them comfortable and stress-free. The sitter should be attentive, patient, and experienced with pets, especially in understanding
-their behavior and needs. Light cleaning related to the pet (such as cleaning bowls or litter areas)
-may be required. Walks or playtime should be done according to the pet’s routine. This job is ideal for someone who genuinely loves animals and can commit to the full duration.
-Previous experience with pet sitting is a plus, but not mandatory if you are reliable and caring.
-Clear communication and updates during the service period are highly appreciated.
-`;
-
 const PostDetails = () => {
     const { postId } = useLocalSearchParams<{ postId: string }>();
     const [post, setPost] = useState<NearbyRequest>();
@@ -34,7 +25,7 @@ const PostDetails = () => {
     const fetchHomeData = async () => {
         try {
             const res = await api.get("/sitter/home");
-            setPost(res.data.nearbyRequests[0]);
+            setPost(res.data.nearbyRequests[3]);
         } catch (error) {
             console.error(error);
         }
@@ -75,7 +66,7 @@ const PostDetails = () => {
                             {post?.duration}
                         </Text>
                     </View>
-                    <View className={"w-full flex flex-row items-center rounded-2xl bg-gray-200 h-20 mt-10"}>
+                    <View className={"w-full flex flex-row items-center rounded-2xl bg-gray-200 h-20 mt-7"}>
                         <View className={"w-[33%] flex items-center justify-center border-r border-r-gray-400"}>
                             <Image source={require("../assets/icons/verified-shield.png")} alt="Verified shield" className={"w-6 h-6 mb-1"} />
                             <Text className={"text-gray-500"}>Verified</Text>
