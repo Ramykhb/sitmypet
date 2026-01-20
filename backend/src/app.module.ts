@@ -11,6 +11,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { SitterModule } from './sitter/sitter.module';
 import { UsersModule } from './users/users.module';
 import { OcrModule } from './ocr/ocr.module';
+import { PostsModule } from './posts/posts.module';
 
 @Module({
   imports: [
@@ -26,8 +27,9 @@ import { OcrModule } from './ocr/ocr.module';
     LocationsModule,
     SitterModule,
     OcrModule,
+    PostsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

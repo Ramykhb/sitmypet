@@ -30,8 +30,8 @@ model User {
   bookingsAsOwner          Booking[]      @relation("OwnerBookings")
   bookingsAsSitter         Booking[]      @relation("SitterBookings")
   ownedPets                Pet[]          @relation("PetOwner")
-  requestsAsOwner          Request[]      @relation("OwnerRequests")
-  savedRequests            SavedRequest[]
+  postsAsOwner             Post[]         @relation("OwnerPosts")
+  savedPosts               SavedPost[]
   savedSitters             SavedSitter[]
   profile                  Profile?
 }
@@ -73,6 +73,7 @@ model Pet {
   updatedAt DateTime  @updatedAt
   bookings  Booking[]
   owner     User      @relation("PetOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  posts     Post[]
 }
 
 model Booking {
@@ -95,7 +96,7 @@ model Booking {
   @@index([ownerId])
 }
 
-model Request {
+model Post {
   id          String         @id @default(uuid())
   ownerId     String
   title       String
@@ -103,25 +104,28 @@ model Request {
   serviceType String
   duration    String
   imageUrl    String?
-  status      RequestStatus  @default(OPEN)
+  status      PostStatus     @default(OPEN)
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
   price       Decimal?       @db.Decimal(10, 2)
-  owner       User           @relation("OwnerRequests", fields: [ownerId], references: [id], onDelete: Cascade)
-  savedBy     SavedRequest[]
+  description String
+  petId       String?
+  owner       User           @relation("OwnerPosts", fields: [ownerId], references: [id], onDelete: Cascade)
+  pet         Pet?           @relation(fields: [petId], references: [id], onDelete: SetNull)
+  savedBy     SavedPost[]
 
   @@index([status, createdAt])
 }
 
-model SavedRequest {
+model SavedPost {
   id        String   @id @default(uuid())
   userId    String
-  requestId String
+  postId    String
   createdAt DateTime @default(now())
-  request   Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, requestId])
+  @@unique([userId, postId])
   @@index([userId])
 }
 
@@ -168,7 +172,7 @@ enum BookingStatus {
 }
 
 
-enum RequestStatus {
+enum PostStatus {
   OPEN
   CLOSED
 }

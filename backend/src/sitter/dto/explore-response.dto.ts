@@ -1,4 +1,4 @@
-export class JobRequestDto {
+export class PostDto {
   id: string;
   ownerName: string;
   imageUrl?: string;
@@ -13,7 +13,7 @@ export class JobRequestDto {
 }
 
 export class ExploreResponseDto {
-  requests: JobRequestDto[];
+  posts: PostDto[];
   total: number;
   page: number;
   limit: number;

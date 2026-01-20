@@ -14,7 +14,7 @@ export class ClientHistoryDto {
   ownerImageUrl?: string;
 }
 
-export class NearbyRequestDto {
+export class NearbyPostDto {
   id: string;
   title: string;
   location: string;
@@ -29,5 +29,5 @@ export class NearbyRequestDto {
 export class SitterHomeFeedDto {
   todaysBookings: TodaysBookingDto[];
   recentClients: ClientHistoryDto[];
-  nearbyRequests: NearbyRequestDto[];
+  nearbyPosts: NearbyPostDto[];
 }

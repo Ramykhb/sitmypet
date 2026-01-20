@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ExploreQueryDto, SortBy } from './dto/explore-query.dto';
-import { ExploreResponseDto } from './dto/explore-response.dto';
+import { ExploreResponseDto, PostDto } from './dto/explore-response.dto';
 import { SitterHomeFeedDto } from './dto/sitter-home.dto';
 
 @Injectable()
@@ -69,7 +69,7 @@ export class SitterService {
     }
     const recentClients = Array.from(uniqueOwners.values());
 
-    const requests = await this.prisma.request.findMany({
+    const posts = await this.prisma.post.findMany({
       where: {
         status: 'OPEN',
       },
@@ -98,8 +98,8 @@ export class SitterService {
       take: 10,
     });
 
-    const nearbyRequests = requests.map((request) => {
-      const reviews = request.owner.bookingsAsOwner
+    const nearbyPosts = posts.map((post) => {
+      const reviews = post.owner.bookingsAsOwner
         .map((booking) => booking.review)
         .filter((review) => review !== null);
 
@@ -111,26 +111,29 @@ export class SitterService {
           : 0;
 
       return {
-        id: request.id,
-        title: request.title,
-        location: request.location,
-        serviceType: request.serviceType,
-        duration: request.duration,
+        id: post.id,
+        title: post.title,
+        location: post.location,
+        serviceType: post.serviceType,
+        duration: post.duration,
         rating: Number(rating.toFixed(1)),
         reviewCount: reviewCount,
-        imageUrl: request.imageUrl ?? undefined,
-        isSaved: request.savedBy.length > 0,
+        imageUrl: post.imageUrl ?? undefined,
+        isSaved: post.savedBy.length > 0,
       };
     });
 
     return {
       todaysBookings,
       recentClients,
-      nearbyRequests,
+      nearbyPosts,
     };
   }
 
-  async explore(query: ExploreQueryDto, userId: string): Promise<ExploreResponseDto> {
+  async explore(
+    query: ExploreQueryDto,
+    userId: string,
+  ): Promise<ExploreResponseDto> {
     const {
       search,
       services,
@@ -145,7 +148,7 @@ export class SitterService {
       where: { userId },
     });
     const sitterLocation = profile?.location || '';
-    
+
     const where: any = {
       status: 'OPEN',
     };
@@ -173,7 +176,7 @@ export class SitterService {
       where.serviceType = { contains: services, mode: 'insensitive' };
     }
 
-    const requests = await this.prisma.request.findMany({
+    const postsData = await this.prisma.post.findMany({
       where,
       include: {
         owner: {
@@ -190,19 +193,21 @@ export class SitterService {
       },
     });
 
-    let processedRequests = requests.map((req) => {
-      const reviews = req.owner.bookingsAsOwner
+    let processedPosts = postsData.map((post) => {
+      const reviews = post.owner.bookingsAsOwner
         .map((b) => b.review)
         .filter((r) => r !== null);
-      
+
       const totalRating = reviews.reduce((sum, r) => sum + (r?.rating || 0), 0);
       const avgRating = reviews.length > 0 ? totalRating / reviews.length : 0;
       const reviewCount = reviews.length;
 
-      const isNear = sitterLocation && req.location.toLowerCase().includes(sitterLocation.toLowerCase());
+      const isNear =
+        sitterLocation &&
+        post.location.toLowerCase().includes(sitterLocation.toLowerCase());
 
       return {
-        ...req,
+        ...post,
         avgRating,
         reviewCount,
         isNear,
@@ -210,49 +215,64 @@ export class SitterService {
     });
 
     if (minRating !== undefined) {
-      processedRequests = processedRequests.filter((r) => r.avgRating >= minRating);
+      processedPosts = processedPosts.filter((r) => r.avgRating >= minRating);
     }
-    if (sortBy === SortBy.HIGHEST_RATED || sortBy === SortBy.RATING_HIGH_TO_LOW) {
-      processedRequests.sort((a, b) => b.avgRating - a.avgRating);
+    if (
+      sortBy === SortBy.HIGHEST_RATED ||
+      sortBy === SortBy.RATING_HIGH_TO_LOW
+    ) {
+      processedPosts.sort((a, b) => b.avgRating - a.avgRating);
     } else if (sortBy === SortBy.MOST_REVIEWS) {
-      processedRequests.sort((a, b) => b.reviewCount - a.reviewCount);
-    } else if (sortBy === SortBy.LOWEST_PRICE || sortBy === SortBy.PRICE_LOW_TO_HIGH) {
-      processedRequests.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
-    } else if (sortBy === SortBy.HIGHEST_PRICE || sortBy === SortBy.PRICE_HIGH_TO_LOW) {
-      processedRequests.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0));
+      processedPosts.sort((a, b) => b.reviewCount - a.reviewCount);
+    } else if (
+      sortBy === SortBy.LOWEST_PRICE ||
+      sortBy === SortBy.PRICE_LOW_TO_HIGH
+    ) {
+      processedPosts.sort(
+        (a, b) => (Number(a.price) || 0) - (Number(b.price) || 0),
+      );
+    } else if (
+      sortBy === SortBy.HIGHEST_PRICE ||
+      sortBy === SortBy.PRICE_HIGH_TO_LOW
+    ) {
+      processedPosts.sort(
+        (a, b) => (Number(b.price) || 0) - (Number(a.price) || 0),
+      );
     } else if (sortBy === SortBy.NEAREST_FIRST) {
-      processedRequests.sort((a, b) => {
+      processedPosts.sort((a, b) => {
         if (a.isNear && !b.isNear) return -1;
         if (!a.isNear && b.isNear) return 1;
         return b.createdAt.getTime() - a.createdAt.getTime();
       });
     } else {
-      processedRequests.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      processedPosts.sort(
+        (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+      );
     }
 
-    const total = processedRequests.length;
+    const total = processedPosts.length;
     const totalPages = Math.ceil(total / limit);
     const start = (page - 1) * limit;
     const end = start + limit;
-    const paginatedRequests = processedRequests.slice(start, end);
+    const paginatedPosts = processedPosts.slice(start, end);
 
-    const requestDtos = paginatedRequests.map((req) => ({
-      id: req.id,
-      ownerName: `${req.owner.firstname} ${req.owner.lastname}`,
-      imageUrl: req.imageUrl ?? undefined,
-      title: req.title,
-      location: req.location,
-      serviceType: req.serviceType,
-      duration: req.duration,
-      createdAt: req.createdAt,
-      price: req.price ? Number(req.price) : undefined,
-      rating: Number(req.avgRating.toFixed(1)),
-      reviewCount: req.reviewCount,
-      isSaved: req.savedBy.length > 0,
+    const postDtos = paginatedPosts.map((post) => ({
+      id: post.id,
+      ownerName: `${post.owner.firstname} ${post.owner.lastname}`,
+      imageUrl: post.imageUrl ?? undefined,
+      title: post.title,
+      location: post.location,
+      serviceType: post.serviceType,
+      duration: post.duration,
+      createdAt: post.createdAt,
+      price: post.price ? Number(post.price) : undefined,
+      rating: Number(post.avgRating.toFixed(1)),
+      reviewCount: post.reviewCount,
+      isSaved: post.savedBy.length > 0,
     }));
 
     return {
-      requests: requestDtos,
+      posts: postDtos,
       total,
       page,
       limit,
@@ -260,34 +280,34 @@ export class SitterService {
     };
   }
 
-  async toggleSavedPost(userId: string, requestId: string) {
-    const request = await this.prisma.request.findUnique({
-      where: { id: requestId },
+  async toggleSavedPost(userId: string, postId: string) {
+    const post = await this.prisma.post.findUnique({
+      where: { id: postId },
     });
 
-    if (!request) {
+    if (!post) {
       throw new NotFoundException('Post not found');
     }
 
-    const existingSave = await this.prisma.savedRequest.findUnique({
+    const existingSave = await this.prisma.savedPost.findUnique({
       where: {
-        userId_requestId: {
+        userId_postId: {
           userId,
-          requestId,
+          postId,
         },
       },
     });
 
     if (existingSave) {
-      await this.prisma.savedRequest.delete({
+      await this.prisma.savedPost.delete({
         where: { id: existingSave.id },
       });
       return { saved: false };
     } else {
-      await this.prisma.savedRequest.create({
+      await this.prisma.savedPost.create({
         data: {
           userId,
-          requestId,
+          postId,
         },
       });
       return { saved: true };
@@ -295,10 +315,10 @@ export class SitterService {
   }
 
   async getSavedPosts(userId: string) {
-    const savedRequests = await this.prisma.savedRequest.findMany({
+    const savedPosts = await this.prisma.savedPost.findMany({
       where: { userId },
       include: {
-        request: {
+        post: {
           include: {
             owner: {
               include: {
@@ -315,29 +335,32 @@ export class SitterService {
     });
 
     return {
-      requests: savedRequests.map((sr) => {
-        const req = sr.request;
-        const reviews = req.owner.bookingsAsOwner
+      posts: savedPosts.map((savedPostItem) => {
+        const post = savedPostItem.post;
+        const reviews = post.owner.bookingsAsOwner
           .map((b) => b.review)
           .filter((r) => r !== null);
-        
-        const totalRating = reviews.reduce((sum, r) => sum + (r?.rating || 0), 0);
+
+        const totalRating = reviews.reduce(
+          (sum, r) => sum + (r?.rating || 0),
+          0,
+        );
         const avgRating = reviews.length > 0 ? totalRating / reviews.length : 0;
         const reviewCount = reviews.length;
 
         return {
-          id: req.id,
-          title: req.title,
-          location: req.location,
-          serviceType: req.serviceType,
-          duration: req.duration,
-          imageUrl: req.imageUrl ?? undefined,
-          ownerName: `${req.owner.firstname} ${req.owner.lastname}`,
-          price: req.price ? Number(req.price) : undefined,
+          id: post.id,
+          title: post.title,
+          location: post.location,
+          serviceType: post.serviceType,
+          duration: post.duration,
+          imageUrl: post.imageUrl ?? undefined,
+          ownerName: `${post.owner.firstname} ${post.owner.lastname}`,
+          price: post.price ? Number(post.price) : undefined,
           rating: Number(avgRating.toFixed(1)),
           reviewCount: reviewCount,
           isSaved: true,
-          createdAt: req.createdAt,
+          createdAt: post.createdAt,
         };
       }),
     };
