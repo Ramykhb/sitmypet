@@ -31,7 +31,7 @@ export default function Saved() {
         setLoading(true);
         try {
             const res = await api.get("/sitter/saved-posts");
-            setPosts(res.data.requests);
+            setPosts(res.data.posts ?? []);
         } catch (error) {
             console.error(error);
         } finally {

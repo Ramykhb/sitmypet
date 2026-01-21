@@ -70,13 +70,15 @@ export default function Explore() {
                 },
             });
 
+            const requests = res.data.requests ?? [];
+
             if (isLoadMore) {
-                setNearYouFound(prev => [...prev, ...res.data.requests]);
+                setNearYouFound(prev => [...prev, ...requests]);
             } else {
-                setNearYouFound(res.data.requests);
+                setNearYouFound(requests);
             }
 
-            setHasMore(res.data.requests.length > 0);
+            setHasMore(requests.length > 0);
             setPage(pageNumber + 1);
         } catch (error) {
             console.error(error);

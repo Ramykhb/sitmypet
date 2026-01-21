@@ -32,7 +32,7 @@ const SitterNearYouCard = (props: NearbyRequest) => {
     }
 
     return (
-        <TouchableOpacity onPress={() => router.push("/[postId]")}>
+        <TouchableOpacity onPress={() => router.push(`/posts/${props.id}`)}>
             <View
                 className={
                     "flex flex-col px-4 py-4 w-full h-full rounded-3xl border-gray-300 border"

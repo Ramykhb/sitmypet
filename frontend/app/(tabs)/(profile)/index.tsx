@@ -50,6 +50,9 @@ export default function Index() {
                         <Text className="text-[#0A0A0A] text-2xl font-bold">Ramy Khachab</Text>
                     </View>
                     <TouchableOpacity
+                        onPress={() =>{
+                            router.push("/(tabs)/(profile)/editProfile");
+                        }}
                         className={"w-full h-[60px] bg-[#dfe4e8] mt-5 rounded-full flex flex-row justify-center items-center"}>
                         <Image source={require("../../../assets/icons/edit-profile.png")} className={"w-8 h-8 mr-3"}
                                tintColor={"#555555"}/>

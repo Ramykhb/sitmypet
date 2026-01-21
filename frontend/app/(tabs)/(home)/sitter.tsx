@@ -19,7 +19,7 @@ import {
 import {SafeAreaView} from "react-native-safe-area-context";
 import "../../global.css";
 
-type NearbyRequest = {
+type NearbyPost = {
     id: string;
     title: string;
     location: string;
@@ -51,7 +51,7 @@ export default function Sitter() {
     const [name, setName] = useState("");
     const [bookingFound, setBookingFound] = useState<TodaysBooking[]>([]);
     const [clientFound, setClientFound] = useState<ClientHistory[]>([]);
-    const [nearYouFound, setNearYouFound] = useState<NearbyRequest[]>([]);
+    const [nearYouFound, setNearYouFound] = useState<NearbyPost[]>([]);
     const [loading, setIsLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
 
@@ -59,9 +59,9 @@ export default function Sitter() {
         setIsLoading(true);
         try {
             const res = await api.get("/sitter/home");
-            setNearYouFound(res.data.nearbyRequests);
-            setClientFound(res.data.recentClients);
-            setBookingFound(res.data.todaysBookings);
+            setNearYouFound(res.data.nearbyPosts ?? []);
+            setClientFound(res.data.recentClients ?? []);
+            setBookingFound(res.data.todaysBookings ?? []);
         } catch (error) {
             console.error(error);
         } finally {
@@ -260,7 +260,7 @@ export default function Sitter() {
                                     <SitterNearYouCardLoading/>
                                 </View>
                             </View>
-                        ) : Object.keys(nearYouFound).length > 0 ? (
+                        ) : nearYouFound.length > 0 ? (
                             <FlatList
                                 data={nearYouFound}
                                 horizontal={true}

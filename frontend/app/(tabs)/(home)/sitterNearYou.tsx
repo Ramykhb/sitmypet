@@ -27,7 +27,8 @@ const SitterNearYou = () => {
             setLoading(true);
             try {
                 const res = await api.get("/sitter/home");
-                setNearYouFound(res.data.nearbyRequests);
+                console.log(res.data);
+                setNearYouFound(res.data.nearbyPosts);
             } catch (error) {
                 console.error(error);
             } finally {
