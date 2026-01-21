@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class PostsService {
   constructor(private prisma: PrismaService) {}
 
-  async findOne(id: string) {
+  async findOne(id: string, userId?: string) {
     const job = await this.prisma.post.findUnique({
       where: { id },
       select: {
@@ -41,6 +41,13 @@ export class PostsService {
           },
         },
         pet: true,
+        savedBy: userId
+          ? {
+              where: {
+                userId: userId,
+              },
+            }
+          : false,
       },
     });
 
@@ -61,11 +68,13 @@ export class PostsService {
 
     return {
       ...job,
+      isSaved: job.savedBy ? job.savedBy.length > 0 : false,
       owner: {
         ...ownerData,
         clientRating,
         reviewsCount: reviews.length,
       },
+      savedBy: undefined,
     };
   }
 }
