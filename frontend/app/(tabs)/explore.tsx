@@ -70,7 +70,7 @@ export default function Explore() {
                 },
             });
 
-            const requests = res.data.requests ?? [];
+            const requests = res.data.posts ?? [];
 
             if (isLoadMore) {
                 setNearYouFound(prev => [...prev, ...requests]);
