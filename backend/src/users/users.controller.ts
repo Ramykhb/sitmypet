@@ -13,12 +13,11 @@ import {
   Req,
   UploadedFile,
   UseGuards,
-  UseInterceptors
+  UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
 import { AuthService } from '../auth/auth.service';
+import { uploadToR2 } from '../storage/r2.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { DeleteAccountDto } from './dto/delete-account.dto';
@@ -32,7 +31,7 @@ export class UsersController {
     private readonly usersService: UsersService,
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
-  ) { }
+  ) {}
 
   @Get('me')
   async me(@Req() req: { user: { sub: string } }) {
@@ -40,25 +39,12 @@ export class UsersController {
   }
 
   @Post('me/profile-image')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './uploads/pfps',
-        filename: (req, file, callback) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          callback(null, `profile-${uniqueSuffix}${ext}`);
-        },
-      }),
-    }),
-  )
+  @UseInterceptors(FileInterceptor('file'))
   async uploadProfileImage(
     @Req() req: { user: { sub: string } },
     @UploadedFile(
       new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }),
-        ],
+        validators: [new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 })],
       }),
     )
     file: Express.Multer.File,
@@ -66,8 +52,14 @@ export class UsersController {
     if (!file.mimetype.match(/^image\/(jpg|jpeg|png|webp)$/)) {
       throw new BadRequestException('Invalid file type');
     }
-    const imageUrl = `/uploads/pfps/${file.filename}`;
-    return this.usersService.updateProfileImage(req.user.sub, imageUrl);
+
+    const uploaded = await uploadToR2(
+      file.buffer,
+      file.originalname,
+      file.mimetype,
+    );
+
+    return this.usersService.updateProfileImage(req.user.sub, uploaded.url);
   }
 
   @Patch('me')
@@ -76,34 +68,21 @@ export class UsersController {
     @Body() dto: UpdateUserDto,
   ) {
     const user = await this.usersService.updateProfile(req.user.sub, dto);
-    
+
     if (dto.email) {
       await this.authService.resendEmailOtp(dto.email);
     }
-    
+
     return user;
   }
 
   @Post('me/id-document')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './uploads/ids',
-        filename: (req, file, callback) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          callback(null, `id-${uniqueSuffix}${ext}`);
-        },
-      }),
-    }),
-  )
+  @UseInterceptors(FileInterceptor('file'))
   async uploadIdDocument(
     @Req() req: { user: { sub: string } },
     @UploadedFile(
       new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }),
-        ],
+        validators: [new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 })],
       }),
     )
     file: Express.Multer.File,
@@ -113,10 +92,22 @@ export class UsersController {
         /^image\/(jpg|jpeg|png|heic|heif)$|^application\/pdf$/,
       )
     ) {
-      throw new BadRequestException('Invalid file type. Supported types: JPG, JPEG, PNG, HEIC, PDF');
+      throw new BadRequestException(
+        'Invalid file type. Supported types: JPG, JPEG, PNG, HEIC, PDF',
+      );
     }
-    const documentUrl = `/uploads/ids/${file.filename}`;
-    return this.usersService.updateIdDocument(req.user.sub, documentUrl);
+
+    const uploaded = await uploadToR2(
+      file.buffer,
+      file.originalname,
+      file.mimetype,
+    );
+
+    return this.usersService.updateIdDocument(
+      req.user.sub,
+      uploaded.url,
+      uploaded.key,
+    );
   }
 
   @Patch('me/password')

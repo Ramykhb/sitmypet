@@ -367,7 +367,11 @@ export class UsersService {
     });
   }
 
-  async updateIdDocument(userId: string, documentUrl: string) {
+  async updateIdDocument(
+    userId: string,
+    documentUrl: string,
+    documentKey?: string,
+  ) {
     const profile = await this.prisma.profile.findUnique({
       where: { userId },
     });
@@ -380,10 +384,14 @@ export class UsersService {
 
     return this.prisma.document.upsert({
       where: { profileId: profile.id },
-      update: { filePath: documentUrl },
+      update: {
+        fileUrl: documentUrl,
+        fileKey: documentKey,
+      },
       create: {
         profileId: profile.id,
-        filePath: documentUrl,
+        fileUrl: documentUrl,
+        fileKey: documentKey,
         status: 'UNVERIFIED',
       },
     });

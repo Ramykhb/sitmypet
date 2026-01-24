@@ -16,10 +16,6 @@ import { PostsModule } from './posts/posts.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
-      serveRoot: '/uploads',
-    }),
     PrismaModule,
     UsersModule,
     AuthModule,

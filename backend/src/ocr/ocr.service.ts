@@ -1,77 +1,105 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { exec } from 'child_process';
 import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
 import { PrismaService } from '../prisma/prisma.service';
+import { uploadToR2 } from '../storage/r2.service';
 
 @Injectable()
 export class OcrService {
   constructor(private prisma: PrismaService) {}
 
-  async handleUpload(file, userId: string) {
+  async handleUpload(file: Express.Multer.File, userId: string) {
     if (!file) {
       throw new Error('No file uploaded');
     }
 
-    if (!file.mimetype.includes('image') && file.mimetype !== 'application/pdf') {
+    if (
+      !file.mimetype.includes('image') &&
+      file.mimetype !== 'application/pdf'
+    ) {
       throw new Error('Invalid file type');
     }
 
-    if (!fs.existsSync('uploads/ids')) {
-      fs.mkdirSync('uploads/ids', { recursive: true });
-    }
+    const uploaded = await uploadToR2(
+      file.buffer,
+      file.originalname,
+      file.mimetype,
+    );
 
-    const filePath = `uploads/ids/${Date.now()}_${file.originalname}`;
-    fs.writeFileSync(filePath, file.buffer);
+    const tempDir = os.tmpdir();
+    const tempFilePath = path.join(
+      tempDir,
+      `ocr_${Date.now()}_${file.originalname}`,
+    );
+    fs.writeFileSync(tempFilePath, file.buffer);
 
     return new Promise((resolve, reject) => {
-      const scriptPath = 'scripts/ocr.py'; 
-      exec(`python3.13 ${scriptPath} "${filePath}"`, async (err, stdout) => {
-        if (err) {
-          console.error(err);
-          return reject('OCR failed: ' + err.message);
-        }
+      const scriptPath = 'scripts/ocr.py';
+      exec(
+        `python3.13 ${scriptPath} "${tempFilePath}"`,
+        async (err, stdout) => {
+          try {
+            if (fs.existsSync(tempFilePath)) {
+              fs.unlinkSync(tempFilePath);
+            }
+          } catch (cleanupErr) {
+            console.error('Failed to cleanup temp file:', cleanupErr);
+          }
 
-        try {
+          if (err) {
+            console.error(err);
+            return reject('OCR failed: ' + err.message);
+          }
+
+          try {
             const ocrResult = JSON.parse(stdout);
             const parsed = this.parseText(ocrResult.text);
             const detected = parsed.documentType !== 'UNKNOWN';
-            
+
             const dbStatus = detected ? 'VERIFIED' : 'UNVERIFIED';
             const clientStatus = dbStatus;
 
-            let profile = await this.prisma.profile.findUnique({ where: { userId } });
+            let profile = await this.prisma.profile.findUnique({
+              where: { userId },
+            });
             if (!profile) {
-                profile = await this.prisma.profile.create({
-                    data: {
-                        userId,
-                        location: 'Unknown',
-                    }
-                });
+              profile = await this.prisma.profile.create({
+                data: {
+                  userId,
+                  location: 'Unknown',
+                },
+              });
             }
 
             const doc = await this.prisma.document.upsert({
               where: { profileId: profile.id },
               update: {
-                filePath,
-                status: dbStatus
+                fileUrl: uploaded.url,
+                fileKey: uploaded.key,
+                status: dbStatus,
               },
               create: {
                 profileId: profile.id,
-                filePath,
-                status: dbStatus
-              }
+                fileUrl: uploaded.url,
+                fileKey: uploaded.key,
+                status: dbStatus,
+              },
             });
 
             resolve({
               status: clientStatus,
               documentType: parsed.documentType,
-              documentId: doc.id
+              documentId: doc.id,
+              url: uploaded.url,
             });
-        } catch (e) {
-            console.error("Error parsing/saving:", e);
-            reject("Processing failed: " + e.message);
-        }
-      });
+          } catch (e) {
+            console.error('Error parsing/saving:', e);
+            reject('Processing failed: ' + e.message);
+          }
+        },
+      );
     });
   }
 
@@ -88,20 +116,31 @@ export class OcrService {
       'Passport',
       'رخصة سوق',
       'DRIVING LICENSE',
-      'PERMIS DE CONDUIRE'
+      'PERMIS DE CONDUIRE',
     ];
 
-    const detectedType = keywords.some(k => 
-      cleanedText.toLowerCase().includes(k.toLowerCase())
-    ) ? 'LEBANESE_DOCUMENT' : 'UNKNOWN';
+    const detectedType = keywords.some((k) =>
+      cleanedText.toLowerCase().includes(k.toLowerCase()),
+    )
+      ? 'LEBANESE_DOCUMENT'
+      : 'UNKNOWN';
 
     let specificType = detectedType;
-    if (cleanedText.includes('بطاقة هوية') || cleanedText.includes('هوية')) specificType = 'ID_CARD';
-    if (cleanedText.includes('جواز سفر') || cleanedText.toLowerCase().includes('passport')) specificType = 'PASSPORT';
-    if (cleanedText.includes('رخصة سوق') || cleanedText.toLowerCase().includes('driving license')) specificType = 'DRIVING_LICENSE';
+    if (cleanedText.includes('بطاقة هوية') || cleanedText.includes('هوية'))
+      specificType = 'ID_CARD';
+    if (
+      cleanedText.includes('جواز سفر') ||
+      cleanedText.toLowerCase().includes('passport')
+    )
+      specificType = 'PASSPORT';
+    if (
+      cleanedText.includes('رخصة سوق') ||
+      cleanedText.toLowerCase().includes('driving license')
+    )
+      specificType = 'DRIVING_LICENSE';
 
     return {
-      documentType: specificType
+      documentType: specificType,
     };
   }
 
@@ -112,20 +151,26 @@ export class OcrService {
     });
 
     if (!profile || !profile.document) {
-      throw new HttpException({
-        status: 'NONE',
-        message: 'No document uploaded',
-      }, 410);
+      throw new HttpException(
+        {
+          status: 'NONE',
+          message: 'No document uploaded',
+        },
+        410,
+      );
     }
-    
+
     const document = profile.document;
 
     if (document.status === 'UNVERIFIED') {
-       throw new HttpException({
-        status: 'UNVERIFIED',
-        documentId: document.id,
-        message: 'Document uploaded but not verified',
-      }, 410);
+      throw new HttpException(
+        {
+          status: 'UNVERIFIED',
+          documentId: document.id,
+          message: 'Document uploaded but not verified',
+        },
+        410,
+      );
     }
 
     return {

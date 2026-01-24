@@ -180,7 +180,8 @@ enum PostStatus {
 model Document {
   id         String   @id @default(uuid())
   profileId  String   @unique
-  filePath   String
+  fileUrl    String
+  fileKey    String?
   status     String   @default("UNVERIFIED")
   createdAt  DateTime @default(now())
   profile    Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)

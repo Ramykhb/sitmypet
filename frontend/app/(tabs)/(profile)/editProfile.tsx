@@ -109,9 +109,7 @@ const EditProfile = () => {
         temp()
     }, []);
 
-    const imageUri = user?.profileImageUrl
-        ? `${backendPath.replace(/\/$/, "")}${user.profileImageUrl}`
-        : `${backendPath}/uploads/pfps/default_pfp.png`;
+    const imageUri = user?.profileImageUrl || "https://pub-4f8704924751443bbd3260d113d11a8f.r2.dev/uploads/pfps/default_pfp.png";
 
     return (
         <SafeAreaView style={{flex: 1}} edges={["right", "left", "bottom"]}>
