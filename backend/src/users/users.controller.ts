@@ -23,12 +23,14 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { DeleteAccountDto } from './dto/delete-account.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
+import { OcrService } from '../ocr/ocr.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
+    private readonly ocrService: OcrService,
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
   ) {}
@@ -97,17 +99,8 @@ export class UsersController {
       );
     }
 
-    const uploaded = await uploadToR2(
-      file.buffer,
-      file.originalname,
-      file.mimetype,
-    );
-
-    return this.usersService.updateIdDocument(
-      req.user.sub,
-      uploaded.url,
-      uploaded.key,
-    );
+    const res = await this.ocrService.handleUpload(file, req.user.sub);
+    return res;
   }
 
   @Patch('me/password')

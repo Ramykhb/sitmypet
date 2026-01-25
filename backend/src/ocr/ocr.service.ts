@@ -28,7 +28,10 @@ export class OcrService {
       file.mimetype,
     );
 
-    const tempDir = os.tmpdir();
+    const tempDir = path.join(process.cwd(), 'uploads', 'temp');
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir, { recursive: true });
+    }
     const tempFilePath = path.join(
       tempDir,
       `ocr_${Date.now()}_${file.originalname}`,

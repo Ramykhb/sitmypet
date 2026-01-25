@@ -6,6 +6,7 @@ import { OcrService } from './ocr.service';
 @Module({
   imports: [PrismaModule],
   controllers: [OcrController],
-  providers: [OcrService]
+  providers: [OcrService],
+  exports: [OcrService],
 })
 export class OcrModule {}
