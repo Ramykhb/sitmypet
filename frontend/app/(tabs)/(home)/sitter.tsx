@@ -47,8 +47,17 @@ type TodaysBooking = {
     time: string;
 };
 
+type User = {
+    id: string;
+    firstname: string;
+    lastname: string;
+    email: string;
+    profileImageUrl: string;
+    roles: ("OWNER" | "SITTER")[];
+};
+
 export default function Sitter() {
-    const [name, setName] = useState("");
+    const [user, setUser] = useState<User | null>(null);
     const [bookingFound, setBookingFound] = useState<TodaysBooking[]>([]);
     const [clientFound, setClientFound] = useState<ClientHistory[]>([]);
     const [nearYouFound, setNearYouFound] = useState<NearbyPost[]>([]);
@@ -75,19 +84,22 @@ export default function Sitter() {
         setRefreshing(false);
     }, []);
 
-    useFocusEffect(
-        React.useCallback(() => {
-            const getName = async () => {
-                const fname: string | null =
-                    await SecureStore.getItemAsync("firstname");
-                fname ? setName(fname as string) : setName("Guest");
-                setIsLoading(true);
-                await fetchHomeData();
-            };
+    useFocusEffect(useCallback(
+        () => {
 
-            getName();
-        }, []),
-    );
+            const getUser = async () => {
+                try {
+                    const res = await api.get("users/me")
+                    setUser(res.data);
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+            getUser();
+            fetchHomeData();
+
+        }, []
+    ));
 
     return (
         <SafeAreaView className="flex-1">
@@ -101,14 +113,14 @@ export default function Sitter() {
                         }
                     >
                         <Image
-                            source={require("../../../assets/images/pfp.jpg")}
+                            source={{uri: user?.profileImageUrl}}
                             alt="Home Image"
                             className={"w-14 h-14 rounded-full"}
                             resizeMode={"cover"}
                         />
                         <View className={"flex flex-col mr-3"}>
                             <Text className={"text-base text-gray-500 text-center"}>
-                                Hello, {name}
+                                Hello, {user?.firstname}
                             </Text>
                             <Text className={"text-lg font-bold text-[#0A0A0A] text-center"}>
                                 How do you feel today?

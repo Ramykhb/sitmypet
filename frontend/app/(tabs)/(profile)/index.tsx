@@ -1,13 +1,22 @@
-import React, {useEffect, useState} from "react";
-import {Image, ScrollView, Text, TouchableOpacity, View} from "react-native";
+import React, {useCallback, useEffect, useState} from "react";
+import {ActivityIndicator, Image, ScrollView, Text, TouchableOpacity, View} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 import "../../global.css";
-import {Link, router} from "expo-router";
+import {Link, router, useFocusEffect} from "expo-router";
 import * as SecureStore from "expo-secure-store";
+import api from "@/config/api";
+
+type User = {
+    id: string;
+    firstname: string;
+    lastname: string;
+    email: string;
+    profileImageUrl: string;
+    roles: ("OWNER" | "SITTER")[];
+};
 
 export default function Index() {
-    const [role, setRole] = useState<String>("");
-    const [name, setName] = useState<String>("");
+    const [user, setUser] = useState<User | null>(null);
 
     async function clearAuthData() {
         try {
@@ -24,33 +33,41 @@ export default function Index() {
         }
     }
 
-    useEffect(() => {
-        const getUser = async () => {
-            try {
-                const userRole =  await SecureStore.getItemAsync("role");
-                setRole(userRole as String);
-                const fname = await SecureStore.getItemAsync("firstname");
-                const lname = await SecureStore.getItemAsync("lastname");
-                setName(fname + " " + lname);
-            } catch (e) {
-                console.log(e);
+    useFocusEffect(useCallback(
+        () => {
+
+            const getUser = async () => {
+                try {
+                    const res = await api.get("users/me")
+                    console.log(res.data);
+                    setUser(res.data);
+                } catch (e) {
+                    console.log(e);
+                }
             }
-        }
-        getUser();
-    })
+            getUser();
+
+        }, []
+    ));
 
     return (
         <SafeAreaView className="home-auth flex-1 ">
             <ScrollView className={"w-full mb-20"}>
                 <View className="flex flex-col flex-1 w-full p-10 items-center">
                     <Text className="text-[#0A0A0A] text-5xl self-start">Profile</Text>
-                    <View className={"flex flex-col items-center justify-center w-full relative"}>
-                        <Image source={require("../../../assets/images/pfp.jpg")}
-                               className={"w-44 h-44 my-5 mt-10 rounded-full"}/>
-                        <Text className="text-[#0A0A0A] text-2xl font-bold">Ramy Khachab</Text>
-                    </View>
+                    {user ? (
+                        <View className="flex flex-col items-center justify-center w-full relative">
+                            <Image
+                                source={{ uri: user.profileImageUrl }}
+                                className="w-44 h-44 my-5 mt-10 rounded-full"
+                            />
+                            <Text className="text-[#0A0A0A] text-2xl font-bold">
+                                {user.firstname} {user.lastname}
+                            </Text>
+                        </View>
+                    ) : <ActivityIndicator color={"#0a0a0a"} size={"large"} className={"my-12 mt-32"}/> }
                     <TouchableOpacity
-                        onPress={() =>{
+                        onPress={() => {
                             router.push("/(tabs)/(profile)/editProfile");
                         }}
                         className={"w-full h-[60px] bg-[#dfe4e8] mt-5 rounded-full flex flex-row justify-center items-center"}>
@@ -119,24 +136,6 @@ export default function Index() {
                                    tintColor={"#555555"}/>
                         </TouchableOpacity>
                         <View className={"w-[75%] self-center h-[1px] bg-gray-300"}/>
-                        {role === "owner" ? <></> : <>
-                            <TouchableOpacity
-                                className={"w-full h-16 flex flex-row justify-between items-center pl-7 pr-2"}
-                                onPress={() => {
-                                    router.push("/(tabs)/(profile)/myDocuments")
-                                }}>
-                                <View className={"flex flex-row justify-center items-center"}>
-                                    <Image source={require("../../../assets/icons/document.png")}
-                                           className={"w-8 h-8 mr-4"}
-                                           tintColor={"#555555"}/>
-                                    <Text className={"text-[#0A0A0A] font-bold text-xl"}>My Documents</Text>
-                                </View>
-                                <Image source={require("../../../assets/icons/right-arrow.png")}
-                                       className={"w-4 h-4 mr-4 "}
-                                       tintColor={"#555555"}/>
-                            </TouchableOpacity>
-                            <View className={"w-[75%] self-center h-[1px] bg-gray-300"}/>
-                        </>}
                         <TouchableOpacity
                             className={"w-full h-16 flex flex-row justify-between items-center pl-7 pr-2"}
                             onPress={() => {
