@@ -39,7 +39,6 @@ export default function Index() {
             const getUser = async () => {
                 try {
                     const res = await api.get("users/me")
-                    console.log(res.data);
                     setUser(res.data);
                 } catch (e) {
                     console.log(e);
@@ -51,8 +50,8 @@ export default function Index() {
     ));
 
     return (
-        <SafeAreaView className="home-auth flex-1 ">
-            <ScrollView className={"w-full mb-20"}>
+        <SafeAreaView className="home-auth flex-1" edges={["right", "top", "left"]}>
+            <ScrollView className={"w-full flex-1"}>
                 <View className="flex flex-col flex-1 w-full p-10 items-center">
                     <Text className="text-[#0A0A0A] text-5xl self-start">Profile</Text>
                     {user ? (
