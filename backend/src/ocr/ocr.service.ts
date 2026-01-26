@@ -4,11 +4,14 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { PrismaService } from '../prisma/prisma.service';
-import { uploadToR2 } from '../storage/r2.service';
+import { R2Service } from '../storage/r2.service';
 
 @Injectable()
 export class OcrService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private r2Service: R2Service,
+  ) {}
 
   async handleUpload(file: Express.Multer.File, userId: string) {
     if (!file) {
@@ -22,7 +25,7 @@ export class OcrService {
       throw new Error('Invalid file type');
     }
 
-    const uploaded = await uploadToR2(
+    const uploaded = await this.r2Service.upload(
       file.buffer,
       file.originalname,
       file.mimetype,

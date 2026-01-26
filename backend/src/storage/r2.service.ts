@@ -1,34 +1,39 @@
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
-const r2Client = new S3Client({
-  region: 'auto',
-  endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-  credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY!,
-    secretAccessKey: process.env.R2_SECRET_KEY!,
-  },
-});
+@Injectable()
+export class R2Service {
+  private r2Client: S3Client;
 
-export async function uploadToR2(
-  buffer: Buffer,
-  fileName: string,
-  mimeType: string,
-) {
-  const key = `uploads/${Date.now()}-${fileName}`;
+  constructor(private configService: ConfigService) {
+    this.r2Client = new S3Client({
+      region: 'auto',
+      endpoint: `https://${this.configService.get<string>('R2_ACCOUNT_ID')}.r2.cloudflarestorage.com`,
+      credentials: {
+        accessKeyId: this.configService.get<string>('R2_ACCESS_KEY')!,
+        secretAccessKey: this.configService.get<string>('R2_SECRET_KEY')!,
+      },
+    });
+  }
 
-  await r2Client.send(
-    new PutObjectCommand({
-      Bucket: process.env.R2_BUCKET!,
-      Key: key,
-      Body: buffer,
-      ContentType: mimeType,
-    }),
-  );
+  async upload(buffer: Buffer, fileName: string, mimeType: string) {
+    const key = `uploads/${Date.now()}-${fileName}`;
 
-  const publicUrl = `${process.env.R2_PUBLIC_URL}/${key}`;
+    await this.r2Client.send(
+      new PutObjectCommand({
+        Bucket: this.configService.get<string>('R2_BUCKET')!,
+        Key: key,
+        Body: buffer,
+        ContentType: mimeType,
+      }),
+    );
 
-  return {
-    key,
-    url: publicUrl,
-  };
+    const publicUrl = `${this.configService.get<string>('R2_PUBLIC_URL')}/${key}`;
+
+    return {
+      key,
+      url: publicUrl,
+    };
+  }
 }

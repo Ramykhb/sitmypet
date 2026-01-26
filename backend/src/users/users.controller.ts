@@ -17,7 +17,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthService } from '../auth/auth.service';
-import { uploadToR2 } from '../storage/r2.service';
+import { R2Service } from '../storage/r2.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { DeleteAccountDto } from './dto/delete-account.dto';
@@ -31,6 +31,7 @@ export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly ocrService: OcrService,
+    private readonly r2Service: R2Service,
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
   ) {}
@@ -55,7 +56,7 @@ export class UsersController {
       throw new BadRequestException('Invalid file type');
     }
 
-    const uploaded = await uploadToR2(
+    const uploaded = await this.r2Service.upload(
       file.buffer,
       file.originalname,
       file.mimetype,

@@ -12,6 +12,7 @@ import { SitterModule } from './sitter/sitter.module';
 import { UsersModule } from './users/users.module';
 import { OcrModule } from './ocr/ocr.module';
 import { PostsModule } from './posts/posts.module';
+import { StorageModule } from './storage/storage.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { PostsModule } from './posts/posts.module';
     SitterModule,
     OcrModule,
     PostsModule,
+    StorageModule,
   ],
   controllers: [AppController],
   providers: [AppService],
