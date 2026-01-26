@@ -60,6 +60,7 @@ export class UsersController {
       file.buffer,
       file.originalname,
       file.mimetype,
+      'uploads/pfps',
     );
 
     return this.usersService.updateProfileImage(req.user.sub, uploaded.url);

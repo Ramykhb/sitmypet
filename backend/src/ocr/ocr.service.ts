@@ -29,6 +29,7 @@ export class OcrService {
       file.buffer,
       file.originalname,
       file.mimetype,
+      'uploads/ids',
     );
 
     const tempDir = path.join(process.cwd(), 'uploads', 'temp');

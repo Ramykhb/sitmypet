@@ -17,8 +17,13 @@ export class R2Service {
     });
   }
 
-  async upload(buffer: Buffer, fileName: string, mimeType: string) {
-    const key = `uploads/${Date.now()}-${fileName}`;
+  async upload(
+    buffer: Buffer,
+    fileName: string,
+    mimeType: string,
+    folder: string = 'uploads',
+  ) {
+    const key = `${folder}/${Date.now()}-${fileName}`;
 
     await this.r2Client.send(
       new PutObjectCommand({
