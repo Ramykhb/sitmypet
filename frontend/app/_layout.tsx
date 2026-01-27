@@ -1,9 +1,16 @@
 import {router, Stack} from "expo-router";
-import {Image, Text, TouchableOpacity, View} from "react-native";
-import React from "react";
-import * as SecureStore from "expo-secure-store";
+import {Image, Text, TouchableOpacity, View, Appearance} from "react-native";
+import React, {useEffect} from "react";
+import * as SystemUI from 'expo-system-ui';
+import { useTheme } from '@react-navigation/native';
 
 export default function RootLayout() {
+    const theme = useTheme();
+    useEffect(() => {
+        Appearance.setColorScheme("light");
+        SystemUI.setBackgroundColorAsync(theme.colors.background);
+    }, [theme]);
+
     return (
         <Stack screenOptions={{headerShown: false}}>
             <Stack.Screen

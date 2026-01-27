@@ -1,16 +1,24 @@
 import {NativeTabs, Icon, Label} from "expo-router/unstable-native-tabs";
 import {SafeAreaProvider} from "react-native-safe-area-context";
 import "../global.css";
+import {useTheme} from "@react-navigation/native";
+import {View} from "react-native";
+import {usePathname} from "expo-router";
 
 export default function TabsLayout() {
+    const {colors} = useTheme();
+    const pathname = usePathname();
+    const activeColor = "#3944D5";
+
+    const isActive = (route: string) => pathname.includes(route);
+
     return (
-        <SafeAreaProvider>
+        <View style={{flex: 1, backgroundColor: colors.background}}>
             <NativeTabs
-                labelStyle={{ color: '#555555' }}
-                tintColor="#3944D5">
+                tintColor={activeColor}>
                 <NativeTabs.Trigger name={"(home)"}>
                     <Label>Home</Label>
-                    <Icon sf={{ default: 'house', selected: 'house.fill' }}/>
+                    <Icon sf={{default: 'house', selected: 'house.fill'}}/>
                 </NativeTabs.Trigger>
                 <NativeTabs.Trigger name={"explore"}>
                     <Label>Explore</Label>
@@ -26,6 +34,6 @@ export default function TabsLayout() {
 
                 </NativeTabs.Trigger>
             </NativeTabs>
-        </SafeAreaProvider>
+        </View>
     );
 }
