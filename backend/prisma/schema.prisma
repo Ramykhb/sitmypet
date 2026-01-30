@@ -41,9 +41,9 @@ model Profile {
   userId         String          @unique
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
-  locationId     String
+  locationId     String?
   document       Document?
-  Location       Location        @relation(fields: [locationId], references: [id])
+  location       Location?       @relation(fields: [locationId], references: [id])
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   profilePicture ProfilePicture?
   savedBy        SavedSitter[]

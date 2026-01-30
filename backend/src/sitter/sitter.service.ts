@@ -151,8 +151,9 @@ export class SitterService {
 
     const profile = await this.prisma.profile.findUnique({
       where: { userId },
+      include: { location: true },
     });
-    const sitterLocation = profile?.location || '';
+    const sitterLocation = profile?.location?.name || '';
 
     const where: Prisma.PostWhereInput = {
       status: PostStatus.OPEN,

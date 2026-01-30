@@ -125,18 +125,32 @@ export class UsersService {
     }
 
     if (location !== undefined) {
+      const loc = await this.prisma.location.findUnique({
+        where: { name: location },
+      });
+
+      if (!loc) {
+        throw new NotFoundException(`Location '${location}' not found`);
+      }
+
       await this.prisma.profile.upsert({
         where: { userId },
-        update: { location },
-        create: { userId, location },
+        update: {
+          location: { connect: { name: location } },
+        },
+        create: {
+          user: { connect: { id: userId } },
+          location: { connect: { name: location } },
+        },
       });
     }
 
-    return this.prisma.user.update({
+    await this.prisma.user.update({
       where: { id: userId },
       data: updateData,
-      select: userSelect,
     });
+
+    return this.getMe(userId);
   }
 
   async removeRole(userId: string, role: Role) {
@@ -166,7 +180,12 @@ export class UsersService {
         profileImageUrl: true,
         profile: {
           select: {
-            location: true,
+            location: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
             document: {
               select: {
                 id: true,
@@ -332,7 +351,9 @@ export class UsersService {
   async updateProfileImage(userId: string, imageUrl: string) {
     const profile = await this.prisma.profile.upsert({
       where: { userId },
-      create: { userId, location: 'Unknown' },
+      create: {
+        user: { connect: { id: userId } },
+      },
       update: {},
     });
 
