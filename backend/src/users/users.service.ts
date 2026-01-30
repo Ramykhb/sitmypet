@@ -167,11 +167,6 @@ export class UsersService {
         profile: {
           select: {
             location: true,
-            profilePicture: {
-              select: {
-                url: true,
-              },
-            },
             document: {
               select: {
                 id: true,
@@ -192,7 +187,6 @@ export class UsersService {
     return {
       ...user,
       location: user.profile?.location ?? null,
-      profilePicture: user.profile?.profilePicture?.url ?? null,
       document: user.profile?.document ?? null,
     };
   }
