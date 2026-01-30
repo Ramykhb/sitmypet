@@ -2,10 +2,12 @@ import {NativeTabs, Icon, Label} from "expo-router/unstable-native-tabs";
 import {SafeAreaProvider} from "react-native-safe-area-context";
 import "../global.css";
 import {useTheme} from "@react-navigation/native";
-import {View} from "react-native";
+import {Platform, View} from "react-native";
 import {usePathname} from "expo-router";
 
 export default function TabsLayout() {
+    const isIOS = Platform.OS === "ios";
+    const isOldIOS = isIOS && Number(Platform.Version) < 26;
     const {colors} = useTheme();
     const pathname = usePathname();
     const activeColor = "#3944D5";
