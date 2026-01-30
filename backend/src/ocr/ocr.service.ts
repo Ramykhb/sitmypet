@@ -73,7 +73,6 @@ export class OcrService {
               profile = await this.prisma.profile.create({
                 data: {
                   user: { connect: { id: userId } },
-                  location: { connect: { name: 'Unknown' } },
                 },
               });
             }
