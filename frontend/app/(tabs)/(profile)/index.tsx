@@ -162,7 +162,7 @@ export default function Index() {
                         </TouchableOpacity>
                     </View>
                     <TouchableOpacity
-                        className={"w-full h-[60px] bg-[#fcb3b3] mt-5 rounded-full flex flex-row justify-center items-center"}>
+                        className={"w-full h-[60px] bg-[#fcb3b3] mt-5 rounded-full flex flex-row justify-center items-center mb-28"}>
                         <Image source={require("../../../assets/icons/trash.png")} className={"w-8 h-8 mr-3"}
                                tintColor={"#dc2626"}/>
                         <Text className={"text-red-600 font-bold text-xl"}>Delete Account</Text>
