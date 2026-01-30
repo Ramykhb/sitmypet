@@ -22,15 +22,6 @@ export enum MediaTypeOptions {
     Images = "Images",
 }
 
-type User = {
-    id: string;
-    firstname: string;
-    lastname: string;
-    email: string;
-    profileImageUrl: string;
-    roles: ("OWNER" | "SITTER")[];
-};
-
 type Location = {
     id: string;
     createdAt: string;
@@ -38,13 +29,23 @@ type Location = {
     updatedAt: string;
 };
 
+type User = {
+    id: string;
+    firstname: string;
+    lastname: string;
+    email: string;
+    profileImageUrl: string;
+    roles: ("OWNER" | "SITTER")[];
+    location: Location;
+};
+
 const EditProfile = () => {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [docLoading, setDocLoading] = useState(false);
     const [user, setUser] = useState<User | null>(null);
+    const [userLocation, setUserLocation] = useState<string | null>(null);
     const [locations, setLocations] = useState<Location[]>([]);
-    const [userLocation, setUserLocation] = useState<Location | null>(null);
     const [imageUri, setImageUri] = useState<string>("https://pub-4f8704924751443bbd3260d113d11a8f.r2.dev/uploads/pfps/default_pfp.png");
     const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
 
@@ -74,11 +75,50 @@ const EditProfile = () => {
         setImageUri(pickedImage.uri);
     };
 
+    const saveChanges = async () => {
+        if (loading) return;
+        setLoading(true);
+
+        const formData = new FormData();
+        formData.append("file", {
+            uri: image?.uri,
+            name: "profile.jpg",
+            type: "image/jpeg",
+        } as any);
+
+        try {
+            const res = await api.post("/users/me/profile-image", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+        } catch (e: any) {
+            setLoading(false);
+            if (e.status === 400) {
+                setError("Invalid image format or size.");
+            } else {
+                setError("An error has occurred.");
+            }
+            return;
+        }
+        try {
+            const res = api.patch("users/me", {
+                firstname: user?.firstname,
+                lastname: user?.lastname,
+                location: userLocation
+            });
+        } catch (e) {
+            setError("An error has occurred.");
+        } finally {
+            setLoading(false);
+        }
+        router.push("/(tabs)/(profile)");
+    }
+
     useEffect(() => {
         const fetchLocations = async () => {
             try {
                 const res = await api.get("/locations");
-                console.log(res.data);
                 setLocations(res.data);
             } catch (error) {
                 console.error(error);
@@ -88,6 +128,7 @@ const EditProfile = () => {
             try {
                 const res = await api.get("/users/me");
                 setUser(res.data);
+                setUserLocation(res.data.location?.name)
                 setImageUri(res.data.profileImageUrl || "https://pub-4f8704924751443bbd3260d113d11a8f.r2.dev/uploads/pfps/default_pfp.png")
             } catch (e) {
                 console.error(e);
@@ -170,17 +211,17 @@ const EditProfile = () => {
                             <Text className={"text-xl"}>Location</Text>
                             <CustomDropdownProfile
                                 data={locations}
-                                value={userLocation?.id ?? null}
+                                value={userLocation ?? null}
                                 onChange={(value: string) => {
-                                    const selected = locations.find(l => l.id === value) || null;
-                                    setUserLocation(selected);
+                                    setUserLocation(value);
                                 }}
                                 placeholder="Select location"
                             />
                         </View>
+                        <Text className={`text-rose-600 font-bold ${!error ? "hidden" : ""}`}>{error}</Text>
                         <TouchableOpacity
                             className="w-[85%] bg-[#3944D5] h-14 rounded-full flex flex-row items-center justify-center mt-5 mb-5"
-
+                            onPress={saveChanges}
                         >
                             {loading ? (
                                 <ActivityIndicator color={"#FFFFFF"} size={"small"} />
