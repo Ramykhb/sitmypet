@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ExploreQueryDto, SortBy } from './dto/explore-query.dto';
-import { ExploreResponseDto, PostDto } from './dto/explore-response.dto';
+import { ExploreResponseDto } from './dto/explore-response.dto';
 import { SitterHomeFeedDto } from './dto/sitter-home.dto';
+import { PostStatus, Prisma } from '@prisma/client';
 
 @Injectable()
 export class SitterService {
@@ -125,7 +126,11 @@ export class SitterService {
 
     return {
       todaysBookings,
-      recentClients,
+      recentClients: recentClients as {
+        id: string;
+        ownerName: string;
+        ownerImageUrl?: string;
+      }[],
       nearbyPosts,
     };
   }
@@ -149,8 +154,8 @@ export class SitterService {
     });
     const sitterLocation = profile?.location || '';
 
-    const where: any = {
-      status: 'OPEN',
+    const where: Prisma.PostWhereInput = {
+      status: PostStatus.OPEN,
     };
 
     if (search) {
@@ -193,7 +198,22 @@ export class SitterService {
       },
     });
 
-    let processedPosts = postsData.map((post) => {
+    type PostWithAll = Prisma.PostGetPayload<{
+      include: {
+        owner: {
+          include: {
+            bookingsAsOwner: {
+              include: { review: true };
+            };
+          };
+        };
+        savedBy: true;
+      };
+    }>;
+
+    const posts = postsData as unknown as PostWithAll[];
+
+    let processedPosts = posts.map((post) => {
       const reviews = post.owner.bookingsAsOwner
         .map((b) => b.review)
         .filter((r) => r !== null);

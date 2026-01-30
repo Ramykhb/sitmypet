@@ -96,8 +96,14 @@ export class UsersService {
       password?: string;
     },
   ) {
-    const { firstname, lastname, email, password } = data;
-    const updateData: any = {};
+    const { firstname, lastname, email, password: __ } = data;
+    void __;
+    const updateData: {
+      firstname?: string;
+      lastname?: string;
+      email?: string;
+      emailVerified?: boolean;
+    } = {};
 
     if (firstname) updateData.firstname = firstname;
     if (lastname) updateData.lastname = lastname;

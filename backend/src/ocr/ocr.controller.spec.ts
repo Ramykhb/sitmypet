@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { OcrController } from './ocr.controller';
+import { OcrService } from './ocr.service';
 
 describe('OcrController', () => {
   let controller: OcrController;
@@ -7,6 +8,12 @@ describe('OcrController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [OcrController],
+      providers: [
+        {
+          provide: OcrService,
+          useValue: {},
+        },
+      ],
     }).compile();
 
     controller = module.get<OcrController>(OcrController);

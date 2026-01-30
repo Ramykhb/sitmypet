@@ -2,7 +2,6 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { exec } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as os from 'os';
 import { PrismaService } from '../prisma/prisma.service';
 import { R2Service } from '../storage/r2.service';
 
@@ -44,9 +43,8 @@ export class OcrService {
 
     return new Promise((resolve, reject) => {
       const scriptPath = 'scripts/ocr.py';
-      exec(
-        `python3.13 ${scriptPath} "${tempFilePath}"`,
-        async (err, stdout) => {
+      exec(`python3.13 ${scriptPath} "${tempFilePath}"`, (err, stdout) => {
+        (async () => {
           try {
             if (fs.existsSync(tempFilePath)) {
               fs.unlinkSync(tempFilePath);
@@ -57,11 +55,11 @@ export class OcrService {
 
           if (err) {
             console.error(err);
-            return reject('OCR failed: ' + err.message);
+            return reject(new Error('OCR failed: ' + err.message));
           }
 
           try {
-            const ocrResult = JSON.parse(stdout);
+            const ocrResult = JSON.parse(stdout) as { text: string };
             const parsed = this.parseText(ocrResult.text);
             const detected = parsed.documentType !== 'UNKNOWN';
 
@@ -103,10 +101,18 @@ export class OcrService {
             });
           } catch (e) {
             console.error('Error parsing/saving:', e);
-            reject('Processing failed: ' + e.message);
+            reject(
+              new Error(
+                'Processing failed: ' +
+                  (e instanceof Error ? e.message : 'Unknown error'),
+              ),
+            );
           }
-        },
-      );
+        })().catch((error) => {
+          console.error('Unhandled error in OCR callback:', error);
+          reject(error instanceof Error ? error : new Error(String(error)));
+        });
+      });
     });
   }
 

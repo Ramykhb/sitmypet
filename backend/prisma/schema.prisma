@@ -8,46 +8,46 @@ datasource db {
 }
 
 model User {
-  id                       String         @id @default(uuid())
-  email                    String         @unique @db.Citext
+  id                       String        @id @default(uuid())
+  email                    String        @unique @db.Citext
   passwordHash             String
   roles                    Role[]
-  createdAt                DateTime       @default(now())
-  updatedAt                DateTime       @updatedAt
+  createdAt                DateTime      @default(now())
+  updatedAt                DateTime      @updatedAt
   firstname                String
   lastname                 String
   refreshTokenExp          DateTime?
   refreshTokenHash         String?
   refreshTokenJti          String?
-  emailVerified            Boolean        @default(false)
-  emailOtpAttempts         Int            @default(0)
+  emailVerified            Boolean       @default(false)
+  emailOtpAttempts         Int           @default(0)
   emailOtpExpires          DateTime?
   emailOtpHash             String?
-  passwordResetOtpAttempts Int            @default(0)
+  passwordResetOtpAttempts Int           @default(0)
   passwordResetOtpExpires  DateTime?
   passwordResetOtpHash     String?
-  profileImageUrl          String?        @default("uploads/pfps/default_pfp.png")
-  bookingsAsOwner          Booking[]      @relation("OwnerBookings")
-  bookingsAsSitter         Booking[]      @relation("SitterBookings")
-  ownedPets                Pet[]          @relation("PetOwner")
-  postsAsOwner             Post[]         @relation("OwnerPosts")
+  profileImageUrl          String?       @default("uploads/pfps/default_pfp.png")
+  bookingsAsOwner          Booking[]     @relation("OwnerBookings")
+  bookingsAsSitter         Booking[]     @relation("SitterBookings")
+  ownedPets                Pet[]         @relation("PetOwner")
+  postsAsOwner             Post[]        @relation("OwnerPosts")
+  profile                  Profile?
   savedPosts               SavedPost[]
   savedSitters             SavedSitter[]
-  profile                  Profile?
 }
 
 model Profile {
-  id            String            @id @default(uuid())
-  userId        String            @unique
-  location      String
-  bio           String?
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
-  services      ServiceOffering[]
-  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  savedBy       SavedSitter[]
-  document      Document?
+  id             String            @id @default(uuid())
+  userId         String            @unique
+  location       String
+  bio            String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  document       Document?
+  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   profilePicture ProfilePicture?
+  savedBy        SavedSitter[]
+  services       ServiceOffering[]
 }
 
 model ServiceOffering {
@@ -97,21 +97,21 @@ model Booking {
 }
 
 model Post {
-  id          String         @id @default(uuid())
+  id          String      @id @default(uuid())
   ownerId     String
   title       String
   location    String
   serviceType String
   duration    String
   imageUrl    String?
-  status      PostStatus     @default(OPEN)
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  price       Decimal?       @db.Decimal(10, 2)
+  status      PostStatus  @default(OPEN)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  price       Decimal?    @db.Decimal(10, 2)
   description String
   petId       String?
-  owner       User           @relation("OwnerPosts", fields: [ownerId], references: [id], onDelete: Cascade)
-  pet         Pet?           @relation(fields: [petId], references: [id], onDelete: SetNull)
+  owner       User        @relation("OwnerPosts", fields: [ownerId], references: [id], onDelete: Cascade)
+  pet         Pet?        @relation(fields: [petId], references: [id])
   savedBy     SavedPost[]
 
   @@index([status, createdAt])
@@ -153,11 +153,30 @@ model SavedSitter {
   userId          String
   sitterProfileId String
   createdAt       DateTime @default(now())
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   profile         Profile  @relation(fields: [sitterProfileId], references: [id], onDelete: Cascade)
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, sitterProfileId])
   @@index([userId])
+}
+
+model Document {
+  id        String   @id @default(uuid())
+  status    String   @default("UNVERIFIED")
+  createdAt DateTime @default(now())
+  profileId String   @unique
+  fileKey   String?
+  fileUrl   String
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model ProfilePicture {
+  id        String   @id @default(uuid())
+  profileId String   @unique
+  url       String   @default("uploads/pfps/default_pfp.png")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
 
 enum Role {
@@ -171,27 +190,7 @@ enum BookingStatus {
   CANCELLED
 }
 
-
 enum PostStatus {
   OPEN
   CLOSED
-}
-
-model Document {
-  id         String   @id @default(uuid())
-  profileId  String   @unique
-  fileUrl    String
-  fileKey    String?
-  status     String   @default("UNVERIFIED")
-  createdAt  DateTime @default(now())
-  profile    Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
-}
-
-model ProfilePicture {
-  id        String   @id @default(uuid())
-  profileId String   @unique
-  url       String   @default("uploads/pfps/default_pfp.png")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }

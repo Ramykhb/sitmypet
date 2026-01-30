@@ -15,7 +15,7 @@ import { SitterService } from './sitter.service';
 @UseGuards(JwtAuthGuard)
 @Controller('sitter')
 export class SitterController {
-  constructor(private readonly sitterService: SitterService) { }
+  constructor(private readonly sitterService: SitterService) {}
 
   @Get('home')
   async getHome(
