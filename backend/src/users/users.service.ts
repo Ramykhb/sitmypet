@@ -94,9 +94,10 @@ export class UsersService {
       lastname?: string;
       email?: string;
       password?: string;
+      location?: string;
     },
   ) {
-    const { firstname, lastname, email, password: __ } = data;
+    const { firstname, lastname, email, location, password: __ } = data;
     void __;
     const updateData: {
       firstname?: string;
@@ -121,6 +122,14 @@ export class UsersService {
 
       updateData.email = email;
       updateData.emailVerified = false;
+    }
+
+    if (location !== undefined) {
+      await this.prisma.profile.upsert({
+        where: { userId },
+        update: { location },
+        create: { userId, location },
+      });
     }
 
     return this.prisma.user.update({
@@ -155,6 +164,24 @@ export class UsersService {
         email: true,
         roles: true,
         profileImageUrl: true,
+        profile: {
+          select: {
+            location: true,
+            profilePicture: {
+              select: {
+                url: true,
+              },
+            },
+            document: {
+              select: {
+                id: true,
+                status: true,
+                fileUrl: true,
+                fileKey: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -162,7 +189,12 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    return user;
+    return {
+      ...user,
+      location: user.profile?.location ?? null,
+      profilePicture: user.profile?.profilePicture?.url ?? null,
+      document: user.profile?.document ?? null,
+    };
   }
 
   async updateRefreshToken(

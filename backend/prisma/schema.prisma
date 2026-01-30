@@ -37,31 +37,17 @@ model User {
 }
 
 model Profile {
-  id             String            @id @default(uuid())
-  userId         String            @unique
+  id             String          @id @default(uuid())
+  userId         String          @unique
   location       String
-  bio            String?
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
   document       Document?
-  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   profilePicture ProfilePicture?
   savedBy        SavedSitter[]
-  services       ServiceOffering[]
 }
 
-model ServiceOffering {
-  id              String   @id @default(uuid())
-  sitterProfileId String
-  serviceType     String
-  price           Decimal  @db.Decimal(10, 2)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  profile         Profile  @relation(fields: [sitterProfileId], references: [id], onDelete: Cascade)
-
-  @@index([sitterProfileId])
-  @@index([serviceType])
-}
 
 model Pet {
   id        String    @id @default(uuid())
