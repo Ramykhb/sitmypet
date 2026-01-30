@@ -45,7 +45,7 @@ const EditProfile = () => {
     const [user, setUser] = useState<User | null>(null);
     const [locations, setLocations] = useState<Location[]>([]);
     const [userLocation, setUserLocation] = useState<Location | null>(null);
-
+    const [imageUri, setImageUri] = useState<string>("https://pub-4f8704924751443bbd3260d113d11a8f.r2.dev/uploads/pfps/default_pfp.png");
     const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
 
     const pickImage = async () => {
@@ -71,38 +71,7 @@ const EditProfile = () => {
 
         const pickedImage = result.assets[0];
         setImage(pickedImage);
-
-        const formData = new FormData();
-        formData.append("file", {
-            uri: pickedImage.uri,
-            name: "profile.jpg",
-            type: "image/jpeg",
-        } as any);
-
-        try {
-            const res = await api.post("/users/me/profile-image", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
-            setUser(prevState => {
-                if (!prevState) {
-                    return null;
-                }
-                return {
-                    ...prevState,
-                    profileImageUrl: res.data.profileImageUrl,
-                };
-            });
-        } catch (e: any) {
-            if (e.status === 400) {
-                setError("Invalid image format or size.");
-            } else {
-                setError("An error has occurred.");
-            }
-        } finally {
-            setDocLoading(false);
-        }
+        setImageUri(pickedImage.uri);
     };
 
     useEffect(() => {
@@ -119,6 +88,7 @@ const EditProfile = () => {
             try {
                 const res = await api.get("/users/me");
                 setUser(res.data);
+                setImageUri(res.data.profileImageUrl || "https://pub-4f8704924751443bbd3260d113d11a8f.r2.dev/uploads/pfps/default_pfp.png")
             } catch (e) {
                 console.error(e);
             }
@@ -127,8 +97,6 @@ const EditProfile = () => {
         fetchLocations();
 
     }, []);
-
-    const imageUri = user?.profileImageUrl || "https://pub-4f8704924751443bbd3260d113d11a8f.r2.dev/uploads/pfps/default_pfp.png";
 
     return (
         <SafeAreaView style={{flex: 1}} edges={["right", "left", "bottom"]}>
