@@ -13,7 +13,7 @@ import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import {SafeAreaView} from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import api from "@/config/api";
-import {backendPath} from "@/config/backConfig";
+import * as SecureStore from "expo-secure-store"
 import CustomDropdownProfile from "@/components/CustomDropdownProfile";
 
 export enum MediaTypeOptions {
@@ -40,9 +40,8 @@ type User = {
 };
 
 const EditProfile = () => {
-    const [error, setError] = useState("");
+    const [status, setStatus] = useState({message: "", type: ""});
     const [loading, setLoading] = useState(false);
-    const [docLoading, setDocLoading] = useState(false);
     const [user, setUser] = useState<User | null>(null);
     const [userLocation, setUserLocation] = useState<string | null>(null);
     const [locations, setLocations] = useState<Location[]>([]);
@@ -50,12 +49,10 @@ const EditProfile = () => {
     const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
 
     const pickImage = async () => {
-        setDocLoading(true);
 
         const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (!permission.granted) {
             alert("Permission required");
-            setDocLoading(false);
             return;
         }
 
@@ -66,7 +63,6 @@ const EditProfile = () => {
         });
 
         if (result.canceled) {
-            setDocLoading(false);
             return;
         }
 
@@ -77,29 +73,37 @@ const EditProfile = () => {
 
     const saveChanges = async () => {
         if (loading) return;
+        if (!user?.firstname || !user?.lastname) {
+            setStatus({type: "error", message: "Please fill all required fields."});
+            return;
+        }
         setLoading(true);
 
-        const formData = new FormData();
-        formData.append("file", {
-            uri: image?.uri,
-            name: "profile.jpg",
-            type: "image/jpeg",
-        } as any);
 
-        try {
-            const res = await api.post("/users/me/profile-image", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
-        } catch (e: any) {
-            setLoading(false);
-            if (e.status === 400) {
-                setError("Invalid image format or size.");
-            } else {
-                setError("An error has occurred.");
+        if (image)
+        {
+            const formData = new FormData();
+            formData.append("file", {
+                uri: image?.uri,
+                name: "profile.jpg",
+                type: "image/jpeg",
+            } as any);
+
+            try {
+                const res = await api.post("/users/me/profile-image", formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                });
+            } catch (e: any) {
+                setLoading(false);
+                if (e.status === 400) {
+                    setStatus({type: "error", message: "Invalid image format or size."});
+                } else {
+                    setStatus({type: "error", message: "An error has occurred."});
+                }
+                return;
             }
-            return;
         }
         try {
             const res = api.patch("users/me", {
@@ -108,11 +112,13 @@ const EditProfile = () => {
                 location: userLocation
             });
         } catch (e) {
-            setError("An error has occurred.");
+            setStatus({type: "error", message: "An error has occurred."});
         } finally {
             setLoading(false);
         }
-        router.push("/(tabs)/(profile)");
+        await SecureStore.setItemAsync("firstname", user?.firstname as string);
+        await SecureStore.setItemAsync("lastname", user?.lastname as string);
+        router.back();
     }
 
     useEffect(() => {
@@ -218,7 +224,7 @@ const EditProfile = () => {
                                 placeholder="Select location"
                             />
                         </View>
-                        <Text className={`text-rose-600 font-bold ${!error ? "hidden" : ""}`}>{error}</Text>
+                        <Text className={`${status.type === "error" ? "text-rose-600" : "text-green-600"} font-bold ${status.message.length <= 0 ? "hidden" : ""}`}>{status.message}</Text>
                         <TouchableOpacity
                             className="w-[85%] bg-[#3944D5] h-14 rounded-full flex flex-row items-center justify-center mt-5 mb-5"
                             onPress={saveChanges}

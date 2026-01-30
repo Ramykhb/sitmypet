@@ -17,6 +17,7 @@ type User = {
 
 export default function Index() {
     const [user, setUser] = useState<User | null>(null);
+    const [name, setName] = useState("");
 
     async function clearAuthData() {
         try {
@@ -40,6 +41,10 @@ export default function Index() {
                 try {
                     const res = await api.get("users/me")
                     setUser(res.data);
+                    const fname = await SecureStore.getItemAsync("firstname");
+                    const lname = await SecureStore.getItemAsync("lastname");
+                    setName(fname as string + " " + lname as string);
+
                 } catch (e) {
                     console.log(e);
                 }
@@ -61,7 +66,7 @@ export default function Index() {
                                 className="w-44 h-44 my-5 mt-10 rounded-full"
                             />
                             <Text className="text-[#0A0A0A] text-2xl font-bold">
-                                {user.firstname} {user.lastname}
+                                {name}
                             </Text>
                         </View>
                     ) : <ActivityIndicator color={"#0a0a0a"} size={"large"} className={"my-12 mt-32"}/> }
