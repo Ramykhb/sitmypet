@@ -68,6 +68,7 @@ export default function Sitter() {
         setIsLoading(true);
         try {
             const res = await api.get("/sitter/home");
+            console.log(res.data.recentClients);
             setNearYouFound(res.data.nearbyPosts ?? []);
             setClientFound(res.data.recentClients ?? []);
             setBookingFound(res.data.todaysBookings ?? []);
@@ -146,7 +147,7 @@ export default function Sitter() {
                             <Text className={"text-2xl ml-8 text-[#0A0A0A]"}>
                                 {"Today's Bookings"}
                             </Text>
-                            <Link href={"/"} className={"mr-8"} disabled={bookingFound.length <= 0}>
+                            <Link href={"/(tabs)/(home)/todaysBookings"} className={"mr-8"} disabled={bookingFound.length <= 0}>
                                 <Text
                                     className={"text-lg font-bold  text-[#3944D5]"}
                                     style={bookingFound.length > 0 ? {} : {color: "#AAAAAA"}}
@@ -198,7 +199,7 @@ export default function Sitter() {
                             <Text className={"text-2xl ml-8 text-[#0A0A0A]"}>
                                 Client History
                             </Text>
-                            <Link href={"/"} className={"mr-8"} disabled={clientFound.length <= 0}>
+                            <Link href={"/(tabs)/(home)/recentClients"} className={"mr-8"} disabled={clientFound.length <= 0}>
                                 <Text
                                     className={"text-lg font-bold  text-[#3944D5]"}
                                     style={clientFound.length > 0 ? {} : {color: "#AAAAAA"}}
