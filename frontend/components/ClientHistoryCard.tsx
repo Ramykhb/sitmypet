@@ -10,7 +10,7 @@ type ClientHistory = {
 const ClientHistoryCard = (props:ClientHistory) => {
     const fName = props.ownerName.split(" ")[0]
   return (
-    <View className={"flex flex-col  w-20 items-center ml-3"}>
+    <View className={"flex flex-col w-20 items-center ml-3"}>
       <Image
         source={{ uri: props.ownerImageUrl }}
         alt="Home Image"

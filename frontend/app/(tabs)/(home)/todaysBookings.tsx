@@ -57,8 +57,8 @@ const TodaysBookings = () => {
                     className={"w-full mb-20 mt-10"}
                     keyExtractor={(item) => item.id}
                     renderItem={({item}) => (
-                        <View className={"w-full px-6 mb-6"}>
-                            <TodaysBookingCard {...item} />
+                        <View className={"w-full mb-6"}>
+                            <TodaysBookingCard {...item} styling={"w-[86%] ml-[7%] h-52"}/>
                         </View>
                     )}
                 />

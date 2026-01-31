@@ -9,13 +9,14 @@ type TodaysBooking = {
     petName: string;
     serviceType: string;
     time: string;
+    styling: string
 };
 
 const TodaysBookingCard = (props:TodaysBooking) => {
   return (
     <View
       className={
-        "flex flex-col px-6 py-6 w-[310px] h-48 rounded-3xl border-gray-300 border ml-8 justify-between"
+        `flex flex-col px-6 py-6 rounded-3xl border-gray-300 border ml-8 justify-between ${props.styling}`
       }
     >
       <View className={"flex-row flex w-full justify-between items-center "}>

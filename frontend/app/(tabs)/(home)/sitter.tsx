@@ -68,12 +68,11 @@ export default function Sitter() {
         setIsLoading(true);
         try {
             const res = await api.get("/sitter/home");
-            console.log(res.data.recentClients);
             setNearYouFound(res.data.nearbyPosts ?? []);
             setClientFound(res.data.recentClients ?? []);
             setBookingFound(res.data.todaysBookings ?? []);
         } catch (error) {
-            console.error(error);
+            console.log(error);
         } finally {
             setIsLoading(false);
         }
@@ -87,7 +86,9 @@ export default function Sitter() {
 
     useFocusEffect(useCallback(
         () => {
-
+            setBookingFound([]);
+            setClientFound([]);
+            setNearYouFound([]);
             const getUser = async () => {
                 try {
                     const res = await api.get("users/me")
@@ -121,7 +122,7 @@ export default function Sitter() {
                         />
                         <View className={"flex flex-col mr-3"}>
                             <Text className={"text-base text-gray-500 text-center"}>
-                                Hello, {user?.firstname}
+                                Hello, {user?.firstname ?? "Guest"}
                             </Text>
                             <Text className={"text-lg font-bold text-[#0A0A0A] text-center"}>
                                 How do you feel today?
@@ -168,7 +169,7 @@ export default function Sitter() {
                                 data={bookingFound}
                                 className={"mr-10"}
                                 keyExtractor={(item) => item.id}
-                                renderItem={({item}) => <TodaysBookingCard {...item} />}
+                                renderItem={({item}) => <TodaysBookingCard {...item} styling={"w-[310px] h-48"}/>}
                                 showsHorizontalScrollIndicator={false}
                             />
                         ) : (
