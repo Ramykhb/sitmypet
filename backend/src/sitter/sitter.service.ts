@@ -65,6 +65,8 @@ export class SitterService {
           id: booking.owner.id,
           ownerName: `${booking.owner.firstname} ${booking.owner.lastname}`,
           ownerImageUrl: booking.owner.profileImageUrl ?? undefined,
+          location: booking.location,
+          lastBookingDate: booking.scheduledTime,
         });
       }
     }
@@ -130,6 +132,8 @@ export class SitterService {
         id: string;
         ownerName: string;
         ownerImageUrl?: string;
+        location: string;
+        lastBookingDate: Date;
       }[],
       nearbyPosts,
     };

@@ -12,6 +12,8 @@ export class ClientHistoryDto {
   id: string;
   ownerName: string;
   ownerImageUrl?: string;
+  location: string;
+  lastBookingDate: Date;
 }
 
 export class NearbyPostDto {
