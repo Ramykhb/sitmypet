@@ -1,27 +1,8 @@
-const formatLastBookingDate = (date?: string) => {
-  if (!date) return "No date";
-
-  const bookingDate = new Date(date);
-  const now = new Date();
-
-  const diffMs = now.getTime() - bookingDate.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-  if (diffDays < 1) return "Today";
-  if (diffDays === 1) return "1 day ago";
-  if (diffDays < 7) return `${diffDays} days ago`;
-
-  return bookingDate.toISOString().split("T")[0];
-};
 import SitterNearYouCard from "@/components/SitterNearYouCard";
 import React, {useEffect, useState} from "react";
 import {FlatList, Image, ScrollView, Text, View} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
-import * as SecureStore from "expo-secure-store";
 import api from "@/config/api";
-import SitterNearYouCardLoading from "@/components/SitterNearYouCardLoading";
-import TodaysBookingCard from "@/components/TodaysBookingCard";
-import TodaysBookingCardLoading from "@/components/TodaysBookingCardLoading";
 
 type ClientHistory = {
     id: string;
@@ -29,6 +10,36 @@ type ClientHistory = {
     location: string;
     lastBookingDate: string;
     ownerImageUrl: string;
+};
+
+const formatLastBookingDate = (date?: string) => {
+    if (!date) return "No date";
+
+    const bookingDate = new Date(date);
+    const now = new Date();
+
+    const diffMs = now.getTime() - bookingDate.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 1) return "Today";
+    if (diffDays === 1) return "1 day ago";
+    if (diffDays < 7) return `${diffDays} days ago`;
+
+    const diffWeeks = Math.floor(diffDays / 7);
+    if (diffWeeks === 1) return "1 week ago";
+    if (diffWeeks < 5) return `${diffWeeks} weeks ago`;
+
+    const diffMonths =
+        now.getFullYear() * 12 +
+        now.getMonth() -
+        (bookingDate.getFullYear() * 12 + bookingDate.getMonth());
+
+    if (diffMonths === 1) return "1 month ago";
+    if (diffMonths < 12) return `${diffMonths} months ago`;
+
+    const diffYears = now.getFullYear() - bookingDate.getFullYear();
+    if (diffYears === 1) return "1 year ago";
+    return `${diffYears} years ago`;
 };
 
 const TodaysBookings = () => {
@@ -57,10 +68,10 @@ const TodaysBookings = () => {
     }, []);
 
     return (
-        <SafeAreaView className={"flex-1"} edges={["right", "bottom", "left"]}>
+        <SafeAreaView className={"flex-1"} edges={["right", "left"]}>
             {loading ? (
               <View className="flex mt-10">
-                {[1,2,3,4,5,6,7].map((_, i) => (
+                {[1,2,3,4,5,6].map((_, i) => (
                   <View key={i} className="w-full px-10 mb-6 flex flex-row h-20 opacity-40">
                     <View className="w-20 h-20 mr-8 bg-gray-300 rounded-full" />
                     <View className="flex flex-col justify-around items-start flex-1">
@@ -80,9 +91,7 @@ const TodaysBookings = () => {
                             <View>
                                 <Image
                                     source={{
-                                        uri: item.ownerImageUrl?.startsWith("http")
-                                            ? item.ownerImageUrl
-                                            : "https://pub-4f8704924751443bbd3260d113d11a8f.r2.dev/uploads/pfps/default_pfp.png",
+                                        uri: item.ownerImageUrl
                                     }}
                                     className="w-20 h-20 rounded-full mr-8"
                                 />

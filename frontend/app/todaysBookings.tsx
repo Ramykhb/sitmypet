@@ -38,7 +38,7 @@ const TodaysBookings = () => {
     }, []);
 
     return (
-        <SafeAreaView className={"flex-1"} edges={["right", "bottom", "left"]}>
+        <SafeAreaView className={"flex-1"} edges={["right", "left"]}>
             {loading ? (
                 <View className="flex mt-10">
                     <View className={"w-full px-6 mb-6"}>

@@ -38,7 +38,7 @@ const SitterNearYou = () => {
     }, []);
 
     return (
-        <SafeAreaView className={"flex-1"} edges={["right", "bottom", "left"]}>
+        <SafeAreaView className={"flex-1"} edges={["right", "left"]}>
             {loading ? (
                     <View className="flex mt-5">
                         <View className={"w-full h-60 px-8 mb-6"}>
