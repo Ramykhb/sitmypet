@@ -26,7 +26,7 @@ model User {
   passwordResetOtpAttempts Int           @default(0)
   passwordResetOtpExpires  DateTime?
   passwordResetOtpHash     String?
-  profileImageUrl          String?       @default("uploads/pfps/default_pfp.png")
+  profileImageUrl          String?       @default("https://pub-4f8704924751443bbd3260d113d11a8f.r2.dev/uploads/pfps/default_pfp.png")
   bookingsAsOwner          Booking[]     @relation("OwnerBookings")
   bookingsAsSitter         Booking[]     @relation("SitterBookings")
   ownedPets                Pet[]         @relation("PetOwner")
@@ -160,7 +160,7 @@ model Document {
 model ProfilePicture {
   id        String   @id @default(uuid())
   profileId String   @unique
-  url       String   @default("uploads/pfps/default_pfp.png")
+  url       String   @default("https://pub-4f8704924751443bbd3260d113d11a8f.r2.dev/uploads/pfps/default_pfp.png")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
