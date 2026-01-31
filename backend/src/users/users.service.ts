@@ -136,11 +136,11 @@ export class UsersService {
       await this.prisma.profile.upsert({
         where: { userId },
         update: {
-          location: { connect: { name: location } },
+          locationId: loc.id,
         },
         create: {
-          user: { connect: { id: userId } },
-          location: { connect: { name: location } },
+          userId: userId,
+          locationId: loc.id,
         },
       });
     }
