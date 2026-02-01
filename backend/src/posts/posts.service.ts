@@ -8,20 +8,8 @@ export class PostsService {
   async findOne(id: string, userId?: string) {
     const job = await this.prisma.post.findUnique({
       where: { id },
-      select: {
-        id: true,
-        ownerId: true,
-        title: true,
-        location: true,
-        serviceType: true,
-        duration: true,
-        imageUrl: true,
-        status: true,
-        createdAt: true,
-        updatedAt: true,
-        price: true,
-        description: true,
-        petId: true,
+      include: {
+        service: true,
         owner: {
           select: {
             id: true,
@@ -47,7 +35,7 @@ export class PostsService {
                 userId: userId,
               },
             }
-          : false,
+          : undefined,
       },
     });
 

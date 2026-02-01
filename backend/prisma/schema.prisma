@@ -67,7 +67,7 @@ model Booking {
   sitterId      String
   ownerId       String
   petId         String
-  serviceType   String
+  serviceId     String // Add this
   location      String
   scheduledTime DateTime
   status        BookingStatus @default(CONFIRMED)
@@ -76,6 +76,7 @@ model Booking {
   owner         User          @relation("OwnerBookings", fields: [ownerId], references: [id], onDelete: Cascade)
   pet           Pet           @relation(fields: [petId], references: [id], onDelete: Cascade)
   sitter        User          @relation("SitterBookings", fields: [sitterId], references: [id], onDelete: Cascade)
+  service       Service       @relation(fields: [serviceId], references: [id]) // Add this
   review        Review?
 
   @@index([sitterId, scheduledTime])
@@ -85,9 +86,9 @@ model Booking {
 model Post {
   id          String      @id @default(uuid())
   ownerId     String
+  serviceId   String
   title       String
   location    String
-  serviceType String
   duration    String
   imageUrl    String?
   status      PostStatus  @default(OPEN)
@@ -98,6 +99,7 @@ model Post {
   petId       String?
   owner       User        @relation("OwnerPosts", fields: [ownerId], references: [id], onDelete: Cascade)
   pet         Pet?        @relation(fields: [petId], references: [id])
+  service     Service     @relation(fields: [serviceId], references: [id])
   savedBy     SavedPost[]
 
   @@index([status, createdAt])
@@ -133,6 +135,15 @@ model Location {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Profile   Profile[]
+}
+
+model Service {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  posts     Post[]
+  bookings  Booking[]
 }
 
 model SavedSitter {
@@ -181,5 +192,3 @@ enum PostStatus {
   OPEN
   CLOSED
 }
-
-//yobrow

@@ -4,7 +4,10 @@ export class PostDto {
   imageUrl?: string;
   title: string;
   location: string;
-  serviceType: string;
+  service: {
+    id: string;
+    name: string;
+  };
   duration: string;
   createdAt: Date;
   price?: number;

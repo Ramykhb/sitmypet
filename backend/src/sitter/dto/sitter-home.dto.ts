@@ -20,7 +20,10 @@ export class NearbyPostDto {
   id: string;
   title: string;
   location: string;
-  serviceType: string;
+  service: {
+    id: string;
+    name: string;
+  };
   duration: string;
   rating: number;
   reviewCount: number;

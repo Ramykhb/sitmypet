@@ -26,6 +26,7 @@ export class SitterService {
       include: {
         owner: true,
         pet: true,
+        service: true,
       },
       orderBy: {
         scheduledTime: 'asc',
@@ -37,7 +38,7 @@ export class SitterService {
       ownerName: `${booking.owner.firstname} ${booking.owner.lastname}`,
       petName: booking.pet.name,
       ownerImageURL: booking.owner.profileImageUrl ?? undefined,
-      serviceType: booking.serviceType,
+      serviceType: booking.service.name,
       location: booking.location,
       time: booking.scheduledTime.toLocaleTimeString('en-US', {
         hour: '2-digit',
@@ -77,6 +78,7 @@ export class SitterService {
         status: 'OPEN',
       },
       include: {
+        service: true,
         owner: {
           include: {
             bookingsAsOwner: {
@@ -117,7 +119,7 @@ export class SitterService {
         id: post.id,
         title: post.title,
         location: post.location,
-        serviceType: post.serviceType,
+        service: post.service,
         duration: post.duration,
         rating: Number(rating.toFixed(1)),
         reviewCount: reviewCount,
@@ -183,12 +185,13 @@ export class SitterService {
     }
 
     if (services) {
-      where.serviceType = { contains: services, mode: 'insensitive' };
+      where.serviceId = services;
     }
 
     const postsData = await this.prisma.post.findMany({
       where,
       include: {
+        service: true,
         owner: {
           include: {
             bookingsAsOwner: {
@@ -205,6 +208,7 @@ export class SitterService {
 
     type PostWithAll = Prisma.PostGetPayload<{
       include: {
+        service: true;
         owner: {
           include: {
             bookingsAsOwner: {
@@ -287,7 +291,7 @@ export class SitterService {
       imageUrl: post.imageUrl ?? undefined,
       title: post.title,
       location: post.location,
-      serviceType: post.serviceType,
+      service: post.service,
       duration: post.duration,
       createdAt: post.createdAt,
       price: post.price ? Number(post.price) : undefined,
@@ -345,6 +349,7 @@ export class SitterService {
       include: {
         post: {
           include: {
+            service: true,
             owner: {
               include: {
                 bookingsAsOwner: {
@@ -377,7 +382,7 @@ export class SitterService {
           id: post.id,
           title: post.title,
           location: post.location,
-          serviceType: post.serviceType,
+          serviceType: post.service.name,
           duration: post.duration,
           imageUrl: post.imageUrl ?? undefined,
           ownerName: `${post.owner.firstname} ${post.owner.lastname}`,

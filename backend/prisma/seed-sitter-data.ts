@@ -12,7 +12,7 @@ const NEARBY_POSTS_DATA = [
   {
     title: 'Energetic Husky needs morning walks',
     location: 'Beirut',
-    serviceType: 'Walking',
+    serviceType: 'Dog Walking',
     duration: '1-2 Hours',
     imageUrl:
       'https://images.unsplash.com/photo-1605568427561-40dd23c2acea?auto=format&fit=crop&w=800&q=80',
@@ -40,7 +40,7 @@ const NEARBY_POSTS_DATA = [
   {
     title: 'Friendly Labrador needs weekend sitting',
     location: 'Jounieh',
-    serviceType: 'Sitting',
+    serviceType: 'Pet Sitting',
     duration: '2-3 Days',
     imageUrl:
       'https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=800&q=80',
@@ -54,7 +54,7 @@ const NEARBY_POSTS_DATA = [
   {
     title: 'Playful Beagle needs afternoon hiking',
     location: 'Beirut',
-    serviceType: 'Hike',
+    serviceType: 'Dog Walking',
     duration: '3-4 Hours',
     imageUrl:
       'https://images.unsplash.com/photo-1505628346881-b72b27e84530?auto=format&fit=crop&w=800&q=80',
@@ -68,7 +68,7 @@ const NEARBY_POSTS_DATA = [
   {
     title: 'Senior Golden Retriever needs gentle care',
     location: 'Baabda',
-    serviceType: 'Sitting',
+    serviceType: 'Pet Sitting',
     duration: '4-5 Hours',
     imageUrl:
       'https://images.unsplash.com/photo-1633722715463-d30f4f325e24?auto=format&fit=crop&w=800&q=80',
@@ -81,7 +81,6 @@ const NEARBY_POSTS_DATA = [
   },
 ];
 
-// Sample data for creating client history (owners who had completed bookings with the sitter)
 const CLIENT_HISTORY_DATA = [
   {
     firstname: 'James',
@@ -89,7 +88,7 @@ const CLIENT_HISTORY_DATA = [
     email: 'james.wilson@example.com',
     petName: 'Bella',
     petBreed: 'French Bulldog',
-    serviceType: 'Walking',
+    serviceType: 'Dog Walking',
     location: 'Beirut',
     rating: 5,
     comment: 'Excellent service! My dog loved the walks.',
@@ -111,7 +110,7 @@ const CLIENT_HISTORY_DATA = [
     email: 'oliver.taylor@example.com',
     petName: 'Cooper',
     petBreed: 'Border Collie',
-    serviceType: 'Sitting',
+    serviceType: 'Pet Sitting',
     location: 'Jounieh',
     rating: 5,
     comment: 'Great experience! Highly recommend.',
@@ -122,7 +121,7 @@ const CLIENT_HISTORY_DATA = [
     email: 'isabella.moore@example.com',
     petName: 'Daisy',
     petBreed: 'Yorkshire Terrier',
-    serviceType: 'Walking',
+    serviceType: 'Dog Walking',
     location: 'Beirut',
     rating: 5,
     comment: 'Wonderful caretaker!',
@@ -133,7 +132,7 @@ const CLIENT_HISTORY_DATA = [
     email: 'ethan.white@example.com',
     petName: 'Zeus',
     petBreed: 'German Shepherd',
-    serviceType: 'Hike',
+    serviceType: 'Medication Administration',
     location: 'Baabda',
     rating: 4,
     comment: 'Good service, very reliable.',
@@ -149,7 +148,7 @@ const BOOKINGS_DATA = [
     email: 'ava.harris@example.com',
     petName: 'Oscar',
     petBreed: 'Cocker Spaniel',
-    serviceType: 'Walking',
+    serviceType: 'Dog Walking',
     location: 'Beirut',
     daysFromToday: 0,
     time: '09:00',
@@ -160,7 +159,7 @@ const BOOKINGS_DATA = [
     email: 'noah.clark@example.com',
     petName: 'Coco',
     petBreed: 'Chihuahua',
-    serviceType: 'Sitting',
+    serviceType: 'Pet Sitting',
     location: 'Jounieh',
     daysFromToday: 0,
     time: '14:30',
@@ -183,7 +182,7 @@ const BOOKINGS_DATA = [
     email: 'liam.johnson@example.com',
     petName: 'Luna',
     petBreed: 'Pomeranian',
-    serviceType: 'Walking',
+    serviceType: 'Dog Walking',
     location: 'Beirut',
     daysFromToday: 1,
     time: '15:00',
@@ -195,7 +194,7 @@ const BOOKINGS_DATA = [
     email: 'emma.williams@example.com',
     petName: 'Rex',
     petBreed: 'Rottweiler',
-    serviceType: 'Hike',
+    serviceType: 'Medication Administration',
     location: 'Baabda',
     daysFromToday: 3,
     time: '08:00',
@@ -207,7 +206,7 @@ const BOOKINGS_DATA = [
     email: 'lucas.brown@example.com',
     petName: 'Mittens',
     petBreed: 'British Shorthair',
-    serviceType: 'Sitting',
+    serviceType: 'Pet Sitting',
     location: 'Jounieh',
     daysFromToday: 5,
     time: '12:00',
@@ -219,7 +218,7 @@ const BOOKINGS_DATA = [
     email: 'olivia.garcia@example.com',
     petName: 'Duke',
     petBreed: 'Boxer',
-    serviceType: 'Walking',
+    serviceType: 'Dog Walking',
     location: 'Beirut',
     daysFromToday: 7,
     time: '17:00',
@@ -286,7 +285,9 @@ async function main() {
   for (const postData of NEARBY_POSTS_DATA) {
     // Create or find owner
     let owner = await prisma.user.findUnique({
-      where: { email: `${postData.ownerFirstname.toLowerCase()}.${postData.ownerLastname.toLowerCase()}@example.com` },
+      where: {
+        email: `${postData.ownerFirstname.toLowerCase()}.${postData.ownerLastname.toLowerCase()}@example.com`,
+      },
     });
 
     if (!owner) {
@@ -332,12 +333,24 @@ async function main() {
       });
     }
 
+    // Find service by name
+    const service = await prisma.service.findUnique({
+      where: { name: postData.serviceType },
+    });
+
+    if (!service) {
+      console.warn(
+        `Service "${postData.serviceType}" not found, skipping post`,
+      );
+      continue;
+    }
+
     // Create post
     await prisma.post.create({
       data: {
         title: postData.title,
         location: postData.location,
-        serviceType: postData.serviceType,
+        serviceId: service.id,
         duration: postData.duration,
         imageUrl: postData.imageUrl,
         description: postData.description,
@@ -389,6 +402,18 @@ async function main() {
       });
     }
 
+    // Find service by name
+    const service = await prisma.service.findUnique({
+      where: { name: clientData.serviceType },
+    });
+
+    if (!service) {
+      console.warn(
+        `Service "${clientData.serviceType}" not found, skipping client`,
+      );
+      continue;
+    }
+
     // Create completed booking in the past
     const pastDate = new Date();
     pastDate.setDate(pastDate.getDate() - Math.floor(Math.random() * 30) - 1); // Random date in the past month
@@ -398,7 +423,7 @@ async function main() {
         sitterId: sitter.id,
         ownerId: owner.id,
         petId: pet.id,
-        serviceType: clientData.serviceType,
+        serviceId: service.id,
         location: clientData.location,
         scheduledTime: pastDate,
         status: 'COMPLETED',
@@ -460,10 +485,22 @@ async function main() {
       });
     }
 
+    // Find service by name
+    const service = await prisma.service.findUnique({
+      where: { name: bookingData.serviceType },
+    });
+
+    if (!service) {
+      console.warn(
+        `Service "${bookingData.serviceType}" not found, skipping booking`,
+      );
+      continue;
+    }
+
     // Calculate booking date
     const bookingDate = new Date(today);
     bookingDate.setDate(bookingDate.getDate() + bookingData.daysFromToday);
-    
+
     // Parse time and set it
     const [hours, minutes] = bookingData.time.split(':');
     bookingDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
@@ -474,7 +511,7 @@ async function main() {
         sitterId: sitter.id,
         ownerId: owner.id,
         petId: pet.id,
-        serviceType: bookingData.serviceType,
+        serviceId: service.id,
         location: bookingData.location,
         scheduledTime: bookingDate,
         status: 'CONFIRMED',
@@ -498,7 +535,9 @@ async function main() {
   console.log(
     `  - ${CLIENT_HISTORY_DATA.length} recent clients with reviews created`,
   );
-  console.log(`  - ${BOOKINGS_DATA.length} bookings created (today, tomorrow, and future)`);
+  console.log(
+    `  - ${BOOKINGS_DATA.length} bookings created (today, tomorrow, and future)`,
+  );
 }
 
 main()
