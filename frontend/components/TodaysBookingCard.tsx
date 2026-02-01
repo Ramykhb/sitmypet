@@ -12,6 +12,13 @@ type TodaysBooking = {
     styling: string
 };
 
+const serviceIcons: Record<string, any> = {
+    "dog walking": require("../assets/icons/dogWalking.png"),
+    "pet sitting": require("../assets/icons/petSitting.png"),
+    "grooming": require("../assets/icons/petGrooming.png"),
+    "medication administration'": require("../assets/icons/petHealth.png"),
+};
+
 const TodaysBookingCard = (props:TodaysBooking) => {
   return (
     <View
@@ -36,18 +43,15 @@ const TodaysBookingCard = (props:TodaysBooking) => {
             </Text>
           </View>
         </View>
-        <Image
-          source={require("../assets/icons/bell-red.png")}
-          alt="Home Image"
-          className={"w-8 h-8 rounded-full"}
-          resizeMode={"cover"}
-        />
+          <Image
+              source={serviceIcons[props.serviceType.toLowerCase()]}
+              className="w-10 h-10 rounded-full"
+              resizeMode="cover"
+          />
       </View>
-      <View
-        className={
-          "w-full flex-row flex h-20 p-4 bg-[#E8ECED] rounded-2xl justify-between"
-        }
-      >
+        <View
+            className={"w-full flex-row h-20 p-4 bg-[#E8ECED] rounded-2xl justify-between"}
+        >
         <View className={"flex justify-around"}>
           <Text className={"text-xs text-gray-500"}>Service type</Text>
           <Text className={"text-base"}>{props.serviceType}</Text>
