@@ -25,14 +25,21 @@ type Pet = {
     updatedAt: string;
 };
 
-export type Post = {
+type Service = {
+    id: string;
+    createdAt: string;
+    name: string;
+    updatedAt: string;
+}
+
+type Post = {
     id: string;
     title: string;
     description: string;
     location: string;
     duration: string;
     imageUrl: string;
-    serviceType: string;
+    service: Service;
     price: string;
     status: "OPEN" | "CLOSED" | "PENDING";
     ownerId: string;
@@ -107,7 +114,7 @@ const PostDetails = () => {
                         </Text>
                         <View className={"w-1 h-1 rounded-full ml-2 bg-gray-500"}/>
                         <Text className={"text-gray-500 ml-2 font-semibold text-sm"}>
-                            {post?.serviceType}
+                            {post?.service.name}
                         </Text>
                         <View className={"w-[1px] h-[12px] rounded-full ml-2 bg-gray-500"}/>
                         <Text className={"text-gray-500 ml-2 font-semibold text-sm"}>

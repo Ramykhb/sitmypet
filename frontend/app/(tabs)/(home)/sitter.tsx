@@ -19,6 +19,13 @@ import {
 import {SafeAreaView} from "react-native-safe-area-context";
 import "../../global.css";
 
+type Service = {
+    id: string;
+    createdAt: string;
+    name: string;
+    updatedAt: string;
+}
+
 type NearbyPost = {
     id: string;
     title: string;
@@ -26,7 +33,7 @@ type NearbyPost = {
     duration: string;
     imageUrl: string;
     isSaved: boolean;
-    serviceType: string;
+    service: Service;
     rating: number;
     reviewCount: number;
 };
