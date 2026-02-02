@@ -128,7 +128,7 @@ const PostDetails = () => {
                             <View className={"w-full flex flex-row justify-center items-center"}>
                                 <Image source={require("../../assets/icons/star.png")} alt="Star"
                                        className={"w-6 h-6 mr-2"}/>
-                                <Text className={"text-xl font-bold text-[#0a0a0a]"}>{post?.owner.clientRating == 0}</Text>
+                                <Text className={"text-xl font-bold text-[#0a0a0a]"}>{post?.owner.reviewsCount == 0 ? "-" : post?.owner.clientRating}</Text>
                             </View>
                             <Text className={" text-gray-600"}>Rating</Text>
                         </View>
