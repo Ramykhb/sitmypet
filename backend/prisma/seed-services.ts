@@ -6,7 +6,7 @@ const services = [
   'Dog Walking',
   'Pet Sitting',
   'Grooming',
-  'Medication Administration',
+  'Health Care',
 ];
 
 async function main() {

@@ -16,7 +16,7 @@ const serviceIcons: Record<string, any> = {
     "dog walking": require("../assets/icons/dogWalking.png"),
     "pet sitting": require("../assets/icons/petSitting.png"),
     "grooming": require("../assets/icons/petGrooming.png"),
-    "medication administration'": require("../assets/icons/petHealth.png"),
+    "health care": require("../assets/icons/petHealth.png"),
 };
 
 const TodaysBookingCard = (props:TodaysBooking) => {

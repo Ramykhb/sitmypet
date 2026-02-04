@@ -749,7 +749,7 @@ This project streamlines the development of pet care services with:
 						</tr>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='https://github.com/tarekhatib/sitmypet/blob/master/backend/prisma/seed-services.ts'>seed-services.ts</a></b></td>
-							<td style='padding: 8px;'>- Seeds core service options into the database to support the applications service catalog<br>- Ensures that essential pet care services such as dog walking, grooming, and medication administration are available for user bookings and interactions<br>- Maintains data integrity by clearing dependent records before populating the service list, facilitating consistent and reliable application operation.</td>
+							<td style='padding: 8px;'>- Seeds core service options into the database to support the applications service catalog<br>- Ensures that essential pet care services such as dog walking, grooming, and health care are available for user bookings and interactions<br>- Maintains data integrity by clearing dependent records before populating the service list, facilitating consistent and reliable application operation.</td>
 						</tr>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='https://github.com/tarekhatib/sitmypet/blob/master/backend/prisma/seed-posts.ts'>seed-posts.ts</a></b></td>

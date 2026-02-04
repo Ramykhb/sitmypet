@@ -42,6 +42,7 @@ type User = {
 const EditProfile = () => {
     const [status, setStatus] = useState({message: "", type: ""});
     const [loading, setLoading] = useState(false);
+    const [gettingProfile, setGettingProfile] = useState(false);
     const [user, setUser] = useState<User | null>(null);
     const [userLocation, setUserLocation] = useState<string | null>(null);
     const [locations, setLocations] = useState<Location[]>([]);
@@ -80,8 +81,7 @@ const EditProfile = () => {
         setLoading(true);
 
 
-        if (image)
-        {
+        if (image) {
             const formData = new FormData();
             formData.append("file", {
                 uri: image?.uri,
@@ -122,6 +122,7 @@ const EditProfile = () => {
     }
 
     useEffect(() => {
+        setGettingProfile(true);
         const fetchLocations = async () => {
             try {
                 const res = await api.get("/locations");
@@ -138,6 +139,8 @@ const EditProfile = () => {
                 setImageUri(res.data.profileImageUrl || "https://pub-4f8704924751443bbd3260d113d11a8f.r2.dev/uploads/pfps/default_pfp.png")
             } catch (e) {
                 console.error(e);
+            } finally {
+                setGettingProfile(false);
             }
         }
         temp();
@@ -155,87 +158,96 @@ const EditProfile = () => {
                     keyboardOpeningTime={100}
                     keyboardShouldPersistTaps="handled"
                 >
-                    <View className="flex flex-col flex-1 w-full p-10 py-5 items-center">
-                        <TouchableOpacity className={'relative'} onPress={pickImage}>
-                            <Image
-                                source={{ uri: imageUri }}
-                                alt="logo"
-                                className="w-48 h-48 rounded-full mt-10"
-                                resizeMode="cover"
-                            />
-                            <View className={"absolute bottom-0 right-0 bg-[#3944D5] w-14 h-14 rounded-full flex items-center justify-center"}>
-                                <Image source={require("../../../assets/icons/camera.png")} className={"w-6 h-6"} />
-                            </View>
-                        </TouchableOpacity>
-                        <View className={"px-5 w-full mt-10 text-[#0A0A0A]"}>
-                            <Text className={"text-xl"}>First Name</Text>
-                            <TextInput
-                                className={
-                                    "w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"
-                                }
-                                value={user?.firstname}
-                                autoCapitalize={"none"}
-                                autoComplete="off"
-                                textContentType="none"
-                                importantForAutofill="no"
-                                onChangeText={(text) => {
-                                    setUser((prevState) => {
-                                        if (!prevState) return prevState;
+                    {
+                        gettingProfile ? <View className={"flex-1 flex justify-center items-center w-full"}>
+                                <ActivityIndicator size="large"/>
+                                <Text className={"text-center text-2xl mt-10 text-[#0a0a0a]"}>Fetching Profile...</Text>
+                            </View> :
 
-                                        return {
-                                            ...prevState,
-                                            firstname: text,
-                                        };
-                                    });
-                                }}
-                            />
-                        </View>
-                        <View className={"px-5 w-full mt-5 text-[#0A0A0A]"}>
-                            <Text className={"text-xl"}>Last Name</Text>
-                            <TextInput
-                                className={
-                                    "w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"
-                                }
-                                value={user?.lastname}
-                                autoCapitalize={"none"}
-                                autoComplete="off"
-                                textContentType="none"
-                                importantForAutofill="no"
-                                onChangeText={(text) => {
-                                    setUser((prevState) => {
-                                        if (!prevState) return prevState;
+                            <View className="flex flex-col flex-1 w-full p-10 py-5 items-center">
+                                <TouchableOpacity className={'relative'} onPress={pickImage}>
+                                    <Image
+                                        source={{uri: imageUri}}
+                                        alt="logo"
+                                        className="w-48 h-48 rounded-full mt-10"
+                                        resizeMode="cover"
+                                    />
+                                    <View
+                                        className={"absolute bottom-0 right-0 bg-[#3944D5] w-14 h-14 rounded-full flex items-center justify-center"}>
+                                        <Image source={require("../../../assets/icons/camera.png")}
+                                               className={"w-6 h-6"}/>
+                                    </View>
+                                </TouchableOpacity>
+                                <View className={"px-5 w-full mt-10 text-[#0A0A0A]"}>
+                                    <Text className={"text-xl"}>First Name</Text>
+                                    <TextInput
+                                        className={
+                                            "w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"
+                                        }
+                                        value={user?.firstname}
+                                        autoCapitalize={"none"}
+                                        autoComplete="off"
+                                        textContentType="none"
+                                        importantForAutofill="no"
+                                        onChangeText={(text) => {
+                                            setUser((prevState) => {
+                                                if (!prevState) return prevState;
 
-                                        return {
-                                            ...prevState,
-                                            lastname: text,
-                                        };
-                                    });
-                                }}
-                            />
-                        </View>
-                        <View className={"px-5 w-full mt-5 mb-5 text-[#0A0A0A]"}>
-                            <Text className={"text-xl"}>Location</Text>
-                            <CustomDropdownProfile
-                                data={locations}
-                                value={userLocation ?? null}
-                                onChange={(value: string) => {
-                                    setUserLocation(value);
-                                }}
-                                placeholder="Select location"
-                            />
-                        </View>
-                        <Text className={`${status.type === "error" ? "text-rose-600" : "text-green-600"} font-bold ${status.message.length <= 0 ? "hidden" : ""}`}>{status.message}</Text>
-                        <TouchableOpacity
-                            className="w-[85%] bg-[#3944D5] h-14 rounded-full flex flex-row items-center justify-center mt-5 mb-5"
-                            onPress={saveChanges}
-                        >
-                            {loading ? (
-                                <ActivityIndicator color={"#FFFFFF"} size={"small"} />
-                            ) : (
-                                <Text className="text-white text-lg font-bold">Save Changes</Text>
-                            )}
-                        </TouchableOpacity>
-                    </View>
+                                                return {
+                                                    ...prevState,
+                                                    firstname: text,
+                                                };
+                                            });
+                                        }}
+                                    />
+                                </View>
+                                <View className={"px-5 w-full mt-5 text-[#0A0A0A]"}>
+                                    <Text className={"text-xl"}>Last Name</Text>
+                                    <TextInput
+                                        className={
+                                            "w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"
+                                        }
+                                        value={user?.lastname}
+                                        autoCapitalize={"none"}
+                                        autoComplete="off"
+                                        textContentType="none"
+                                        importantForAutofill="no"
+                                        onChangeText={(text) => {
+                                            setUser((prevState) => {
+                                                if (!prevState) return prevState;
+
+                                                return {
+                                                    ...prevState,
+                                                    lastname: text,
+                                                };
+                                            });
+                                        }}
+                                    />
+                                </View>
+                                <View className={"px-5 w-full mt-5 mb-5 text-[#0A0A0A]"}>
+                                    <Text className={"text-xl"}>Location</Text>
+                                    <CustomDropdownProfile
+                                        data={locations}
+                                        value={userLocation ?? null}
+                                        onChange={(value: string) => {
+                                            setUserLocation(value);
+                                        }}
+                                        placeholder="Select location"
+                                    />
+                                </View>
+                                <Text
+                                    className={`${status.type === "error" ? "text-rose-600" : "text-green-600"} font-bold ${status.message.length <= 0 ? "hidden" : ""}`}>{status.message}</Text>
+                                <TouchableOpacity
+                                    className="w-[85%] bg-[#3944D5] h-14 rounded-full flex flex-row items-center justify-center mt-5 mb-5"
+                                    onPress={saveChanges}
+                                >
+                                    {loading ? (
+                                        <ActivityIndicator color={"#FFFFFF"} size={"small"}/>
+                                    ) : (
+                                        <Text className="text-white text-lg font-bold">Save Changes</Text>
+                                    )}
+                                </TouchableOpacity>
+                            </View>}
                 </KeyboardAwareScrollView>
             </TouchableWithoutFeedback>
         </SafeAreaView>
