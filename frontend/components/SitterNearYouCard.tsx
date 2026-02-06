@@ -4,13 +4,6 @@ import {Image, Pressable, Text, TouchableOpacity, View} from "react-native";
 import api from "@/config/api";
 import {router} from "expo-router";
 
-type Service = {
-    id: string;
-    createdAt: string;
-    name: string;
-    updatedAt: string;
-}
-
 type NearbyRequest = {
     id: string;
     title: string;
@@ -18,7 +11,7 @@ type NearbyRequest = {
     imageUrl: string;
     isSaved: boolean;
     location: string;
-    service: Service;
+    serviceType: string;
     rating: number;
     reviewCount: number;
     onUnsave?: () => void;
@@ -108,7 +101,7 @@ const SitterNearYouCard = (props: NearbyRequest) => {
                         </Text>
                         <View className={"w-1 h-1 rounded-full ml-2 bg-gray-500"}/>
                         <Text className={"text-gray-500 ml-2 font-semibold text-sm"}>
-                            {props.service.name}
+                            {props.serviceType}
                         </Text>
                         <View className={"w-[1px] h-[12px] rounded-full ml-2 bg-gray-500"}/>
                         <Text className={"text-gray-500 ml-2 font-semibold text-sm"}>
