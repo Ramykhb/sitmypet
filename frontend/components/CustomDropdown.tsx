@@ -23,6 +23,7 @@ type CustomDropdownProps = {
     value: string | null;
     onChange: (value: string) => void;
     placeholder?: string;
+    wrapperWidth?: string;
 };
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -32,13 +33,14 @@ export default function CustomDropdown({
                                                 value,
                                                 onChange,
                                                 placeholder = 'Select an option',
+    wrapperWidth
                                             }: CustomDropdownProps) {
     const [visible, setVisible] = useState(false);
 
     const selectedLabel = data.find((item) => item.name === value)?.name || '';
 
     return (
-        <View style={styles.wrapper} className={"bg-transparent"}>
+        <View style={styles.wrapper} className={`bg-transparent w-[${wrapperWidth ? wrapperWidth : "50%" }]`}>
             <TouchableOpacity
                 activeOpacity={0.8}
                 onPress={() => setVisible(true)}
@@ -88,7 +90,6 @@ export default function CustomDropdown({
 
 const styles = StyleSheet.create({
     wrapper: {
-        width: '50%',
         marginHorizontal: "0%",
     },
     button: {
