@@ -11,6 +11,7 @@ import { UsersModule } from './users/users.module';
 import { OcrModule } from './ocr/ocr.module';
 import { PostsModule } from './posts/posts.module';
 import { StorageModule } from './storage/storage.module';
+import { BookingsModule } from './bookings/bookings.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { StorageModule } from './storage/storage.module';
     OcrModule,
     PostsModule,
     StorageModule,
+    BookingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
