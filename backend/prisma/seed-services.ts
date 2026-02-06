@@ -14,7 +14,6 @@ async function main() {
 
   const unique = [...new Set(services)].sort();
 
-  // Delete dependent records first
   await prisma.booking.deleteMany({});
   await prisma.post.deleteMany({});
   await prisma.service.deleteMany({});

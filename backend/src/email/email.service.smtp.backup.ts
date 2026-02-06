@@ -1,39 +1,41 @@
+/*
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Resend } from 'resend';
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
-export class EmailService {
-  private resend?: Resend;
-  private from?: string;
+export class EmailServiceSMTP {
+  private transporter: nodemailer.Transporter | null = null;
 
   constructor(private readonly configService: ConfigService) {
-    const apiKey = this.configService.get<string>('RESEND_API_KEY');
-    this.from = this.configService.get<string>('EMAIL_FROM');
+    const smtpHost = this.configService.get<string>('SMTP_HOST');
+    const smtpPort = this.configService.get<number>('SMTP_PORT');
+    const smtpUser = this.configService.get<string>('SMTP_USER');
+    const smtpPass = this.configService.get<string>('SMTP_PASS');
 
-    if (apiKey) {
-      this.resend = new Resend(apiKey);
-    } else {
-      console.error('RESEND_API_KEY missing. Emails will not be sent.');
+    if (smtpHost && smtpPort && smtpUser && smtpPass) {
+      this.transporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: smtpPort,
+        secure: false,
+        auth: {
+          user: smtpUser,
+          pass: smtpPass,
+        },
+      });
     }
-  }
-
-  private getFrom(): string {
-    if (!this.from) {
-      throw new Error('EMAIL_FROM not configured');
-    }
-    return this.from;
   }
 
   async sendOtp(email: string, otp: string): Promise<void> {
-    if (!this.resend) {
-      console.error('Resend not initialized. Cannot send OTP email.');
-      throw new InternalServerErrorException('Email service not configured');
+    if (!this.transporter) {
+      return;
     }
 
+    const smtpFrom = this.configService.get<string>('SMTP_FROM');
+
     try {
-      await this.resend.emails.send({
-        from: this.getFrom(),
+      await this.transporter.sendMail({
+        from: smtpFrom,
         to: email,
         subject: 'Your SitMyPet Verification Code',
         html: `
@@ -77,16 +79,15 @@ export class EmailService {
   }
 
   async sendPasswordResetOtp(email: string, otp: string): Promise<void> {
-    if (!this.resend) {
-      console.error(
-        'Resend not initialized. Cannot send password reset email.',
-      );
-      throw new InternalServerErrorException('Email service not configured');
+    if (!this.transporter) {
+      return;
     }
 
+    const smtpFrom = this.configService.get<string>('SMTP_FROM');
+
     try {
-      await this.resend.emails.send({
-        from: this.getFrom(),
+      await this.transporter.sendMail({
+        from: smtpFrom,
         to: email,
         subject: 'Reset Your SitMyPet Password',
         html: `
@@ -135,18 +136,19 @@ export class EmailService {
     subject: string,
     message: string,
   ): Promise<void> {
-    if (!this.resend) {
-      console.error('Resend not initialized. Cannot send contact form email.');
-      throw new InternalServerErrorException('Email service not configured');
+    if (!this.transporter) {
+      throw new InternalServerErrorException('Email service is not configured');
     }
 
+    const smtpFrom = this.configService.get<string>('SMTP_FROM');
     const ramyEmail = 'ramykhb18@gmail.com';
-    const tarekEmail = 'tarekalkhatibb@gmail.com';
+    const tarekEmail = 'tarekalkhatibb@gmail.com;';
 
     try {
-      const response = await this.resend.emails.send({
-        from: this.getFrom(),
+      await this.transporter.sendMail({
+        from: smtpFrom,
         to: [tarekEmail, ramyEmail],
+        replyTo: email,
         subject: `Contact Form: ${subject}`,
         html: `
         <!DOCTYPE html>
@@ -196,3 +198,4 @@ export class EmailService {
     }
   }
 }
+*/
