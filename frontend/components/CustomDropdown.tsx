@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
     View,
     Text,
@@ -9,7 +9,7 @@ import {
     TouchableWithoutFeedback,
     Dimensions, Image,
 } from 'react-native';
-import { BlurView } from 'expo-blur';
+import {BlurView} from 'expo-blur';
 
 type DropdownItem = {
     id: string;
@@ -24,30 +24,37 @@ type CustomDropdownProps = {
     onChange: (value: string) => void;
     placeholder?: string;
     wrapperWidth?: string;
+    buttonColor?: string;
 };
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 export default function CustomDropdown({
-                                                data,
-                                                value,
-                                                onChange,
-                                                placeholder = 'Select an option',
-    wrapperWidth
-                                            }: CustomDropdownProps) {
+                                           data,
+                                           value,
+                                           onChange,
+                                           placeholder = 'Select an option',
+                                           wrapperWidth = "w-1/2",
+                                           buttonColor = '#e5e7eb'
+                                       }: CustomDropdownProps) {
     const [visible, setVisible] = useState(false);
 
     const selectedLabel = data.find((item) => item.name === value)?.name || '';
 
     return (
-        <View style={styles.wrapper} className={`bg-transparent w-[${wrapperWidth ? wrapperWidth : "50%" }]`}>
+        <View className={`${wrapperWidth} bg-transparent`}>
             <TouchableOpacity
                 activeOpacity={0.8}
                 onPress={() => setVisible(true)}
-                className={"bg-transparent"}
+                style={{backgroundColor: buttonColor, borderRadius: 20, overflow: 'hidden'}}
             >
-                <BlurView intensity={25} tint="light" style={styles.button}>
-                    <Text style={[styles.buttonText, !value && { color: '#0a0a0a' }]} className={"flex flex-row item-center justify-center"}>
+                <BlurView
+                    intensity={25}
+                    tint="light"
+                    style={styles.button}
+                >
+                    <Text style={[styles.buttonText, !value && {color: '#0a0a0a'}]}
+                          className={"flex flex-row item-center justify-center"}>
                         {value ? selectedLabel : placeholder}{"  "}
                         <Image source={require("../assets/icons/arrow-down.png")} className={"w-4 h-4 mt-2"}/>
                     </Text>
@@ -61,8 +68,8 @@ export default function CustomDropdown({
                             <FlatList
                                 data={data}
                                 keyExtractor={(item) => item.name}
-                                ItemSeparatorComponent={() => <View style={styles.separator} />}
-                                renderItem={({ item }) => (
+                                ItemSeparatorComponent={() => <View style={styles.separator}/>}
+                                renderItem={({item}) => (
                                     <TouchableOpacity
                                         style={styles.item}
                                         onPress={() => {
@@ -89,9 +96,6 @@ export default function CustomDropdown({
 }
 
 const styles = StyleSheet.create({
-    wrapper: {
-        marginHorizontal: "0%",
-    },
     button: {
         height: 35,
         borderRadius: 20,
@@ -100,7 +104,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingHorizontal: 20,
         overflow: 'hidden',
-        backgroundColor: "#e5e7eb",
     },
     buttonText: {
         fontSize: 13,
