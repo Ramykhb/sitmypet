@@ -142,7 +142,6 @@ const CLIENT_HISTORY_DATA = [
     petName: 'Zeus',
     petBreed: 'German Shepherd',
     serviceName: 'Health Care',
-    serviceName: 'Medication Administration',
     location: 'Baabda',
     rating: 4,
     comment: 'Good service, very reliable.',
@@ -204,7 +203,6 @@ const BOOKINGS_DATA = [
     email: 'emma.williams@example.com',
     petName: 'Rex',
     petBreed: 'Rottweiler',
-    serviceName: 'Health Care',
     serviceName: 'Medication Administration',
     location: 'Baabda',
     daysFromToday: 3,
@@ -372,7 +370,6 @@ async function main() {
         status: 'OPEN',
         owner: { connect: { id: owner.id } },
         pet: { connect: { id: pet.id } },
-        scheduledTime: randomScheduledTime(),
       },
     });
 

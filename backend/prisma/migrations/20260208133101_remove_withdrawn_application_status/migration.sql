@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /*
   Warnings:
 
@@ -15,6 +14,4 @@ ALTER TYPE "ApplicationStatus_new" RENAME TO "ApplicationStatus";
 DROP TYPE "public"."ApplicationStatus_old";
 ALTER TABLE "Application" ALTER COLUMN "status" SET DEFAULT 'PENDING';
 COMMIT;
-=======
 -- already applied in database
->>>>>>> backend/sitter

@@ -91,8 +91,6 @@ model Post {
   title         String
   location      String
   scheduledTime DateTime
-  title         String
-  location      String
   duration      String
   imageUrl      String?
   status        PostStatus    @default(OPEN)
@@ -101,14 +99,11 @@ model Post {
   price         Decimal?      @db.Decimal(10, 2)
   description   String
   petId         String?
-  serviceId     String
-  scheduledTime DateTime
   applications  Application[]
   owner         User          @relation("OwnerPosts", fields: [ownerId], references: [id], onDelete: Cascade)
   pet           Pet?          @relation(fields: [petId], references: [id])
   service       Service       @relation(fields: [serviceId], references: [id])
   savedBy       SavedPost[]
-  applications  Application[]
 
   @@index([status, createdAt])
 }
@@ -133,12 +128,8 @@ model Application {
   updatedAt DateTime          @updatedAt
   status    ApplicationStatus @default(PENDING)
 
-  post      Post              @relation(fields: [postId], references: [id], onDelete: Cascade)
-  sitter    User              @relation(fields: [sitterId], references: [id], onDelete: Cascade)
-  status    ApplicationStatus @default(PENDING)
-  updatedAt DateTime
-  post      Post              @relation(fields: [postId], references: [id], onDelete: Cascade)
-  sitter    User              @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  sitter User @relation(fields: [sitterId], references: [id], onDelete: Cascade)
 
   @@unique([postId, sitterId])
 }
