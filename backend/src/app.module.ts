@@ -12,6 +12,7 @@ import { OcrModule } from './ocr/ocr.module';
 import { PostsModule } from './posts/posts.module';
 import { StorageModule } from './storage/storage.module';
 import { BookingsModule } from './bookings/bookings.module';
+import { ApplicationsModule } from './applications/applications.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { BookingsModule } from './bookings/bookings.module';
     PostsModule,
     StorageModule,
     BookingsModule,
+    ApplicationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

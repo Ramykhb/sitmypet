@@ -38,6 +38,19 @@ const SAMPLE_POSTS = [
   },
 ];
 
+function randomScheduledTime() {
+  const now = new Date();
+  const daysAhead = Math.floor(Math.random() * 14) + 1;
+  const hours = Math.floor(Math.random() * 10) + 8;
+  const minutes = Math.random() < 0.5 ? 0 : 30;
+
+  const date = new Date(now);
+  date.setDate(now.getDate() + daysAhead);
+  date.setHours(hours, minutes, 0, 0);
+
+  return date;
+}
+
 async function main() {
   console.log('Cleaning up existing posts...');
   try {
@@ -112,6 +125,7 @@ async function main() {
         location: postData.location,
         serviceId: service.id,
         duration: postData.duration,
+        scheduledTime: randomScheduledTime(),
         imageUrl: postData.imageUrl,
         description: postData.description,
         price: postData.price,

@@ -352,6 +352,9 @@ async function main() {
         location: postData.location,
         serviceId: service.id,
         duration: postData.duration,
+        scheduledTime: new Date(
+          Date.now() + Math.floor(Math.random() * 14 + 1) * 24 * 60 * 60 * 1000,
+        ),
         imageUrl: postData.imageUrl,
         description: postData.description,
         price: postData.price,
