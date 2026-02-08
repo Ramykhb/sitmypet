@@ -118,7 +118,7 @@ const CreatePost = () => {
                         <Text className={"text-xl"}>Duration</Text>
                         <TextInput
                             className={
-                                "w-full h-14 border border-gray-300 rounded-xl mt-3 px-5 placeholder:text-xl"
+                                "w-full h-14 border border-gray-300 rounded-xl mt-3 px-5 placeholder:text-xl pb-2"
                             }
                             autoCapitalize={"none"}
                             style={{textAlignVertical: 'center'}}
@@ -138,7 +138,7 @@ const CreatePost = () => {
                             <Text className={"text-2xl text-[#0a0a0a]"}>$</Text>
                             <TextInput
                                 className={
-                                    "w-full h-14 px-2 flex flex-row items-center justify-center placeholder:text-xl"
+                                    "w-full h-14 px-2 flex flex-row items-center justify-center placeholder:text-xl pb-2"
                                 }
                                 style={{textAlignVertical: 'center'}}
                                 autoCapitalize={"none"}
