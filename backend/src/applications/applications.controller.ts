@@ -17,16 +17,16 @@ export class ApplicationsController {
   @Post('apply/:postId')
   async apply(
     @Param('postId') postId: string,
-    @Req() req: { user: { id: string } },
+    @Req() req: { user: { sub: string } },
   ) {
-    return this.applicationsService.apply(postId, req.user.id);
+    return this.applicationsService.apply(postId, req.user.sub);
   }
 
   @Delete('withdraw/:postId')
   async withdraw(
     @Param('postId') postId: string,
-    @Req() req: { user: { id: string } },
+    @Req() req: { user: { sub: string } },
   ) {
-    return this.applicationsService.withdraw(postId, req.user.id);
+    return this.applicationsService.withdraw(postId, req.user.sub);
   }
 }

@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-const SITTER_EMAIL = 'ramykhb18@gmail.com';
+const SITTER_EMAIL = 'tarekalkhatibb@gmail.com';
 
 function randomScheduledTime() {
   const now = new Date();
