@@ -8,8 +8,8 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Get(':id')
-  async getOne(@Param('id') id: string, @Req() req: { user: { sub: string } }) {
-    const userId = req.user.sub;
+  async getOne(@Param('id') id: string, @Req() req: any) {
+    const userId = req.user?.sub;
     return this.postsService.findOne(id, userId);
   }
 }

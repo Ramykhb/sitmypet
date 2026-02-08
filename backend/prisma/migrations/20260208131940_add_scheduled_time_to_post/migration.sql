@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
   Warnings:
 
@@ -14,3 +15,6 @@ ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL;
 
 -- AlterTable
 ALTER TABLE "Post" ADD COLUMN     "scheduledTime" TIMESTAMP(3) NOT NULL DEFAULT NOW();
+=======
+-- already applied in database
+>>>>>>> backend/sitter

@@ -27,6 +27,7 @@ model User {
   passwordResetOtpExpires  DateTime?
   passwordResetOtpHash     String?
   profileImageUrl          String?       @default("https://pub-4f8704924751443bbd3260d113d11a8f.r2.dev/uploads/pfps/default_pfp.png")
+  applications             Application[]
   bookingsAsOwner          Booking[]     @relation("OwnerBookings")
   bookingsAsSitter         Booking[]     @relation("SitterBookings")
   ownedPets                Pet[]         @relation("PetOwner")
@@ -34,7 +35,6 @@ model User {
   profile                  Profile?
   savedPosts               SavedPost[]
   savedSitters             SavedSitter[]
-  applications             Application[]
 }
 
 model Profile {
@@ -68,16 +68,16 @@ model Booking {
   sitterId      String
   ownerId       String
   petId         String
-  serviceId     String // Add this
   location      String
   scheduledTime DateTime
   status        BookingStatus @default(CONFIRMED)
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
+  serviceId     String
   owner         User          @relation("OwnerBookings", fields: [ownerId], references: [id], onDelete: Cascade)
   pet           Pet           @relation(fields: [petId], references: [id], onDelete: Cascade)
+  service       Service       @relation(fields: [serviceId], references: [id])
   sitter        User          @relation("SitterBookings", fields: [sitterId], references: [id], onDelete: Cascade)
-  service       Service       @relation(fields: [serviceId], references: [id]) // Add this
   review        Review?
 
   @@index([sitterId, scheduledTime])
@@ -91,6 +91,8 @@ model Post {
   title         String
   location      String
   scheduledTime DateTime
+  title         String
+  location      String
   duration      String
   imageUrl      String?
   status        PostStatus    @default(OPEN)
@@ -99,6 +101,9 @@ model Post {
   price         Decimal?      @db.Decimal(10, 2)
   description   String
   petId         String?
+  serviceId     String
+  scheduledTime DateTime
+  applications  Application[]
   owner         User          @relation("OwnerPosts", fields: [ownerId], references: [id], onDelete: Cascade)
   pet           Pet?          @relation(fields: [petId], references: [id])
   service       Service       @relation(fields: [serviceId], references: [id])
@@ -128,8 +133,12 @@ model Application {
   updatedAt DateTime          @updatedAt
   status    ApplicationStatus @default(PENDING)
 
-  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-  sitter User @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+  post      Post              @relation(fields: [postId], references: [id], onDelete: Cascade)
+  sitter    User              @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+  status    ApplicationStatus @default(PENDING)
+  updatedAt DateTime
+  post      Post              @relation(fields: [postId], references: [id], onDelete: Cascade)
+  sitter    User              @relation(fields: [sitterId], references: [id], onDelete: Cascade)
 
   @@unique([postId, sitterId])
 }
@@ -159,8 +168,8 @@ model Service {
   name      String    @unique
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  posts     Post[]
   bookings  Booking[]
+  posts     Post[]
 }
 
 model SavedSitter {

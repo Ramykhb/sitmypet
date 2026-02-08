@@ -5,6 +5,14 @@ const prisma = new PrismaClient();
 const LOREM_IPSUM =
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
 
+function randomScheduledTime() {
+  const now = new Date();
+  const daysAhead = Math.floor(Math.random() * 7) + 1; // 1–7 days
+  const hours = Math.floor(Math.random() * 10) + 8; // 8 AM – 6 PM
+  now.setDate(now.getDate() + daysAhead);
+  now.setHours(hours, 0, 0, 0);
+  return now;
+}
 const SAMPLE_POSTS = [
   {
     title: 'Golden Retriever needs a hike buddy',
@@ -123,15 +131,25 @@ async function main() {
       data: {
         title: postData.title,
         location: postData.location,
-        serviceId: service.id,
         duration: postData.duration,
         scheduledTime: randomScheduledTime(),
         imageUrl: postData.imageUrl,
         description: postData.description,
         price: postData.price,
         status: 'OPEN',
-        ownerId: owner.id,
-        petId: pet.id,
+        scheduledTime: randomScheduledTime(),
+
+        service: {
+          connect: { id: service.id },
+        },
+
+        owner: {
+          connect: { id: owner.id },
+        },
+
+        pet: {
+          connect: { id: pet.id },
+        },
       },
     });
   }

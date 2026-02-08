@@ -15,18 +15,18 @@ export class ApplicationsController {
   constructor(private readonly applicationsService: ApplicationsService) {}
 
   @Post('apply/:postId')
-  apply(
+  async apply(
     @Param('postId') postId: string,
-    @Req() req: { user: { sub: string } },
+    @Req() req: { user: { id: string } },
   ) {
-    return this.applicationsService.apply(postId, req.user.sub);
+    return this.applicationsService.apply(postId, req.user.id);
   }
 
   @Delete('withdraw/:postId')
-  withdraw(
+  async withdraw(
     @Param('postId') postId: string,
-    @Req() req: { user: { sub: string } },
+    @Req() req: { user: { id: string } },
   ) {
-    return this.applicationsService.withdraw(postId, req.user.sub);
+    return this.applicationsService.withdraw(postId, req.user.id);
   }
 }

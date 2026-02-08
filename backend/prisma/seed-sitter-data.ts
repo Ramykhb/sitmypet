@@ -4,6 +4,15 @@ const prisma = new PrismaClient();
 
 const SITTER_EMAIL = 'ramykhb18@gmail.com';
 
+function randomScheduledTime() {
+  const now = new Date();
+  const daysAhead = Math.floor(Math.random() * 7) + 1; // 1–7 days
+  const hours = Math.floor(Math.random() * 10) + 8; // 8 AM – 6 PM
+  now.setDate(now.getDate() + daysAhead);
+  now.setHours(hours, 0, 0, 0);
+  return now;
+}
+
 const LOREM_IPSUM =
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.';
 
@@ -133,6 +142,7 @@ const CLIENT_HISTORY_DATA = [
     petName: 'Zeus',
     petBreed: 'German Shepherd',
     serviceName: 'Health Care',
+    serviceName: 'Medication Administration',
     location: 'Baabda',
     rating: 4,
     comment: 'Good service, very reliable.',
@@ -195,6 +205,7 @@ const BOOKINGS_DATA = [
     petName: 'Rex',
     petBreed: 'Rottweiler',
     serviceName: 'Health Care',
+    serviceName: 'Medication Administration',
     location: 'Baabda',
     daysFromToday: 3,
     time: '08:00',
@@ -350,7 +361,7 @@ async function main() {
       data: {
         title: postData.title,
         location: postData.location,
-        serviceId: service.id,
+        service: { connect: { id: service.id } },
         duration: postData.duration,
         scheduledTime: new Date(
           Date.now() + Math.floor(Math.random() * 14 + 1) * 24 * 60 * 60 * 1000,
@@ -359,8 +370,9 @@ async function main() {
         description: postData.description,
         price: postData.price,
         status: 'OPEN',
-        ownerId: owner.id,
-        petId: pet.id,
+        owner: { connect: { id: owner.id } },
+        pet: { connect: { id: pet.id } },
+        scheduledTime: randomScheduledTime(),
       },
     });
 
