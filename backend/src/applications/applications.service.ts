@@ -34,6 +34,15 @@ export class ApplicationsService {
         postId,
         sitterId,
         status: 'PENDING',
+        updatedAt: new Date(),
+      },
+      select: {
+        id: true,
+        postId: true,
+        sitterId: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
   }

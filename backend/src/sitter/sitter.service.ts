@@ -38,7 +38,10 @@ export class SitterService {
       ownerName: `${booking.owner.firstname} ${booking.owner.lastname}`,
       petName: booking.pet.name,
       ownerImageURL: booking.owner.profileImageUrl ?? undefined,
-      service: booking.service.name,
+      service: {
+        id: booking.service.id,
+        name: booking.service.name,
+      },
       location: booking.location,
       time: booking.scheduledTime.toLocaleTimeString('en-US', {
         hour: '2-digit',
@@ -117,7 +120,10 @@ export class SitterService {
         id: post.id,
         title: post.title,
         location: post.location,
-        service: post.service,
+        service: {
+          id: post.service.id,
+          name: post.service.name,
+        },
         duration: post.duration,
         rating: Number(rating.toFixed(1)),
         reviewCount: reviewCount,
@@ -287,7 +293,10 @@ export class SitterService {
       imageUrl: post.imageUrl ?? undefined,
       title: post.title,
       location: post.location,
-      service: post.service,
+      service: {
+        id: post.service.id,
+        name: post.service.name,
+      },
       duration: post.duration,
       createdAt: post.createdAt,
       price: post.price ? Number(post.price) : undefined,
@@ -378,7 +387,10 @@ export class SitterService {
           id: post.id,
           title: post.title,
           location: post.location,
-          service: post.service.name,
+          service: {
+            id: post.service.id,
+            name: post.service.name,
+          },
           duration: post.duration,
           imageUrl: post.imageUrl ?? undefined,
           ownerName: `${post.owner.firstname} ${post.owner.lastname}`,

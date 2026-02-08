@@ -9,7 +9,12 @@ export class PostsService {
     const job = await this.prisma.post.findUnique({
       where: { id },
       include: {
-        service: true,
+        service: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         owner: {
           select: {
             id: true,
@@ -36,6 +41,12 @@ export class PostsService {
               },
             }
           : undefined,
+        applications: userId
+          ? {
+              where: { sitterId: userId },
+              select: { id: true },
+            }
+          : undefined,
       },
     });
 
@@ -55,15 +66,27 @@ export class PostsService {
     const { bookingsAsOwner: __, ...ownerData } = job.owner;
     void __;
 
+    const isApplied = userId
+      ? job.applications
+        ? job.applications.length > 0
+        : false
+      : false;
+
     return {
       ...job,
+      service: {
+        id: job.service.id,
+        name: job.service.name,
+      },
       isSaved: job.savedBy ? job.savedBy.length > 0 : false,
+      isApplied,
       owner: {
         ...ownerData,
         clientRating,
         reviewsCount: reviews.length,
       },
       savedBy: undefined,
+      applications: undefined,
     };
   }
 }

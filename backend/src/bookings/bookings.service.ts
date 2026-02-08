@@ -9,74 +9,48 @@ export class BookingsService {
     const bookings = await this.prisma.booking.findMany({
       orderBy: { createdAt: 'desc' },
       include: {
-        service: true,
+        service: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         owner: {
           select: {
             id: true,
             firstname: true,
-            lastname: true,
             profileImageUrl: true,
-            emailVerified: true,
           },
         },
         sitter: {
           select: {
             id: true,
             firstname: true,
-            lastname: true,
             profileImageUrl: true,
-            emailVerified: true,
           },
         },
-        pet: true,
+        pet: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
 
     return bookings.map((booking) => ({
-      ...booking,
+      id: booking.id,
+      ownerName: booking.owner.firstname,
+      petName: booking.pet.name,
+      ownerImageURL: booking.owner.profileImageUrl,
+      service: {
+        id: booking.service.id,
+        name: booking.service.name,
+      },
+      location: booking.location,
+      time: booking.scheduledTime,
       isOwner: userId ? booking.ownerId === userId : false,
       isSitter: userId ? booking.sitterId === userId : false,
     }));
   }
-
-  // in case zedna search bar baaden
-
-  //   async findOne(id: string, userId?: string) {
-  //     const booking = await this.prisma.booking.findUnique({
-  //       where: { id },
-  //       include: {
-  //         service: true,
-  //         owner: {
-  //           select: {
-  //             id: true,
-  //             firstname: true,
-  //             lastname: true,
-  //             profileImageUrl: true,
-  //             emailVerified: true,
-  //           },
-  //         },
-  //         sitter: {
-  //           select: {
-  //             id: true,
-  //             firstname: true,
-  //             lastname: true,
-  //             profileImageUrl: true,
-  //             emailVerified: true,
-  //           },
-  //         },
-  //         pet: true,
-  //         review: true,
-  //       },
-  //     });
-
-  //     if (!booking) {
-  //       throw new NotFoundException(`Booking with ID ${id} not found`);
-  //     }
-
-  //     return {
-  //       ...booking,
-  //       isOwner: userId ? booking.ownerId === userId : false,
-  //       isSitter: userId ? booking.sitterId === userId : false,
-  //     };
-  //   }
 }
