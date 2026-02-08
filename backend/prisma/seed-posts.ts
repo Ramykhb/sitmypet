@@ -5,11 +5,19 @@ const prisma = new PrismaClient();
 const LOREM_IPSUM =
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
 
+function randomScheduledTime() {
+  const now = new Date();
+  const daysAhead = Math.floor(Math.random() * 7) + 1; // 1–7 days
+  const hours = Math.floor(Math.random() * 10) + 8; // 8 AM – 6 PM
+  now.setDate(now.getDate() + daysAhead);
+  now.setHours(hours, 0, 0, 0);
+  return now;
+}
 const SAMPLE_POSTS = [
   {
     title: 'Golden Retriever needs a hike buddy',
     location: 'Dahyeh, Beirut',
-    serviceType: 'Dog Walking',
+    serviceName: 'Dog Walking',
     duration: '2-3 Days',
     imageUrl:
       'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=800&q=80',
@@ -19,7 +27,7 @@ const SAMPLE_POSTS = [
   {
     title: 'Playful Kitten needs afternoon sitting',
     location: 'Hamra, Beirut',
-    serviceType: 'Pet Sitting',
+    serviceName: 'Pet Sitting',
     duration: '4-5 Hours',
     imageUrl:
       'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80',
@@ -29,7 +37,7 @@ const SAMPLE_POSTS = [
   {
     title: 'Senior Dog needs gentle walks',
     location: 'Ashrafieh, Beirut',
-    serviceType: 'Grooming',
+    serviceName: 'Grooming',
     duration: '1 Hour',
     imageUrl:
       'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80',
@@ -96,12 +104,12 @@ async function main() {
   for (const postData of SAMPLE_POSTS) {
     // Find service by name
     const service = await prisma.service.findUnique({
-      where: { name: postData.serviceType },
+      where: { name: postData.serviceName },
     });
 
     if (!service) {
       console.warn(
-        `Service "${postData.serviceType}" not found, skipping post`,
+        `Service "${postData.serviceName}" not found, skipping post`,
       );
       continue;
     }
@@ -110,14 +118,24 @@ async function main() {
       data: {
         title: postData.title,
         location: postData.location,
-        serviceId: service.id,
         duration: postData.duration,
         imageUrl: postData.imageUrl,
         description: postData.description,
         price: postData.price,
         status: 'OPEN',
-        ownerId: owner.id,
-        petId: pet.id,
+        scheduledTime: randomScheduledTime(),
+
+        service: {
+          connect: { id: service.id },
+        },
+
+        owner: {
+          connect: { id: owner.id },
+        },
+
+        pet: {
+          connect: { id: pet.id },
+        },
       },
     });
   }

@@ -4,6 +4,15 @@ const prisma = new PrismaClient();
 
 const SITTER_EMAIL = 'ramykhb18@gmail.com';
 
+function randomScheduledTime() {
+  const now = new Date();
+  const daysAhead = Math.floor(Math.random() * 7) + 1; // 1–7 days
+  const hours = Math.floor(Math.random() * 10) + 8; // 8 AM – 6 PM
+  now.setDate(now.getDate() + daysAhead);
+  now.setHours(hours, 0, 0, 0);
+  return now;
+}
+
 const LOREM_IPSUM =
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.';
 
@@ -12,7 +21,7 @@ const NEARBY_POSTS_DATA = [
   {
     title: 'Energetic Husky needs morning walks',
     location: 'Beirut',
-    serviceType: 'Dog Walking',
+    serviceName: 'Dog Walking',
     duration: '1-2 Hours',
     imageUrl:
       'https://images.unsplash.com/photo-1605568427561-40dd23c2acea?auto=format&fit=crop&w=800&q=80',
@@ -26,7 +35,7 @@ const NEARBY_POSTS_DATA = [
   {
     title: 'Persian Cat needs grooming and care',
     location: 'Beirut',
-    serviceType: 'Grooming',
+    serviceName: 'Grooming',
     duration: '2-3 Hours',
     imageUrl:
       'https://images.unsplash.com/photo-1583511655826-05700d4f7de5?auto=format&fit=crop&w=800&q=80',
@@ -40,7 +49,7 @@ const NEARBY_POSTS_DATA = [
   {
     title: 'Friendly Labrador needs weekend sitting',
     location: 'Jounieh',
-    serviceType: 'Pet Sitting',
+    serviceName: 'Pet Sitting',
     duration: '2-3 Days',
     imageUrl:
       'https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=800&q=80',
@@ -54,7 +63,7 @@ const NEARBY_POSTS_DATA = [
   {
     title: 'Playful Beagle needs afternoon hiking',
     location: 'Beirut',
-    serviceType: 'Dog Walking',
+    serviceName: 'Dog Walking',
     duration: '3-4 Hours',
     imageUrl:
       'https://images.unsplash.com/photo-1505628346881-b72b27e84530?auto=format&fit=crop&w=800&q=80',
@@ -68,7 +77,7 @@ const NEARBY_POSTS_DATA = [
   {
     title: 'Senior Golden Retriever needs gentle care',
     location: 'Baabda',
-    serviceType: 'Pet Sitting',
+    serviceName: 'Pet Sitting',
     duration: '4-5 Hours',
     imageUrl:
       'https://images.unsplash.com/photo-1633722715463-d30f4f325e24?auto=format&fit=crop&w=800&q=80',
@@ -88,7 +97,7 @@ const CLIENT_HISTORY_DATA = [
     email: 'james.wilson@example.com',
     petName: 'Bella',
     petBreed: 'French Bulldog',
-    serviceType: 'Dog Walking',
+    serviceName: 'Dog Walking',
     location: 'Beirut',
     rating: 5,
     comment: 'Excellent service! My dog loved the walks.',
@@ -99,7 +108,7 @@ const CLIENT_HISTORY_DATA = [
     email: 'sophia.brown@example.com',
     petName: 'Milo',
     petBreed: 'Poodle',
-    serviceType: 'Grooming',
+    serviceName: 'Grooming',
     location: 'Beirut',
     rating: 4,
     comment: 'Very professional and caring.',
@@ -110,7 +119,7 @@ const CLIENT_HISTORY_DATA = [
     email: 'oliver.taylor@example.com',
     petName: 'Cooper',
     petBreed: 'Border Collie',
-    serviceType: 'Pet Sitting',
+    serviceName: 'Pet Sitting',
     location: 'Jounieh',
     rating: 5,
     comment: 'Great experience! Highly recommend.',
@@ -121,7 +130,7 @@ const CLIENT_HISTORY_DATA = [
     email: 'isabella.moore@example.com',
     petName: 'Daisy',
     petBreed: 'Yorkshire Terrier',
-    serviceType: 'Dog Walking',
+    serviceName: 'Dog Walking',
     location: 'Beirut',
     rating: 5,
     comment: 'Wonderful caretaker!',
@@ -132,7 +141,7 @@ const CLIENT_HISTORY_DATA = [
     email: 'ethan.white@example.com',
     petName: 'Zeus',
     petBreed: 'German Shepherd',
-    serviceType: 'Medication Administration',
+    serviceName: 'Medication Administration',
     location: 'Baabda',
     rating: 4,
     comment: 'Good service, very reliable.',
@@ -148,7 +157,7 @@ const BOOKINGS_DATA = [
     email: 'ava.harris@example.com',
     petName: 'Oscar',
     petBreed: 'Cocker Spaniel',
-    serviceType: 'Dog Walking',
+    serviceName: 'Dog Walking',
     location: 'Beirut',
     daysFromToday: 0,
     time: '09:00',
@@ -159,7 +168,7 @@ const BOOKINGS_DATA = [
     email: 'noah.clark@example.com',
     petName: 'Coco',
     petBreed: 'Chihuahua',
-    serviceType: 'Pet Sitting',
+    serviceName: 'Pet Sitting',
     location: 'Jounieh',
     daysFromToday: 0,
     time: '14:30',
@@ -171,7 +180,7 @@ const BOOKINGS_DATA = [
     email: 'mia.lewis@example.com',
     petName: 'Simba',
     petBreed: 'Maine Coon',
-    serviceType: 'Grooming',
+    serviceName: 'Grooming',
     location: 'Beirut',
     daysFromToday: 1,
     time: '10:00',
@@ -182,7 +191,7 @@ const BOOKINGS_DATA = [
     email: 'liam.johnson@example.com',
     petName: 'Luna',
     petBreed: 'Pomeranian',
-    serviceType: 'Dog Walking',
+    serviceName: 'Dog Walking',
     location: 'Beirut',
     daysFromToday: 1,
     time: '15:00',
@@ -194,7 +203,7 @@ const BOOKINGS_DATA = [
     email: 'emma.williams@example.com',
     petName: 'Rex',
     petBreed: 'Rottweiler',
-    serviceType: 'Medication Administration',
+    serviceName: 'Medication Administration',
     location: 'Baabda',
     daysFromToday: 3,
     time: '08:00',
@@ -206,7 +215,7 @@ const BOOKINGS_DATA = [
     email: 'lucas.brown@example.com',
     petName: 'Mittens',
     petBreed: 'British Shorthair',
-    serviceType: 'Pet Sitting',
+    serviceName: 'Pet Sitting',
     location: 'Jounieh',
     daysFromToday: 5,
     time: '12:00',
@@ -218,7 +227,7 @@ const BOOKINGS_DATA = [
     email: 'olivia.garcia@example.com',
     petName: 'Duke',
     petBreed: 'Boxer',
-    serviceType: 'Dog Walking',
+    serviceName: 'Dog Walking',
     location: 'Beirut',
     daysFromToday: 7,
     time: '17:00',
@@ -335,12 +344,12 @@ async function main() {
 
     // Find service by name
     const service = await prisma.service.findUnique({
-      where: { name: postData.serviceType },
+      where: { name: postData.serviceName },
     });
 
     if (!service) {
       console.warn(
-        `Service "${postData.serviceType}" not found, skipping post`,
+        `Service "${postData.serviceName}" not found, skipping post`,
       );
       continue;
     }
@@ -350,14 +359,15 @@ async function main() {
       data: {
         title: postData.title,
         location: postData.location,
-        serviceId: service.id,
+        service: { connect: { id: service.id } },
         duration: postData.duration,
         imageUrl: postData.imageUrl,
         description: postData.description,
         price: postData.price,
         status: 'OPEN',
-        ownerId: owner.id,
-        petId: pet.id,
+        owner: { connect: { id: owner.id } },
+        pet: { connect: { id: pet.id } },
+        scheduledTime: randomScheduledTime(),
       },
     });
 
@@ -404,12 +414,12 @@ async function main() {
 
     // Find service by name
     const service = await prisma.service.findUnique({
-      where: { name: clientData.serviceType },
+      where: { name: clientData.serviceName },
     });
 
     if (!service) {
       console.warn(
-        `Service "${clientData.serviceType}" not found, skipping client`,
+        `Service "${clientData.serviceName}" not found, skipping client`,
       );
       continue;
     }
@@ -487,12 +497,12 @@ async function main() {
 
     // Find service by name
     const service = await prisma.service.findUnique({
-      where: { name: bookingData.serviceType },
+      where: { name: bookingData.serviceName },
     });
 
     if (!service) {
       console.warn(
-        `Service "${bookingData.serviceType}" not found, skipping booking`,
+        `Service "${bookingData.serviceName}" not found, skipping booking`,
       );
       continue;
     }
