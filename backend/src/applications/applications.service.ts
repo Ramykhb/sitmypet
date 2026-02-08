@@ -34,6 +34,7 @@ export class ApplicationsService {
         postId,
         sitterId,
         status: 'PENDING',
+        updatedAt: new Date(),
       },
     });
   }

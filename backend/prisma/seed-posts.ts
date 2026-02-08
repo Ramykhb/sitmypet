@@ -9,7 +9,7 @@ const SAMPLE_POSTS = [
   {
     title: 'Golden Retriever needs a hike buddy',
     location: 'Dahyeh, Beirut',
-    serviceType: 'Dog Walking',
+    serviceName: 'Dog Walking',
     duration: '2-3 Days',
     imageUrl:
       'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=800&q=80',
@@ -19,7 +19,7 @@ const SAMPLE_POSTS = [
   {
     title: 'Playful Kitten needs afternoon sitting',
     location: 'Hamra, Beirut',
-    serviceType: 'Pet Sitting',
+    serviceName: 'Pet Sitting',
     duration: '4-5 Hours',
     imageUrl:
       'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80',
@@ -29,7 +29,7 @@ const SAMPLE_POSTS = [
   {
     title: 'Senior Dog needs gentle walks',
     location: 'Ashrafieh, Beirut',
-    serviceType: 'Grooming',
+    serviceName: 'Grooming',
     duration: '1 Hour',
     imageUrl:
       'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80',
@@ -109,12 +109,12 @@ async function main() {
   for (const postData of SAMPLE_POSTS) {
     // Find service by name
     const service = await prisma.service.findUnique({
-      where: { name: postData.serviceType },
+      where: { name: postData.serviceName },
     });
 
     if (!service) {
       console.warn(
-        `Service "${postData.serviceType}" not found, skipping post`,
+        `Service "${postData.serviceName}" not found, skipping post`,
       );
       continue;
     }
