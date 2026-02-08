@@ -20,6 +20,13 @@ import {Animated} from "react-native";
 import {Button, Menu, PaperProvider} from "react-native-paper";
 import CustomDropdown from "@/components/CustomDropdown";
 
+type Service = {
+    id: string;
+    createdAt: string;
+    name: string;
+    updatedAt: string;
+}
+
 type NearbyRequest = {
     id: string;
     title: string;
@@ -27,7 +34,7 @@ type NearbyRequest = {
     duration: string;
     imageUrl: string;
     isSaved: boolean;
-    serviceType: string;
+    service: Service;
     rating: number;
     reviewCount: number;
 };

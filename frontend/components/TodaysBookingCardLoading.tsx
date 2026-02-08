@@ -22,7 +22,7 @@ const TodaysBookingCardLoading = () => {
   return (
     <View
       className={
-        "flex flex-col px-6 py-6 w-[310px] h-48 rounded-3xl bg-[#DDDDDD] ml-8 justify-between overflow-hidden relative opacity-40"
+        "flex flex-col px-6 py-6 w-full h-48 rounded-3xl bg-[#DDDDDD] justify-between overflow-hidden relative opacity-40"
       }
     >
       <View className={"flex-row flex w-full justify-between items-center " }>

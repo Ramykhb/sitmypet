@@ -9,13 +9,20 @@ import api from "@/config/api";
 import SitterNearYouCardLoading from "@/components/SitterNearYouCardLoading";
 import SitterNearYouCard from "@/components/SitterNearYouCard";
 
+type Service = {
+    id: string;
+    createdAt: string;
+    name: string;
+    updatedAt: string;
+}
+
 export type SavedPost = {
     id: string;
     title: string;
     location: string;
     duration: string;
     imageUrl: string;
-    serviceType: string;
+    service: Service;
     rating: number;
     reviewCount: number;
     ownerName: string;
@@ -67,12 +74,13 @@ export default function Saved() {
                     </View>
                 </View>
             ) : posts.length === 0 ? <View className={"flex-1 flex items-center justify-center px-10"}>
-                <Text className="text-xl font-semibold text-[#0A0A0A] mb-2">
-                    No saved posts yet
-                </Text>
-                <Text className="text-center text-base text-gray-500">
-                    You haven’t saved any posts. When you find a post you like, tap the save icon and it will appear here.
-                </Text>
+                    <Text className="text-xl font-semibold text-[#0A0A0A] mb-2">
+                        No saved posts yet
+                    </Text>
+                    <Text className="text-center text-base text-gray-500">
+                        You haven’t saved any posts. When you find a post you like, tap the save icon and it will appear
+                        here.
+                    </Text>
                 </View> :
                 <FlatList
                     data={posts}
@@ -80,7 +88,7 @@ export default function Saved() {
                     keyExtractor={(item) => item.id}
                     renderItem={({item}) => (
                         <View className={"w-full h-60 px-8 mb-6"}>
-                            <SitterNearYouCard {...item} onUnsave={() => handleRemove(item.id)} />
+                            <SitterNearYouCard {...item} onUnsave={() => handleRemove(item.id)}/>
                         </View>
                     )}
                 />

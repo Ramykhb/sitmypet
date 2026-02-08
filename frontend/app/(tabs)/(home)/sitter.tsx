@@ -50,7 +50,7 @@ type TodaysBooking = {
     ownerImageURL: string;
     ownerName: string;
     petName: string;
-    serviceType: string;
+    service: Service;
     time: string;
 };
 
@@ -167,8 +167,12 @@ export default function Sitter() {
 
                         {loading ? (
                             <View className="flex flex-row">
-                                <TodaysBookingCardLoading/>
-                                <TodaysBookingCardLoading/>
+                                <View className={"w-[310px] ml-8"}>
+                                    <TodaysBookingCardLoading/>
+                                </View>
+                                <View className={"w-[310px] ml-8"}>
+                                    <TodaysBookingCardLoading/>
+                                </View>
                             </View>
                         ) : Object.keys(bookingFound).length > 0 ? (
                             <FlatList

@@ -6,6 +6,13 @@ import * as SecureStore from "expo-secure-store";
 import api from "@/config/api";
 import SitterNearYouCardLoading from "@/components/SitterNearYouCardLoading";
 
+type Service = {
+    id: string;
+    createdAt: string;
+    name: string;
+    updatedAt: string;
+}
+
 type NearbyRequest = {
     id: string;
     title: string;
@@ -13,7 +20,7 @@ type NearbyRequest = {
     duration: string;
     imageUrl: string;
     isSaved: boolean;
-    serviceType: string;
+    service: Service;
     rating: number;
     reviewCount: number;
 };

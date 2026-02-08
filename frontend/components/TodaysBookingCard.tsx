@@ -1,13 +1,20 @@
 import React from "react";
 import { Image, Text, View } from "react-native";
 
+type Service = {
+    id: string;
+    createdAt: string;
+    name: string;
+    updatedAt: string;
+}
+
 type TodaysBooking = {
     id: string;
     location: string;
     ownerImageURL: string;
     ownerName: string;
     petName: string;
-    serviceType: string;
+    service: Service;
     time: string;
     styling: string
 };
@@ -44,7 +51,7 @@ const TodaysBookingCard = (props:TodaysBooking) => {
           </View>
         </View>
           <Image
-              source={serviceIcons[props.serviceType.toLowerCase()]}
+              source={serviceIcons[props.service.name.toLowerCase()]}
               className="w-10 h-10 rounded-full"
               resizeMode="cover"
           />
@@ -54,7 +61,7 @@ const TodaysBookingCard = (props:TodaysBooking) => {
         >
         <View className={"flex justify-around"}>
           <Text className={"text-xs text-gray-500"}>Service type</Text>
-          <Text className={"text-base"}>{props.serviceType}</Text>
+          <Text className={"text-base"}>{props.service.name}</Text>
         </View>
         <View className={"h-full w-[1px] bg-gray-300"} />
 
