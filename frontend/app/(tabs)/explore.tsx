@@ -8,7 +8,7 @@ import {
     TouchableOpacity,
     View,
     StyleSheet,
-    FlatList,
+    FlatList, ActivityIndicator,
 } from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 import "../global.css";
@@ -130,12 +130,17 @@ export default function Explore() {
 
     const renderFooter = () => {
         if (!loadingMore) return null;
-        return <SitterNearYouCardLoading />;
+
+        return (
+            <View className="py-6">
+                <ActivityIndicator size="small" color="#0A0A0A" />
+            </View>
+        );
     };
 
     return (
         <PaperProvider>
-            <SafeAreaView className="flex-1">
+            <SafeAreaView className="flex-1" edges={["left", "right", "top"]}>
                 <View className="flex flex-col w-full p-10 items-center pb-5">
                     <Text className="text-[#0A0A0A] text-4xl self-start">Explore</Text>
                     <View className={"flex flex-row w-full items-center mt-6 justify-between"}>
@@ -544,13 +549,13 @@ export default function Explore() {
                 {loading && !loadingMore ? (
                     <View className="flex mt-5">
                         <View className={"w-full h-60 px-8 mb-6"}>
-                            <SitterNearYouCardLoading />
+                            <SitterNearYouCardLoading/>
                         </View>
                         <View className={"w-full h-60 px-8 mb-6"}>
-                            <SitterNearYouCardLoading />
+                            <SitterNearYouCardLoading/>
                         </View>
                         <View className={"w-full h-60 px-8 mb-6"}>
-                            <SitterNearYouCardLoading />
+                            <SitterNearYouCardLoading/>
                         </View>
                     </View>
                 ) : nearYouFound.length === 0 ? (
@@ -559,19 +564,21 @@ export default function Explore() {
                             No posts found
                         </Text>
                         <Text className="text-center text-base text-gray-500">
-                            There are no posts matching your search or filters right now. Try adjusting your filters or check back later.
+                            There are no posts matching your search or filters right now. Try adjusting your filters or
+                            check back later.
                         </Text>
                     </View>
                 ) : (
                     <FlatList
                         data={nearYouFound}
-                        className="w-full mb-16 mt-2"
+                        className="w-full mt-2"
                         keyExtractor={(item) => item.id}
                         renderItem={({item}) => (
                             <View className="w-full h-72 px-8 mb-6">
                                 <SitterNearYouCard {...item} />
                             </View>
                         )}
+                        contentContainerStyle={{paddingBottom: 75}}
                         onEndReached={() => fetchData(page, true)}
                         onEndReachedThreshold={0.5}
                         ListFooterComponent={renderFooter}

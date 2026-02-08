@@ -49,12 +49,15 @@ type Post = {
     createdAt: string;
     updatedAt: string;
     isSaved: boolean;
+    isApplied: boolean;
 };
 
 const PostDetails = () => {
     const {postId} = useLocalSearchParams<{ postId: string }>();
     const [post, setPost] = useState<Post>();
     const [loading, setLoading] = useState<boolean>(false);
+    const [applying, setApplying] = useState<boolean>(false);
+    const [isApplied, setIsApplied] = useState<boolean>(false);
 
     const handleSave = async () => {
         if (!post) return;
@@ -74,10 +77,40 @@ const PostDetails = () => {
         }
     };
 
+    const handeApplication = async () => {
+        if (applying) return;
+        setApplying(true);
+        if (isApplied) {
+            try {
+                const res = await api.delete(`/applications/withdraw/${post?.id}`);
+                setIsApplied(false);
+            } catch (e) {
+                console.log(e);
+            } finally {
+                setApplying(false);
+            }
+        } else {
+            try {
+                const res = await api.post(`/applications/apply/${post?.id}`);
+                setIsApplied(true);
+            } catch (e) {
+                console.log(e);
+            } finally {
+                setApplying(false);
+            }
+        }
+    }
+
+    useEffect(() => {
+        if (!post) return;
+        setIsApplied(post.isApplied)
+    }, [post]);
+
     const fetchHomeData = async () => {
         try {
             setLoading(true);
             const res = await api.get(`/posts/${postId}`);
+            console.log(res.data);
             setPost(res.data);
         } catch (error) {
             console.error(error);
@@ -156,16 +189,20 @@ const PostDetails = () => {
                     </View>
                 </ScrollView>
             }
-            <View
+            {loading ? <></> : <View
                 className={"bg-white flex justify-around p-10 h-60 w-full absolute bottom-0 left-0 rounded-tl-[35px] rounded-tr-[35px] shadow-xl"}>
                 <TouchableOpacity className={"w-full h-14 bg-gray-200 rounded-full flex items-center justify-center"}>
                     <Text className={"text-lg font-bold text[#0a0a0a]"}>Contact via email</Text>
                 </TouchableOpacity>
-                <TouchableOpacity className={"w-full h-14 bg-[#3944D5] rounded-full flex items-center justify-center"}>
-                    <Text className={"text-lg font-bold text-white"}>Apply to job</Text>
+                <TouchableOpacity
+                    className={`w-full h-14 ${isApplied ? "bg-[#E7E8FF]" : "bg-[#3944D5]"} rounded-full flex items-center justify-center`}
+                    onPress={handeApplication}>
+                    {applying ? <ActivityIndicator size="small" color={"#ffffff"}/> : !isApplied ?
+                        <Text className={"text-lg font-bold text-white"}>Apply to job</Text> :
+                        <Text className={`text-lg font-bold text-[#3944D5]`}>Withdraw application</Text>}
                 </TouchableOpacity>
-            </View>
-        </SafeAreaView>
-    )
-}
-export default PostDetails;
+            </View>}
+            </SafeAreaView>
+                )
+            }
+            export default PostDetails;
