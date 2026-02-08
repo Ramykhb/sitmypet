@@ -38,7 +38,7 @@ export class SitterService {
       ownerName: `${booking.owner.firstname} ${booking.owner.lastname}`,
       petName: booking.pet.name,
       ownerImageURL: booking.owner.profileImageUrl ?? undefined,
-      serviceType: booking.service.name,
+      service: booking.service.name,
       location: booking.location,
       time: booking.scheduledTime.toLocaleTimeString('en-US', {
         hour: '2-digit',
@@ -382,7 +382,7 @@ export class SitterService {
           id: post.id,
           title: post.title,
           location: post.location,
-          serviceType: post.service.name,
+          service: post.service.name,
           duration: post.duration,
           imageUrl: post.imageUrl ?? undefined,
           ownerName: `${post.owner.firstname} ${post.owner.lastname}`,

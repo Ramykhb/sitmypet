@@ -3,7 +3,7 @@ export class TodaysBookingDto {
   ownerName: string;
   petName: string;
   ownerImageURL?: string;
-  serviceType: string;
+  service: string;
   location: string;
   time: string;
 }
