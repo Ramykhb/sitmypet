@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ExploreQueryDto, SortBy } from './dto/explore-query.dto';
 import { ExploreResponseDto } from './dto/explore-response.dto';
 import { SitterHomeFeedDto } from './dto/sitter-home.dto';
-import { PostStatus, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class SitterService {
@@ -164,7 +164,7 @@ export class SitterService {
     const sitterLocation = profile?.location?.name || '';
 
     const where: Prisma.PostWhereInput = {
-      status: PostStatus.OPEN,
+      status: 'OPEN',
     };
 
     if (search) {
