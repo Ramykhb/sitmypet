@@ -37,5 +37,5 @@ export class NearbyPostDto {
 export class SitterHomeFeedDto {
   todaysBookings: TodaysBookingDto[];
   recentClients: ClientHistoryDto[];
-  nearbyPosts: NearbyPostDto[];
+  nearbyPosts: NearbyPostDto[] | null;
 }

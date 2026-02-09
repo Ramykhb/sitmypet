@@ -76,63 +76,79 @@ export class SitterService {
     }
     const recentClients = Array.from(uniqueOwners.values());
 
-    const posts = await this.prisma.post.findMany({
-      where: {
-        status: 'OPEN',
-      },
-      include: {
-        service: true,
-        owner: {
-          include: {
-            bookingsAsOwner: {
-              where: {
-                status: 'COMPLETED',
-              },
-              include: {
-                review: true,
+    const profile = await this.prisma.profile.findUnique({
+      where: { userId },
+      include: { location: true },
+    });
+
+    const locationName = profile?.location?.name;
+
+    let posts: any[] = [];
+    let nearbyPosts: any[] | null = null;
+
+    if (locationName) {
+      posts = await this.prisma.post.findMany({
+        where: {
+          status: 'OPEN',
+          location: {
+            contains: locationName,
+            mode: 'insensitive',
+          },
+        },
+        include: {
+          service: true,
+          owner: {
+            include: {
+              bookingsAsOwner: {
+                where: {
+                  status: 'COMPLETED',
+                },
+                include: {
+                  review: true,
+                },
               },
             },
           },
-        },
-        savedBy: {
-          where: {
-            userId: userId,
+          savedBy: {
+            where: {
+              userId: userId,
+            },
           },
         },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      take: 10,
-    });
-
-    const nearbyPosts = posts.map((post) => {
-      const reviews = post.owner.bookingsAsOwner
-        .map((booking) => booking.review)
-        .filter((review) => review !== null);
-
-      const reviewCount = reviews.length;
-      const rating =
-        reviewCount > 0
-          ? reviews.reduce((sum, review) => sum + (review?.rating || 0), 0) /
-            reviewCount
-          : 0;
-
-      return {
-        id: post.id,
-        title: post.title,
-        location: post.location,
-        service: {
-          id: post.service.id,
-          name: post.service.name,
+        orderBy: {
+          createdAt: 'desc',
         },
-        duration: post.duration,
-        rating: Number(rating.toFixed(1)),
-        reviewCount: reviewCount,
-        imageUrl: post.imageUrl ?? undefined,
-        isSaved: post.savedBy.length > 0,
-      };
-    });
+        take: 10,
+      });
+
+      nearbyPosts = posts.map((post) => {
+        const reviews = post.owner.bookingsAsOwner
+          .map((booking) => booking.review)
+          .filter((review) => review !== null);
+
+        const reviewCount = reviews.length;
+        const rating =
+          reviewCount > 0
+            ? reviews.reduce((sum, review) => sum + (review?.rating || 0), 0) /
+              reviewCount
+            : 0;
+
+        return {
+          id: post.id,
+          title: post.title,
+          location: post.location,
+          service: {
+            id: post.service.id,
+            name: post.service.name,
+          },
+          duration: post.duration,
+          rating: Number(rating.toFixed(1)),
+          reviewCount: reviewCount,
+          imageUrl: post.imageUrl ?? undefined,
+          isSaved: post.savedBy.length > 0,
+        };
+      });
+    }
 
     return {
       todaysBookings,
