@@ -57,7 +57,7 @@ export default function Saved() {
     };
 
     return (
-        <SafeAreaView className="flex-1 ">
+        <SafeAreaView className="flex-1" edges={["top", "right", "left"]}>
             <View className="flex flex-col w-full p-10 items-center pb-3">
                 <Text className="text-[#0A0A0A] text-4xl self-start">Saved posts</Text>
             </View>
@@ -84,13 +84,14 @@ export default function Saved() {
                 </View> :
                 <FlatList
                     data={posts}
-                    className={"w-full mb-16 mt-5"}
+                    className={"w-full mt-5"}
                     keyExtractor={(item) => item.id}
                     renderItem={({item}) => (
                         <View className={"w-full h-60 px-8 mb-6"}>
                             <SitterNearYouCard {...item} onUnsave={() => handleRemove(item.id)}/>
                         </View>
                     )}
+                    contentContainerStyle={{paddingBottom: 75}}
                 />
             }
         </SafeAreaView>
