@@ -54,6 +54,11 @@ type TodaysBooking = {
     time: string;
 };
 
+type Location = {
+    id: string;
+    name: string;
+}
+
 type User = {
     id: string;
     firstname: string;
@@ -61,6 +66,7 @@ type User = {
     email: string;
     profileImageUrl: string;
     roles: ("OWNER" | "SITTER")[];
+    location: Location;
 };
 
 export default function Sitter() {
@@ -305,10 +311,10 @@ export default function Sitter() {
                                 }
                             >
                                 <Text className="text-xl text-[#0a0a0a] font-bold mb-1">
-                                    No current jobs available. 🙁
+                                    {user?.location == null ? "Location not set."  : "No current jobs available. 🙁"}
                                 </Text>
-                                <Text className="text-lg text-[#0a0a0a]">
-                                    {"We'll notify you when something opens up."}
+                                <Text className="text-lg px-8 text-center text-[#0a0a0a]">
+                                    {user?.location == null ? "Set your location in Profile → Edit Profile to see nearby jobs."  : "We'll notify you when something opens up."}
                                 </Text>
                             </View>
                         )}
