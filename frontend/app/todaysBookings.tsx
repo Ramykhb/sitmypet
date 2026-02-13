@@ -1,57 +1,25 @@
 import SitterNearYouCard from "@/components/SitterNearYouCard";
 import React, {useEffect, useState} from "react";
-import {FlatList, ScrollView, Text, View} from "react-native";
+import {ScrollView, Text, View, TouchableOpacity} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 import * as SecureStore from "expo-secure-store";
 import api from "@/config/api";
 import SitterNearYouCardLoading from "@/components/SitterNearYouCardLoading";
 import TodaysBookingCard from "@/components/TodaysBookingCard";
 import TodaysBookingCardLoading from "@/components/TodaysBookingCardLoading";
-
-type AppointmentStatus = "CONFIRMED" | "COMPLETED" | "CANCELLED";
-
-interface Service {
-    id: string;
-    name: string;
-    createdAt: string;
-    updatedAt: string;
-}
-
-interface UserProfile {
-    id: string;
-    firstname: string;
-    lastname: string;
-    profileImageUrl: string;
-    emailVerified: boolean;
-}
-
-interface Pet {
-    id: string;
-    name: string;
-    breed: string;
-    imageUrl: string | null;
-    ownerId: string;
-    createdAt: string;
-    updatedAt: string;
-}
+import GlobalBookingCard from "@/components/GlobalBookingCard";
 
 interface Appointment {
     id: string;
-    sitterId: string;
-    ownerId: string;
-    petId: string;
-    serviceId: string;
     location: string;
-    scheduledTime: string;
-    status: AppointmentStatus;
-    createdAt: string;
-    updatedAt: string;
-    service: Service;
-    owner: UserProfile;
-    sitter: UserProfile;
-    pet: Pet;
-    isOwner: boolean;
-    isSitter: boolean;
+    ownerImageURL: string;
+    ownerName: string;
+    petName: string;
+    service: {
+        id: string;
+        name: string;
+    };
+    time: string;
 }
 
 type AppointmentList = Appointment[];
@@ -60,6 +28,9 @@ const TodaysBookings = () => {
     const [loading, setLoading] = useState(false);
     const [completed, setCompleted] = useState<AppointmentList>([]);
     const [unCompleted, setUnCompleted] = useState<AppointmentList>([]);
+    const [isFutureOpen, setIsFutureOpen] = useState(true);
+    const [isPastOpen, setIsPastOpen] = useState(true);
+
 
     useEffect(() => {
         const getBookings = async () => {
@@ -67,17 +38,17 @@ const TodaysBookings = () => {
             try {
                 const res = await api.get("/bookings");
                 const allBookings: AppointmentList = res.data;
+                const now = new Date();
 
-                const completedBookings = allBookings.filter(
-                    b => b.status === "COMPLETED" || b.status === "CANCELLED"
+                const futureBookings = allBookings.filter(
+                    booking => new Date(booking.time) >= now
                 );
 
-                const unCompletedBookings = allBookings.filter(
-                    b => b.status === "CONFIRMED"
+                const pastBookings = allBookings.filter(
+                    booking => new Date(booking.time) < now
                 );
-
-                setCompleted(completedBookings);
-                setUnCompleted(unCompletedBookings);
+                setCompleted(pastBookings);
+                setUnCompleted(futureBookings);
             } catch (error) {
                 console.error(error);
             } finally {
@@ -91,10 +62,10 @@ const TodaysBookings = () => {
         <SafeAreaView className={"flex-1"} edges={["right", "left"]}>
             {loading ? (
                 <View className="flex mt-10">
-                    <View className={"w-[90%] ml-[5%] px-6 mb-10"}>
+                    <View className={"w-[90%] ml-[5%] px-6 mb-14 mt-10"}>
                         <TodaysBookingCardLoading/>
                     </View>
-                    <View className={"w-[90%] ml-[5%] px-6 mb-10"}>
+                    <View className={"w-[90%] ml-[5%] px-6 mb-14"}>
                         <TodaysBookingCardLoading/>
                     </View>
                     <View className={"w-[90%] ml-[5%] px-6 mb-10"}>
@@ -102,16 +73,44 @@ const TodaysBookings = () => {
                     </View>
                 </View>
             ) : (
-                <FlatList
-                    data={unCompleted}
-                    className={"w-full mb-20 mt-10"}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({item}) => (
-                        <View className={"w-full mb-6"}>
-                            <TodaysBookingCard {...item} styling={"w-[86%] ml-[7%] h-52"}/>
-                        </View>
-                    )}
-                />
+                <ScrollView
+                  className="w-full mt-10"
+                  contentContainerStyle={{ paddingBottom: 20 }}
+                >
+                  <TouchableOpacity
+                    className="w-[86%] ml-[7%] mb-4"
+                    onPress={() => setIsFutureOpen(prev => !prev)}
+                  >
+                    <View className="w-full px-5 flex flex-row justify-between">
+                      <Text className="text-xl font-bold text-[#0a0a0a]">Future Bookings</Text>
+                      <Text>{isFutureOpen ? "▲" : "▼"}</Text>
+                    </View>
+                  </TouchableOpacity>
+                  {isFutureOpen &&
+                    unCompleted.map((booking) => (
+                      <View key={booking.id} className="w-full mb-6">
+                        <TodaysBookingCard {...booking} styling="w-[86%] ml-[7%] h-52" longDate={true} />
+                      </View>
+                    ))
+                  }
+
+                  <TouchableOpacity
+                    className="w-[86%] ml-[7%] mb-4 mt-5"
+                    onPress={() => setIsPastOpen(prev => !prev)}
+                  >
+                    <View className="w-full px-5 flex flex-row justify-between">
+                      <Text className="text-xl font-bold text-[#0a0a0a]">Past Bookings</Text>
+                      <Text>{isPastOpen ? "▲" : "▼"}</Text>
+                    </View>
+                  </TouchableOpacity>
+                  {isPastOpen &&
+                    completed.map((booking) => (
+                      <View key={booking.id} className="w-full mb-6">
+                        <TodaysBookingCard {...booking} styling="w-[86%] ml-[7%] h-52" longDate={true} />
+                      </View>
+                    ))
+                  }
+                </ScrollView>
             )}
         </SafeAreaView>
     );

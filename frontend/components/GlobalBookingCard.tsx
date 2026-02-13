@@ -1,24 +1,52 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { Image, Text, View } from "react-native";
+import * as SecureStore from "expo-secure-store"
+type AppointmentStatus = "CONFIRMED" | "COMPLETED" | "CANCELLED";
 
-type Service = {
+interface Service {
     id: string;
-    createdAt?: string;
     name: string;
-    updatedAt?: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
-type TodaysBooking = {
+interface UserProfile {
     id: string;
+    firstname: string;
+    lastname: string;
+    profileImageUrl: string;
+    emailVerified: boolean;
+}
+
+interface Pet {
+    id: string;
+    name: string;
+    breed: string;
+    imageUrl: string | null;
+    ownerId: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+interface Appointment {
+    id: string;
+    sitterId: string;
+    ownerId: string;
+    petId: string;
+    serviceId: string;
     location: string;
-    ownerImageURL: string;
-    ownerName: string;
-    petName: string;
+    scheduledTime: string;
+    status: AppointmentStatus;
+    createdAt: string;
+    updatedAt: string;
     service: Service;
-    time: string;
-    styling: string;
-    longDate?: boolean;
-};
+    owner: UserProfile;
+    sitter: UserProfile;
+    pet: Pet;
+    isOwner: boolean;
+    isSitter: boolean;
+    styling?: string;
+}
 
 const serviceIcons: Record<string, any> = {
     "dog walking": require("../assets/icons/dogWalking.png"),
@@ -27,15 +55,16 @@ const serviceIcons: Record<string, any> = {
     "health care": require("../assets/icons/petHealth.png"),
 };
 
-const formatLongDate = (isoDate: string) => {
-    const date = new Date(isoDate);
-    const day = date.toLocaleDateString('en-US', { weekday: 'short' });
-    const dayOfMonth = date.getDate();
-    const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-    return `${day} ${dayOfMonth}, ${time}`;
-};
+const GlobalBookingCard = (props:Appointment) => {
+    const [role, setRole] = useState("");
+    useEffect(() => {
+        const getRole = async () => {
+            const role = await SecureStore.getItemAsync("role");
+            setRole(role as string);
+        }
+        getRole();
+    }, []);
 
-const TodaysBookingCard = (props:TodaysBooking) => {
   return (
     <View
       className={
@@ -45,17 +74,17 @@ const TodaysBookingCard = (props:TodaysBooking) => {
       <View className={"flex-row flex w-full justify-between items-center "}>
         <View className={"flex flex-row"}>
           <Image
-            source={{uri: props.ownerImageURL}}
+            source={role === "SITTER" ? {uri: props.owner.profileImageUrl} : {uri: props.sitter.profileImageUrl}}
             alt="Home Image"
             className={"w-12 h-12 rounded-full"}
             resizeMode={"cover"}
           />
           <View className={"flex flex-col ml-3"}>
             <Text className={"text-base text-[#0A0A0A] text-left"}>
-                {props.ownerName}
+                {role === "SITTER" ? props.owner.firstname + " " + props.owner.lastname : props.sitter.firstname + " " + props.sitter.lastname}
             </Text>
             <Text className={"text-sm text-gray-500 text-left"}>
-                {props.petName}
+                {props.pet.name}
             </Text>
           </View>
         </View>
@@ -76,13 +105,11 @@ const TodaysBookingCard = (props:TodaysBooking) => {
 
         <View className={"flex justify-around"}>
           <Text className={"text-xs text-gray-500"}>{props.location}</Text>
-          <Text className={"text-base"}>
-            {props.longDate && props.time ? formatLongDate(props.time) : props.time}
-          </Text>
+          <Text className={"text-base"}>{props.scheduledTime}</Text>
         </View>
       </View>
     </View>
   );
-}
+};
 
-export default TodaysBookingCard;
+export default GlobalBookingCard;
