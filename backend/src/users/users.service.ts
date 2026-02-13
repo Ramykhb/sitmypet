@@ -95,15 +95,24 @@ export class UsersService {
       email?: string;
       password?: string;
       location?: string;
+      profileImageUrl?: string;
     },
   ) {
-    const { firstname, lastname, email, location, password: __ } = data;
+    const {
+      firstname,
+      lastname,
+      email,
+      location,
+      password: __,
+      profileImageUrl,
+    } = data;
     void __;
     const updateData: {
       firstname?: string;
       lastname?: string;
       email?: string;
       emailVerified?: boolean;
+      profileImageUrl?: string;
     } = {};
 
     if (firstname) updateData.firstname = firstname;

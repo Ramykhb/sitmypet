@@ -121,6 +121,7 @@ export class AuthService {
       payload = verified as typeof payload;
     } catch {
       throw new UnauthorizedException('Invalid refresh token');
+      console.log('Refresh token verification failed');
     }
 
     const user = await this.usersService.findByIdWithRefreshToken(payload.sub);
@@ -132,14 +133,17 @@ export class AuthService {
       !user.refreshTokenJti
     ) {
       throw new UnauthorizedException('Invalid refresh token');
+      console.log('User not found or missing refresh token data');
     }
 
     if (user.refreshTokenExp < new Date()) {
       throw new UnauthorizedException('Refresh token expired');
+      console.log('Refresh token expired');
     }
 
     if (payload.jti !== user.refreshTokenJti) {
       throw new UnauthorizedException('Refresh token already used');
+      console.log('Refresh token jti mismatch');
     }
 
     const isTokenValid = await this.compareToken(
@@ -149,6 +153,7 @@ export class AuthService {
 
     if (!isTokenValid) {
       throw new UnauthorizedException('Invalid refresh token');
+      console.log('Refresh token hash mismatch');
     }
 
     const tokens = this.generateTokens(user.id, user.roles);
