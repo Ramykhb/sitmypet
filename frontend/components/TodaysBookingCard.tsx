@@ -1,5 +1,5 @@
 import React from "react";
-import { Image, Text, View } from "react-native";
+import {Image, Text, View} from "react-native";
 
 type Service = {
     id: string;
@@ -29,60 +29,60 @@ const serviceIcons: Record<string, any> = {
 
 const formatLongDate = (isoDate: string) => {
     const date = new Date(isoDate);
-    const day = date.toLocaleDateString('en-US', { weekday: 'short' });
+    const month = date.toLocaleDateString('en-US', {month: 'short'}); // Feb
     const dayOfMonth = date.getDate();
-    const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-    return `${day} ${dayOfMonth}, ${time}`;
+    const time = date.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true}); // 5:00 PM
+    return `${month} ${dayOfMonth}, ${time}`;
 };
 
-const TodaysBookingCard = (props:TodaysBooking) => {
-  return (
-    <View
-      className={
-        `flex flex-col px-6 py-6 rounded-3xl border-gray-300 border ml-8 justify-between ${props.styling}`
-      }
-    >
-      <View className={"flex-row flex w-full justify-between items-center "}>
-        <View className={"flex flex-row"}>
-          <Image
-            source={{uri: props.ownerImageURL}}
-            alt="Home Image"
-            className={"w-12 h-12 rounded-full"}
-            resizeMode={"cover"}
-          />
-          <View className={"flex flex-col ml-3"}>
-            <Text className={"text-base text-[#0A0A0A] text-left"}>
-                {props.ownerName}
-            </Text>
-            <Text className={"text-sm text-gray-500 text-left"}>
-                {props.petName}
-            </Text>
-          </View>
-        </View>
-          <Image
-              source={serviceIcons[props.service.name.toLowerCase()]}
-              className="w-10 h-10 rounded-full"
-              resizeMode="cover"
-          />
-      </View>
+const TodaysBookingCard = (props: TodaysBooking) => {
+    return (
         <View
-            className={"w-full flex-row h-20 p-4 bg-[#E8ECED] rounded-2xl justify-between"}
+            className={
+                `flex flex-col px-6 py-6 rounded-3xl border-gray-300 border ml-8 justify-between ${props.styling}`
+            }
         >
-        <View className={"flex justify-around"}>
-          <Text className={"text-xs text-gray-500"}>Service type</Text>
-          <Text className={"text-base"}>{props.service.name}</Text>
-        </View>
-        <View className={"h-full w-[1px] bg-gray-300"} />
+            <View className={"flex-row flex w-full justify-between items-center "}>
+                <View className={"flex flex-row"}>
+                    <Image
+                        source={{uri: props.ownerImageURL}}
+                        alt="Home Image"
+                        className={"w-12 h-12 rounded-full"}
+                        resizeMode={"cover"}
+                    />
+                    <View className={"flex flex-col ml-3"}>
+                        <Text className={"text-base text-[#0A0A0A] text-left"}>
+                            {props.ownerName}
+                        </Text>
+                        <Text className={"text-sm text-gray-500 text-left"}>
+                            {props.petName}
+                        </Text>
+                    </View>
+                </View>
+                <Image
+                    source={serviceIcons[props.service.name.toLowerCase()]}
+                    className="w-10 h-10 rounded-full"
+                    resizeMode="cover"
+                />
+            </View>
+            <View
+                className={"w-full flex-row h-20 p-4 bg-[#E8ECED] rounded-2xl justify-between"}
+            >
+                <View className={"flex justify-around"}>
+                    <Text className={"text-xs text-gray-500"}>Service type</Text>
+                    <Text className={"text-base"}>{props.service.name}</Text>
+                </View>
+                <View className={"h-full w-[1px] bg-gray-300"}/>
 
-        <View className={"flex justify-around"}>
-          <Text className={"text-xs text-gray-500"}>{props.location}</Text>
-          <Text className={"text-base"}>
-            {props.longDate && props.time ? formatLongDate(props.time) : props.time}
-          </Text>
+                <View className={"flex justify-around"}>
+                    <Text className={"text-xs text-gray-500"}>{props.location}</Text>
+                    <Text className={"text-base"}>
+                        {props.longDate && props.time ? formatLongDate(props.time) : props.time}
+                    </Text>
+                </View>
+            </View>
         </View>
-      </View>
-    </View>
-  );
+    );
 }
 
 export default TodaysBookingCard;

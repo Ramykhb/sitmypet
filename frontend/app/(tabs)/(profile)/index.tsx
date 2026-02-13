@@ -16,8 +16,8 @@ type User = {
 };
 
 export default function Index() {
-    const [user, setUser] = useState<User | null>(null);
     const [name, setName] = useState("");
+    const [userProfileImageUrl, setUserProfileImageUrl] = useState("");
 
     async function clearAuthData() {
         try {
@@ -39,12 +39,11 @@ export default function Index() {
 
             const getUser = async () => {
                 try {
-                    const res = await api.get("users/me")
-                    setUser(res.data);
+                    const pfp = await SecureStore.getItemAsync("profileImageUrl");
                     const fname = await SecureStore.getItemAsync("firstname");
                     const lname = await SecureStore.getItemAsync("lastname");
                     setName(fname as string + " " + lname as string);
-
+                    setUserProfileImageUrl(pfp as string);
                 } catch (e) {
                     console.log(e);
                 }
@@ -59,17 +58,18 @@ export default function Index() {
             <ScrollView className={"w-full flex-1"}>
                 <View className="flex flex-col flex-1 w-full p-10 items-center">
                     <Text className="text-[#0A0A0A] text-5xl self-start">Profile</Text>
-                    {user ? (
-                        <View className="flex flex-col items-center justify-center w-full relative">
-                            <Image
-                                source={{ uri: user.profileImageUrl }}
-                                className="w-44 h-44 my-5 mt-10 rounded-full"
-                            />
-                            <Text className="text-[#0A0A0A] text-2xl font-bold">
-                                {name}
-                            </Text>
-                        </View>
-                    ) : <ActivityIndicator color={"#0a0a0a"} size={"large"} className={"my-12 mt-32"}/> }
+                    <View className="flex flex-col items-center justify-center w-full relative">
+                        <Image
+                            source={{ uri: userProfileImageUrl && userProfileImageUrl.length > 0
+                                    ? userProfileImageUrl
+                                    : "https://pub-4f8704924751443bbd3260d113d11a8f.r2.dev/uploads/pfps/default_pfp.png"
+                            }}
+                            className="w-44 h-44 my-5 mt-10 rounded-full"
+                        />
+                        <Text className="text-[#0A0A0A] text-2xl font-bold">
+                            {name}
+                        </Text>
+                    </View>
                     <TouchableOpacity
                         onPress={() => {
                             router.push("/(tabs)/(profile)/editProfile");
@@ -167,7 +167,7 @@ export default function Index() {
                         </TouchableOpacity>
                     </View>
                     <TouchableOpacity
-                        className={"w-full h-[60px] bg-[#fcb3b3] mt-5 rounded-full flex flex-row justify-center items-center mb-28"}>
+                        className={"w-full h-[60px] bg-[#fcb3b3] mt-5 rounded-full flex flex-row justify-center items-center mb-10"}>
                         <Image source={require("../../../assets/icons/trash.png")} className={"w-8 h-8 mr-3"}
                                tintColor={"#dc2626"}/>
                         <Text className={"text-red-600 font-bold text-xl"}>Delete Account</Text>

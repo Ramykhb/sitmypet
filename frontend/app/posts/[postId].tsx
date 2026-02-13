@@ -4,6 +4,7 @@ import {useLocalSearchParams} from 'expo-router'
 import api from "@/config/api";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {backendPath} from "@/config/backConfig";
+import * as SecureStore from "expo-secure-store";
 
 type Owner = {
     id: string;
@@ -58,6 +59,7 @@ const PostDetails = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [applying, setApplying] = useState<boolean>(false);
     const [isApplied, setIsApplied] = useState<boolean>(false);
+    const [userId, setUserId] = useState<string>("");
 
     const handleSave = async () => {
         if (!post) return;
@@ -110,7 +112,6 @@ const PostDetails = () => {
         try {
             setLoading(true);
             const res = await api.get(`/posts/${postId}`);
-            console.log(res.data);
             setPost(res.data);
         } catch (error) {
             console.error(error);
@@ -120,6 +121,11 @@ const PostDetails = () => {
     };
 
     useEffect(() => {
+        const getUserId = async () => {
+            const id = await SecureStore.getItemAsync("id");
+            setUserId(id as string);
+        }
+        getUserId();
         fetchHomeData();
     }, []);
 
@@ -189,7 +195,20 @@ const PostDetails = () => {
                     </View>
                 </ScrollView>
             }
-            {loading ? <></> : <View
+            {loading ? <></> : userId === post?.ownerId ? <View
+                className={"bg-white flex justify-around p-10 h-60 w-full absolute bottom-0 left-0 rounded-tl-[35px] rounded-tr-[35px] shadow-xl"}>
+                <TouchableOpacity
+                    className={`w-full h-14 bg-[#E7E8FF] rounded-full flex items-center justify-center`}
+                    onPress={handeApplication}>
+                    <Text className={`text-lg font-bold text-[#3944D5]`}>View Applications</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    className={"w-full h-14 bg-[#fcb3b3] rounded-full flex flex-row justify-center items-center"}>
+                    <Image source={require("../../assets/icons/trash.png")} className={"w-8 h-8 mr-3"}
+                           tintColor={"#dc2626"}/>
+                    <Text className={"text-red-600 font-bold text-lg"}>Delete Post</Text>
+                </TouchableOpacity>
+            </View> : <View
                 className={"bg-white flex justify-around p-10 h-60 w-full absolute bottom-0 left-0 rounded-tl-[35px] rounded-tr-[35px] shadow-xl"}>
                 <TouchableOpacity className={"w-full h-14 bg-gray-200 rounded-full flex items-center justify-center"}>
                     <Text className={"text-lg font-bold text[#0a0a0a]"}>Contact via email</Text>
@@ -202,7 +221,7 @@ const PostDetails = () => {
                         <Text className={`text-lg font-bold text-[#3944D5]`}>Withdraw application</Text>}
                 </TouchableOpacity>
             </View>}
-            </SafeAreaView>
-                )
-            }
-            export default PostDetails;
+        </SafeAreaView>
+    )
+}
+export default PostDetails;

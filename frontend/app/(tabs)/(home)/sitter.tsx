@@ -76,7 +76,7 @@ type cachedUser = {
 
 export default function Sitter() {
     const [user, setUser] = useState<User | null>(null);
-    const [cachedUser, setCachedUser] = useState<cachedUser | null>(null);
+    const [cachedUser, setCachedUser] = useState<cachedUser | null>({profileImageUrl: "https://pub-4f8704924751443bbd3260d113d11a8f.r2.dev/uploads/pfps/default_pfp.png", firstname: "Guest"});
     const [bookingFound, setBookingFound] = useState<TodaysBooking[]>([]);
     const [clientFound, setClientFound] = useState<ClientHistory[]>([]);
     const [nearYouFound, setNearYouFound] = useState<NearbyPost[]>([]);
