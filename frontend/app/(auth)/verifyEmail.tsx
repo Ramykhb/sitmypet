@@ -108,6 +108,10 @@ export default function VerifyEmail({
                     String(res.data.user.lastname)
                 );
                 await SecureStore.setItemAsync(
+                    "profileImageUrl",
+                    String(res.data.user.profileImageUrl)
+                );
+                await SecureStore.setItemAsync(
                     "firstname",
                     String(res.data.user.firstname)
                 );

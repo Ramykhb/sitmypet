@@ -118,6 +118,7 @@ const EditProfile = () => {
         }
         await SecureStore.setItemAsync("firstname", user?.firstname as string);
         await SecureStore.setItemAsync("lastname", user?.lastname as string);
+        await SecureStore.setItemAsync("profileImageUrl", user?.profileImageUrl as string);
         router.back();
     }
 

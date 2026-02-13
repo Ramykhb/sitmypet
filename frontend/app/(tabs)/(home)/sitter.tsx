@@ -65,12 +65,18 @@ type User = {
     lastname: string;
     email: string;
     profileImageUrl: string;
+    location: string | null;
     roles: ("OWNER" | "SITTER")[];
-    location: Location;
+};
+
+type cachedUser = {
+    firstname: string;
+    profileImageUrl: string;
 };
 
 export default function Sitter() {
     const [user, setUser] = useState<User | null>(null);
+    const [cachedUser, setCachedUser] = useState<cachedUser | null>(null);
     const [bookingFound, setBookingFound] = useState<TodaysBooking[]>([]);
     const [clientFound, setClientFound] = useState<ClientHistory[]>([]);
     const [nearYouFound, setNearYouFound] = useState<NearbyPost[]>([]);
@@ -97,24 +103,40 @@ export default function Sitter() {
         setRefreshing(false);
     }, []);
 
+    const getUser = async () => {
+        try {
+            const res = await api.get("users/me")
+            setUser(res.data);
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    const getCachedUser = async () => {
+        try {
+            const fname =  await SecureStore.getItemAsync("firstname") as string;
+            const profileImageUrl =  await SecureStore.getItemAsync("profileImageUrl") as string;
+            setCachedUser({firstname: fname, profileImageUrl})
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
     useFocusEffect(useCallback(
         () => {
-            setBookingFound([]);
-            setClientFound([]);
-            setNearYouFound([]);
-            const getUser = async () => {
-                try {
-                    const res = await api.get("users/me")
-                    setUser(res.data);
-                } catch (e) {
-                    console.log(e);
-                }
-            }
+            getCachedUser()
             getUser();
-            fetchHomeData();
-
         }, []
     ));
+
+    useEffect(() => {
+        setBookingFound([]);
+        setClientFound([]);
+        setNearYouFound([]);
+        getCachedUser();
+        getUser();
+        fetchHomeData();
+    }, []);
 
     return (
         <SafeAreaView className="flex-1">
@@ -128,14 +150,14 @@ export default function Sitter() {
                         }
                     >
                         <Image
-                            source={{uri: user?.profileImageUrl}}
+                            source={cachedUser?.profileImageUrl ? {uri: cachedUser?.profileImageUrl} : {uri: user?.profileImageUrl}}
                             alt="Home Image"
                             className={"w-14 h-14 rounded-full"}
                             resizeMode={"cover"}
                         />
                         <View className={"flex flex-col mr-3"}>
                             <Text className={"text-base text-gray-500 text-center"}>
-                                Hello, {user?.firstname ?? "Guest"}
+                                Hello, {user?.firstname ?? cachedUser?.firstname}
                             </Text>
                             <Text className={"text-lg font-bold text-[#0A0A0A] text-center"}>
                                 How do you feel today?
