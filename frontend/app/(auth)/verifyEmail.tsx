@@ -109,7 +109,7 @@ export default function VerifyEmail({
                 );
                 await SecureStore.setItemAsync(
                     "profileImageUrl",
-                    String(res.data.user.profileImageUrl)
+                    String("https://pub-4f8704924751443bbd3260d113d11a8f.r2.dev/uploads/pfps/default_pfp.png")
                 );
                 await SecureStore.setItemAsync(
                     "firstname",

@@ -106,11 +106,13 @@ const EditProfile = () => {
             }
         }
         try {
-            const res = api.patch("users/me", {
+            const res = await api.patch("users/me", {
                 firstname: user?.firstname,
                 lastname: user?.lastname,
                 location: userLocation
             });
+            console.log(res.data);
+            await SecureStore.setItemAsync("profileImageUrl", res.data.profileImageUrl as string);
         } catch (e) {
             setStatus({type: "error", message: "An error has occurred."});
         } finally {
@@ -118,7 +120,6 @@ const EditProfile = () => {
         }
         await SecureStore.setItemAsync("firstname", user?.firstname as string);
         await SecureStore.setItemAsync("lastname", user?.lastname as string);
-        await SecureStore.setItemAsync("profileImageUrl", user?.profileImageUrl as string);
         router.back();
     }
 
