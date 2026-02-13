@@ -1,4 +1,4 @@
-import {View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator} from 'react-native'
+import {View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator, Linking} from 'react-native'
 import React, {useEffect, useState} from 'react'
 import {useLocalSearchParams} from 'expo-router'
 import api from "@/config/api";
@@ -13,6 +13,7 @@ type Owner = {
     profileImageUrl: string;
     emailVerified: boolean;
     clientRating: number;
+    email: string;
     reviewsCount: number;
 };
 
@@ -79,6 +80,26 @@ const PostDetails = () => {
         }
     };
 
+    const handleEmailPress = async () => {
+        if (!post?.owner?.email) return;
+
+        const email = post.owner.email.trim();
+        const subject = encodeURIComponent("Regarding your pet sitting post");
+        const body = encodeURIComponent("Hi " + post.owner.firstname + ",\n\nI'm interested in your post.");
+        const url = `mailto:${email}?subject=${subject}&body=${body}`;
+
+        try {
+            const supported = await Linking.canOpenURL(url);
+            if (supported) {
+                await Linking.openURL(url);
+            } else {
+                console.log("Mail app is not available on this device (simulator issue).");
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
     const handeApplication = async () => {
         if (applying) return;
         setApplying(true);
@@ -112,6 +133,7 @@ const PostDetails = () => {
         try {
             setLoading(true);
             const res = await api.get(`/posts/${postId}`);
+            console.log(res.data);
             setPost(res.data);
         } catch (error) {
             console.error(error);
@@ -210,8 +232,11 @@ const PostDetails = () => {
                 </TouchableOpacity>
             </View> : <View
                 className={"bg-white flex justify-around p-10 h-60 w-full absolute bottom-0 left-0 rounded-tl-[35px] rounded-tr-[35px] shadow-xl"}>
-                <TouchableOpacity className={"w-full h-14 bg-gray-200 rounded-full flex items-center justify-center"}>
-                    <Text className={"text-lg font-bold text[#0a0a0a]"}>Contact via email</Text>
+                <TouchableOpacity
+                    onPress={handleEmailPress}
+                    className={"w-full h-14 bg-gray-200 rounded-full flex items-center justify-center"}
+                >
+                    <Text className={"text-lg font-bold text-[#0a0a0a]"}>Contact via email</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     className={`w-full h-14 ${isApplied ? "bg-[#E7E8FF]" : "bg-[#3944D5]"} rounded-full flex items-center justify-center`}
