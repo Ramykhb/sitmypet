@@ -18,6 +18,10 @@ export default function RootLayout() {
                 options={{headerShown: false}}
             />
             <Stack.Screen
+                name="verifyUser"
+                options={{headerShown: false}}
+            />
+            <Stack.Screen
                 name="sitterNearYou"
                 options={{
                     headerShown: true,

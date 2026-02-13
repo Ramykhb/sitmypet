@@ -4,12 +4,12 @@ import {useEffect, useState} from "react";
 import api from "@/config/api";
 import {ActivityIndicator, Text, View} from "react-native";
 
-export default function Index() {
+export default function VerifyUser() {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const checkRole = async () => {
+        const checkDoc = async () => {
             try {
                 const res = await api.get("users/me")
                 if (!res.data.document) {
@@ -21,21 +21,16 @@ export default function Index() {
             } finally {
                 setLoading(false);
             }
-            const role = await SecureStore.getItemAsync("role");
-            if (role === "OWNER") {
-                router.replace("/(tabs)/(home)/owner");
-            } else {
-                router.replace("/(tabs)/(home)/sitter");
-            }
+            router.replace("/(tabs)/(home)");
         };
 
-        checkRole();
+        checkDoc();
     }, []);
 
     return <View className={"flex-1 flex items-center justify-center"}>
         <View>
             <ActivityIndicator color={"0a0a0a"} size={"large"} />
-            <Text className={"text-lg text-center text-[#0a0a0a] mt-5"}>Launching App</Text>
+            <Text className={"text-xl font-bold text-center text-[#0a0a0a] mt-8"}>Launching App</Text>
         </View>
     </View>;
 }

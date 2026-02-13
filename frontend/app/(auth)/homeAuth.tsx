@@ -39,7 +39,7 @@ const HomeAuth = () => {
           className="w-[75%] bg-[#3944D5] h-16 rounded-full flex flex-row items-center justify-center my-5"
           onPress={async () => {
             setOwnLoading(true);
-            await SecureStore.setItemAsync("role", "owner");
+            await SecureStore.setItemAsync("role", "OWNER");
             setOwnLoading(false);
             router.push("/(tabs)/(home)");
           }}
@@ -61,7 +61,7 @@ const HomeAuth = () => {
           className="w-[75%] bg-[#0F1998] h-16 rounded-full flex flex-row items-center justify-center"
           onPress={async () => {
             setSitLoading(true);
-            await SecureStore.setItemAsync("role", "sitter");
+            await SecureStore.setItemAsync("role", "SITTER");
             setSitLoading(false);
             router.push("/(tabs)/(home)");
           }}

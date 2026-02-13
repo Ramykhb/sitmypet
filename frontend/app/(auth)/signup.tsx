@@ -55,7 +55,6 @@ const SignUp = () => {
       }
       setLoading(true);
       try {
-        delete (formData as Record<string, any>)["confirmPassword"];
         const res = await api.post(`/auth/register`, {
           firstname: formData.firstname,
           lastname: formData.lastname,
@@ -170,7 +169,7 @@ const SignUp = () => {
               ></TextInput>
             </View>
             <View className={"px-5 w-full mt-5 text-[#0A0A0A]"}>
-              <Text className={"text-xl"}>Confim Password</Text>
+              <Text className={"text-xl"}>Confirm Password</Text>
               <TextInput
                 className={
                   "w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"

@@ -76,6 +76,7 @@ type cachedUser = {
 
 export default function Sitter() {
     const [user, setUser] = useState<User | null>(null);
+    const [role, setRole] = useState<string>("");
     const [cachedUser, setCachedUser] = useState<cachedUser | null>({profileImageUrl: "https://pub-4f8704924751443bbd3260d113d11a8f.r2.dev/uploads/pfps/default_pfp.png", firstname: "Guest"});
     const [bookingFound, setBookingFound] = useState<TodaysBooking[]>([]);
     const [clientFound, setClientFound] = useState<ClientHistory[]>([]);
@@ -86,10 +87,21 @@ export default function Sitter() {
     const fetchHomeData = async () => {
         setIsLoading(true);
         try {
-            const res = await api.get("/sitter/home");
-            setNearYouFound(res.data.nearbyPosts ?? []);
-            setClientFound(res.data.recentClients ?? []);
-            setBookingFound(res.data.todaysBookings ?? []);
+            const userRole = await SecureStore.getItemAsync("role");
+            if (userRole === "SITTER") {
+                const res = await api.get("/sitter/home");
+                setNearYouFound(res.data.nearbyPosts ?? []);
+                setClientFound(res.data.recentClients ?? []);
+                setBookingFound(res.data.todaysBookings ?? []);
+            }
+            else
+            {
+                const res = await api.get("/owner/home");
+                console.log(res.data)
+                setNearYouFound(res.data.nearbyPosts ?? []);
+                setClientFound(res.data.recentClients ?? []);
+                setBookingFound(res.data.todaysBookings ?? []);
+            }
         } catch (error) {
             console.log(error);
         } finally {
@@ -115,6 +127,8 @@ export default function Sitter() {
     const getCachedUser = async () => {
         try {
             const fname =  await SecureStore.getItemAsync("firstname") as string;
+            const role =  await SecureStore.getItemAsync("role") as string;
+            setRole(role);
             const profileImageUrl =  await SecureStore.getItemAsync("profileImageUrl") as string;
             setCachedUser({firstname: fname, profileImageUrl})
         } catch (e) {
