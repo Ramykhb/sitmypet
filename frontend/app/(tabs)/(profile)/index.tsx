@@ -27,6 +27,7 @@ export default function Index() {
             await SecureStore.deleteItemAsync("role");
             await SecureStore.deleteItemAsync("firstname");
             await SecureStore.deleteItemAsync("lastname");
+            await SecureStore.deleteItemAsync("profileImageUrl");
             await SecureStore.deleteItemAsync("email");
             router.push("/(auth)/signin");
         } catch (error) {

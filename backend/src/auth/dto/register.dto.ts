@@ -16,7 +16,6 @@ export class RegisterDto {
   @MinLength(8)
   password: string;
 
-  @IsOptional()
   @IsString()
   profileImageUrl?: string;
 }
