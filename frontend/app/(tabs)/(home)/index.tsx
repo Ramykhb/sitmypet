@@ -10,17 +10,6 @@ export default function Index() {
 
     useEffect(() => {
         const checkRole = async () => {
-            try {
-                const res = await api.get("users/me")
-                if (!res.data.document) {
-                    router.replace("/(auth)/uploadDocument");
-                    return;
-                }
-            } catch (e) {
-                console.log(e);
-            } finally {
-                setLoading(false);
-            }
             const role = await SecureStore.getItemAsync("role");
             if (role === "OWNER") {
                 router.replace("/(tabs)/(home)/owner");
@@ -32,11 +21,6 @@ export default function Index() {
         checkRole();
     }, []);
 
-    return <View className={"flex-1 flex items-center justify-center"}>
-        <View>
-            <ActivityIndicator color={"0a0a0a"} size={"large"} />
-            <Text className={"text-lg text-center text-[#0a0a0a] mt-5"}>Launching App</Text>
-        </View>
-    </View>;
+    return null;
 }
 
