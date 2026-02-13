@@ -4,6 +4,8 @@ const prisma = new PrismaClient();
 
 const SITTER_EMAIL = 'tarekalkhatibb@gmail.com';
 
+//npx ts-node prisma/seed-locations.ts && npx ts-node prisma/seed-services.ts && npx ts-node prisma/seed-posts.ts && npx ts-node prisma/seed-sitter-data.ts
+
 function randomScheduledTime() {
   const now = new Date();
   const daysAhead = Math.floor(Math.random() * 7) + 1; // 1–7 days

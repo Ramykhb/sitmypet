@@ -44,6 +44,7 @@ export class AuthService {
       lastname: dto.lastname,
       email,
       passwordHash,
+      profileImageUrl: dto.profileImageUrl,
     });
 
     const otp = this.generateOtp();

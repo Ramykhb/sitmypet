@@ -27,6 +27,7 @@ export class UsersService {
     email: string;
     passwordHash: string;
     roles?: Role[];
+    profileImageUrl?: string;
   }) {
     const exists = await this.prisma.user.findUnique({
       where: { email: data.email },
@@ -43,6 +44,7 @@ export class UsersService {
         email: data.email,
         passwordHash: data.passwordHash,
         roles: data.roles ?? [Role.OWNER, Role.SITTER],
+        ...(data.profileImageUrl && { profileImageUrl: data.profileImageUrl }),
       },
       select: userSelect,
     });
