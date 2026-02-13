@@ -43,6 +43,7 @@ type Post = {
     imageUrl: string;
     service: Service;
     price: string;
+    scheduledTime: string;
     status: "OPEN" | "CLOSED" | "PENDING";
     ownerId: string;
     petId: string;
@@ -98,6 +99,14 @@ const PostDetails = () => {
         } catch (e) {
             console.log(e);
         }
+    };
+
+    const formatLongDate = (isoDate: string) => {
+        const date = new Date(isoDate);
+        const month = date.toLocaleDateString('en-US', {month: 'long'}); // Feb
+        const dayOfMonth = date.getDate();
+        const time = date.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true}); // 5:00 PM
+        return `${month} ${dayOfMonth}, ${time}`;
     };
 
     const handeApplication = async () => {
@@ -191,7 +200,15 @@ const PostDetails = () => {
                                 {post?.duration}
                             </Text>
                         </View>
-                        <View className={"w-full flex flex-row items-center rounded-2xl bg-gray-200 h-20 mt-7"}>
+                        <View className={"w-full flex flex-row items-center justify-between mt-4"}>
+                            <Text className={"text-gray-500 ml-2 font-semibold text-sm"}>
+                                {formatLongDate(post?.scheduledTime as string)}
+                            </Text>
+                            <Text className={"text-gray-700 mr-2 font-semibold text-xl"}>
+                                ${post?.price}
+                            </Text>
+                        </View>
+                        <View className={"w-full flex flex-row items-center rounded-2xl bg-gray-200 h-20 mt-3"}>
                             <View className={"w-[33%] flex items-center justify-center border-r border-r-gray-400"}>
                                 <Image source={require("../../assets/icons/verified-shield.png")} alt="Verified shield"
                                        className={"w-6 h-6 mb-1"}/>
