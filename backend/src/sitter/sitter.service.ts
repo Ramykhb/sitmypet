@@ -42,6 +42,7 @@ export class SitterService {
         id: booking.service.id,
         name: booking.service.name,
       },
+      status: booking.status,
       location: booking.location,
       time: booking.scheduledTime.toLocaleTimeString('en-US', {
         hour: '2-digit',
@@ -83,7 +84,23 @@ export class SitterService {
 
     const locationName = profile?.location?.name;
 
-    let posts: any[] = [];
+    type PostWithRelations = Prisma.PostGetPayload<{
+      include: {
+        service: true;
+        owner: {
+          include: {
+            bookingsAsOwner: {
+              include: {
+                review: true;
+              };
+            };
+          };
+        };
+        savedBy: true;
+      };
+    }>;
+
+    let posts: PostWithRelations[] = [];
     let nearbyPosts: any[] | null = null;
 
     if (locationName) {

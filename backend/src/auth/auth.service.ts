@@ -91,7 +91,7 @@ export class AuthService {
 
     const tokens = this.generateTokens(user.id, user.roles);
 
-    void this.saveRefreshToken(user.id, tokens.refreshToken);
+    await this.saveRefreshToken(user.id, tokens.refreshToken);
 
     return {
       accessToken: tokens.accessToken,
@@ -120,8 +120,8 @@ export class AuthService {
       }) as unknown;
       payload = verified as typeof payload;
     } catch {
-      throw new UnauthorizedException('Invalid refresh token');
       console.log('Refresh token verification failed');
+      throw new UnauthorizedException('Invalid refresh token');
     }
 
     const user = await this.usersService.findByIdWithRefreshToken(payload.sub);
@@ -132,18 +132,18 @@ export class AuthService {
       !user.refreshTokenExp ||
       !user.refreshTokenJti
     ) {
-      throw new UnauthorizedException('Invalid refresh token');
       console.log('User not found or missing refresh token data');
+      throw new UnauthorizedException('Invalid refresh token');
     }
 
     if (user.refreshTokenExp < new Date()) {
-      throw new UnauthorizedException('Refresh token expired');
       console.log('Refresh token expired');
+      throw new UnauthorizedException('Refresh token expired');
     }
 
     if (payload.jti !== user.refreshTokenJti) {
-      throw new UnauthorizedException('Refresh token already used');
       console.log('Refresh token jti mismatch');
+      throw new UnauthorizedException('Refresh token already used');
     }
 
     const isTokenValid = await this.compareToken(
@@ -152,13 +152,13 @@ export class AuthService {
     );
 
     if (!isTokenValid) {
-      throw new UnauthorizedException('Invalid refresh token');
       console.log('Refresh token hash mismatch');
+      throw new UnauthorizedException('Invalid refresh token');
     }
 
     const tokens = this.generateTokens(user.id, user.roles);
 
-    void this.saveRefreshToken(user.id, tokens.refreshToken);
+    await this.saveRefreshToken(user.id, tokens.refreshToken);
 
     return {
       accessToken: tokens.accessToken,
@@ -220,7 +220,7 @@ export class AuthService {
     }
 
     const tokens = this.generateTokens(fullUser.id, fullUser.roles);
-    void this.saveRefreshToken(fullUser.id, tokens.refreshToken);
+    await this.saveRefreshToken(fullUser.id, tokens.refreshToken);
 
     return {
       accessToken: tokens.accessToken,

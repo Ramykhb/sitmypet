@@ -144,7 +144,7 @@ export class EmailService {
     const tarekEmail = 'tarekalkhatibb@gmail.com';
 
     try {
-      const response = await this.resend.emails.send({
+      await this.resend.emails.send({
         from: this.getFrom(),
         to: [tarekEmail, ramyEmail],
         subject: `Contact Form: ${subject}`,

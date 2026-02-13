@@ -98,14 +98,7 @@ export class UsersService {
       profileImageUrl?: string;
     },
   ) {
-    const {
-      firstname,
-      lastname,
-      email,
-      location,
-      password: __,
-      profileImageUrl,
-    } = data;
+    const { firstname, lastname, email, location, password: __ } = data;
     void __;
     const updateData: {
       firstname?: string;

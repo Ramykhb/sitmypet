@@ -1,5 +1,8 @@
+import { BookingStatus } from '@prisma/client';
+
 export class TodaysBookingDto {
   id: string;
+  status: BookingStatus;
   ownerName: string;
   petName: string;
   ownerImageURL?: string;
