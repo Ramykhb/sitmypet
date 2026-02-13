@@ -20,6 +20,7 @@ export class PostsService {
             id: true,
             firstname: true,
             lastname: true,
+            email: true,
             profileImageUrl: true,
             emailVerified: true,
             bookingsAsOwner: {

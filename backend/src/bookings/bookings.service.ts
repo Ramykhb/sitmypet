@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -52,5 +52,49 @@ export class BookingsService {
       isOwner: userId ? booking.ownerId === userId : false,
       isSitter: userId ? booking.sitterId === userId : false,
     }));
+  }
+
+  async findOne(id: string, userId?: string) {
+    const booking = await this.prisma.booking.findUnique({
+      where: { id },
+      include: {
+        service: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        owner: {
+          select: {
+            id: true,
+            firstname: true,
+            lastname: true,
+            email: true,
+            profileImageUrl: true,
+          },
+        },
+        sitter: {
+          select: {
+            id: true,
+            firstname: true,
+            lastname: true,
+            email: true,
+            profileImageUrl: true,
+          },
+        },
+        pet: true,
+        review: true,
+      },
+    });
+
+    if (!booking) {
+      throw new NotFoundException(`Booking with ID ${id} not found`);
+    }
+
+    return {
+      ...booking,
+      isOwner: userId ? booking.ownerId === userId : false,
+      isSitter: userId ? booking.sitterId === userId : false,
+    };
   }
 }
