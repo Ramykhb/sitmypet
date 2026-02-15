@@ -62,8 +62,7 @@ export default function Explore() {
     const [hasMore, setHasMore] = useState(true);
 
     const fetchData = async (pageNumber: number, isLoadMore = false) => {
-        if ((loading && !isLoadMore) || (loadingMore && isLoadMore) || !hasMore) return;
-
+        if ((loading && !isLoadMore) || (loadingMore && isLoadMore) || (!hasMore && pageNumber !== 1)) return;
         isLoadMore ? setLoadingMore(true) : setLoading(true);
 
         try {
@@ -114,7 +113,7 @@ export default function Explore() {
 
     useEffect(() => {
         Animated.timing(filterHeight, {
-            toValue: filter_toggled ? 290 : 0,
+            toValue: filter_toggled ? 320 : 0,
             duration: 300,
             useNativeDriver: false,
         }).start();
@@ -313,7 +312,7 @@ export default function Explore() {
                         <Text className="text-xl font-semibold mb-4">Filters</Text>
 
                         <Text className="text-sm text-gray-500 mb-2">Service Type</Text>
-                        <View className="flex-row mb-4">
+                        <View className="flex-row mb-4 flex-wrap">
                             <TouchableOpacity
                                 className="px-4 py-2 mr-2 rounded-full bg-gray-200"
                                 style={[
@@ -324,19 +323,19 @@ export default function Explore() {
                                         shadowRadius: 3,
                                         elevation: 2,
                                     },
-                                    filterOptions.services === "walking" ? {backgroundColor: "#0A0A0A"} : {},
+                                    filterOptions.services === "Dog Walking" ? {backgroundColor: "#0A0A0A"} : {},
                                 ]}
                                 onPress={() => {
-                                    setFilterOptions(prevState => (filterOptions.services === "walking" ? {
+                                    setFilterOptions(prevState => (filterOptions.services === "Dog Walking" ? {
                                         ...prevState,
                                         services: ""
                                     } : {
                                         ...prevState,
-                                        services: "walking"
+                                        services: "Dog Walking"
                                     }))
                                 }}>
                                 <Text
-                                    style={filterOptions.services === "walking" ? {color: "white"} : {color: "black"}}>Walking</Text>
+                                    style={filterOptions.services === "Dog Walking" ? {color: "white"} : {color: "black"}}>Walking</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 className="px-4 py-2 mr-2 rounded-full bg-gray-200"
@@ -348,19 +347,19 @@ export default function Explore() {
                                         shadowRadius: 3,
                                         elevation: 2,
                                     },
-                                    filterOptions.services === "sitting" ? {backgroundColor: "#0A0A0A"} : {},
+                                    filterOptions.services === "Pet Sitting" ? {backgroundColor: "#0A0A0A"} : {},
                                 ]}
                                 onPress={() => {
-                                    setFilterOptions(prevState => (filterOptions.services === "sitting" ? {
+                                    setFilterOptions(prevState => (filterOptions.services === "Pet Sitting" ? {
                                         ...prevState,
                                         services: ""
                                     } : {
                                         ...prevState,
-                                        services: "sitting"
+                                        services: "Pet Sitting"
                                     }))
                                 }}>
                                 <Text
-                                    style={filterOptions.services === "sitting" ? {color: "white"} : {color: "black"}}>Sitting</Text>
+                                    style={filterOptions.services === "Pet Sitting" ? {color: "white"} : {color: "black"}}>Sitting</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 className="px-4 py-2 rounded-full bg-gray-200"
@@ -372,19 +371,43 @@ export default function Explore() {
                                         shadowRadius: 3,
                                         elevation: 2,
                                     },
-                                    filterOptions.services === "boarding" ? {backgroundColor: "#0A0A0A"} : {},
+                                    filterOptions.services === "Grooming" ? {backgroundColor: "#0A0A0A"} : {},
                                 ]}
                                 onPress={() => {
-                                    setFilterOptions(prevState => (filterOptions.services === "boarding" ? {
+                                    setFilterOptions(prevState => (filterOptions.services === "Grooming" ? {
                                         ...prevState,
                                         services: ""
                                     } : {
                                         ...prevState,
-                                        services: "boarding"
+                                        services: "Grooming"
                                     }))
                                 }}>
                                 <Text
-                                    style={filterOptions.services === "boarding" ? {color: "white"} : {color: "black"}}>Boarding</Text>
+                                    style={filterOptions.services === "Grooming" ? {color: "white"} : {color: "black"}}>Grooming</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                className="px-4 py-2 rounded-full bg-gray-200 mt-2"
+                                style={[
+                                    {
+                                        shadowColor: "#000",
+                                        shadowOffset: {width: 0, height: 1},
+                                        shadowOpacity: 0.08,
+                                        shadowRadius: 3,
+                                        elevation: 2,
+                                    },
+                                    filterOptions.services === "Health Care" ? {backgroundColor: "#0A0A0A"} : {},
+                                ]}
+                                onPress={() => {
+                                    setFilterOptions(prevState => (filterOptions.services === "Health Care" ? {
+                                        ...prevState,
+                                        services: ""
+                                    } : {
+                                        ...prevState,
+                                        services: "Health Care"
+                                    }))
+                                }}>
+                                <Text
+                                    style={filterOptions.services === "Health Care" ? {color: "white"} : {color: "black"}}>Health Care</Text>
                             </TouchableOpacity>
                         </View>
 
