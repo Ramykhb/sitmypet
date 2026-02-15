@@ -224,7 +224,12 @@ export class SitterService {
     }
 
     if (services) {
-      where.serviceId = services;
+      const service = await this.prisma.service.findFirst({
+        where: { name: { equals: services, mode: 'insensitive' } },
+      });
+      if (service) {
+        where.serviceId = service.id;
+      }
     }
 
     const postsData = await this.prisma.post.findMany({
