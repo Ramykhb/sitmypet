@@ -29,6 +29,7 @@ export default function Index() {
             await SecureStore.deleteItemAsync("lastname");
             await SecureStore.deleteItemAsync("profileImageUrl");
             await SecureStore.deleteItemAsync("email");
+            await SecureStore.deleteItemAsync("isVerified");
             router.push("/(auth)/signin");
         } catch (error) {
             console.error("Failed to clear auth data:", error);

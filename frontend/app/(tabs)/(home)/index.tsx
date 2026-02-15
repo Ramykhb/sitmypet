@@ -13,8 +13,10 @@ export default function Index() {
             const role = await SecureStore.getItemAsync("role");
             if (role === "OWNER") {
                 router.replace("/(tabs)/(home)/owner");
-            } else {
+            } else if (role === "SITTER") {
                 router.replace("/(tabs)/(home)/sitter");
+            } else {
+                router.replace("/(auth)/homeAuth");
             }
         };
 

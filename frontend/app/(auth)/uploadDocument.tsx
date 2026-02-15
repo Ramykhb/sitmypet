@@ -78,6 +78,7 @@ const UploadDocument = () => {
     };
 
     const handleContinue = async () => {
+        await SecureStore.setItemAsync("isVerified", "true");
         router.push("/(auth)/uploadPFP");
     };
 

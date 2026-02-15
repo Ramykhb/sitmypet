@@ -47,7 +47,7 @@ const Signin = () => {
           "refreshToken",
           String(res.data.refreshToken)
         );
-        router.push("/(auth)/homeAuth");
+        router.push("/verifyUser");
       } catch (error: any) {
           console.log(error.status, error);
         if (error.status === 401) {

@@ -21,6 +21,7 @@ export default function VerifyUser() {
             } finally {
                 setLoading(false);
             }
+            await SecureStore.setItemAsync("isVerified", "true");
             router.replace("/(tabs)/(home)");
         };
 

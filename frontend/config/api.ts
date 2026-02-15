@@ -31,6 +31,22 @@ const processQueue = (error: unknown, token: string | null = null) => {
     failedQueue = [];
 };
 
+async function clearAuthData() {
+    try {
+        await SecureStore.deleteItemAsync("accessToken");
+        await SecureStore.deleteItemAsync("refreshToken");
+        await SecureStore.deleteItemAsync("id");
+        await SecureStore.deleteItemAsync("role");
+        await SecureStore.deleteItemAsync("firstname");
+        await SecureStore.deleteItemAsync("lastname");
+        await SecureStore.deleteItemAsync("profileImageUrl");
+        await SecureStore.deleteItemAsync("email");
+        await SecureStore.deleteItemAsync("isVerified");
+    } catch (error) {
+        console.error("Failed to clear auth data:", error);
+    }
+}
+
 api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
     config.headers = config.headers ?? {};
     const token = await SecureStore.getItemAsync("accessToken");
@@ -61,7 +77,7 @@ api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
                 } catch (err: any) {
                     if (err.status === 401 || err.status === 403) {
                         processQueue(err, null);
-                        await SecureStore.deleteItemAsync("accessToken");
+                        await clearAuthData();
                         router.replace("/(auth)/signin");
                     }
                 } finally {
@@ -83,7 +99,7 @@ api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
                 config.headers.Authorization = `Bearer ${token}`;
             }
         } catch {
-            await SecureStore.deleteItemAsync("accessToken");
+            await clearAuthData();
             router.replace("/(auth)/signin");
         }
     }
@@ -94,7 +110,7 @@ api.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {
         if (error.response && error.response.status === 401) {
-            await SecureStore.deleteItemAsync("accessToken");
+            await clearAuthData();
         }
         return Promise.reject(error);
     }

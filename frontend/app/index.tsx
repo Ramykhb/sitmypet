@@ -7,10 +7,14 @@ export default function Index() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const userLoggedIn = await fakeCheckAuth();
-      if (userLoggedIn) {
+      const userLoggedIn = await checkUser();
+      if (userLoggedIn === 1) {
         router.replace("/verifyUser");
-      } else {
+      }
+      else if (userLoggedIn === 2) {
+          router.replace("/(tabs)/(home)");
+      }
+      else {
         router.replace("/(auth)/signin");
       }
     };
@@ -20,13 +24,22 @@ export default function Index() {
   return null;
 }
 
-async function fakeCheckAuth(): Promise<boolean> {
+async function checkUser(): Promise<number> {
   try {
     const token = await SecureStore.getItemAsync("accessToken");
 
-    return token !== null && token !== "";
+    if (token !== null && token !== ""){
+        const verified = await SecureStore.getItemAsync("isVerified");
+        if (verified === "true") {
+            return 2;
+        }
+        return 1;
+    }
+    else {
+        return 0;
+    }
   } catch (error) {
     console.error("Error checking auth:", error);
-    return false;
+    return 0;
   }
 }
