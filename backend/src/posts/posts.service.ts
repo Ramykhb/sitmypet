@@ -1,9 +1,48 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreatePostDto } from './dto/create-post.dto';
 
 @Injectable()
 export class PostsService {
   constructor(private prisma: PrismaService) {}
+
+  async create(ownerId: string, dto: CreatePostDto) {
+    const service = await this.prisma.service.findFirst({
+      where: { name: { equals: dto.serviceName, mode: 'insensitive' } },
+    });
+
+    if (!service) {
+      throw new NotFoundException(`Service "${dto.serviceName}" not found`);
+    }
+
+    if (dto.petId) {
+      const pet = await this.prisma.pet.findFirst({
+        where: { id: dto.petId, ownerId },
+      });
+
+      if (!pet) {
+        throw new NotFoundException('Pet not found or does not belong to you');
+      }
+    }
+
+    return this.prisma.post.create({
+      data: {
+        ownerId,
+        serviceId: service.id,
+        title: dto.title,
+        description: dto.description,
+        petId: dto.petId,
+        scheduledTime: new Date(dto.scheduledTime),
+        duration: dto.duration,
+        price: dto.price,
+        location: dto.location,
+      },
+      include: {
+        service: { select: { id: true, name: true } },
+        pet: true,
+      },
+    });
+  }
 
   async findOne(id: string, userId?: string) {
     const job = await this.prisma.post.findUnique({
