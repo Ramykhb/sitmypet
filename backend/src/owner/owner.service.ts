@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { OwnerHomeFeedDto } from './dto/owner-home.dto';
+import { CreatePetDto } from './dto/create-pet.dto';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -168,5 +169,29 @@ export class OwnerService {
       recentSitters,
       nearbySitters,
     };
+  }
+
+  async getPets(ownerId: string) {
+    return this.prisma.pet.findMany({
+      where: { ownerId },
+      select: {
+        id: true,
+        name: true,
+        breed: true,
+        imageUrl: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async createPet(ownerId: string, dto: CreatePetDto) {
+    return this.prisma.pet.create({
+      data: {
+        ownerId,
+        name: dto.name,
+        breed: dto.breed,
+        imageUrl: dto.imageUrl,
+      },
+    });
   }
 }
