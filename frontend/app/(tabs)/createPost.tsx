@@ -1,10 +1,12 @@
 import {View, Text, ScrollView, Image, TouchableOpacity, TextInput, ActivityIndicator} from 'react-native'
-import React, {useState} from 'react'
+import React, {useCallback, useState} from 'react'
 import {SafeAreaView} from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import CustomDropdown from "@/components/CustomDropdown";
 import DatePicker from "react-native-date-picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import api from "@/config/api";
+import {router, useFocusEffect} from "expo-router";
 
 const pets = [
     {id: '1', createdAt: '', name: 'Dog', updatedAt: ''},
@@ -13,22 +15,86 @@ const pets = [
     {id: '4', createdAt: '', name: 'Rabbit', updatedAt: ''},
 ];
 
+const services = [
+    {id: "", createdAt: "", name: "Dog Walking", updatedAt: ""},
+    {id: "", createdAt: "", name: "Pet Sitting", updatedAt: ""},
+    {id: "", createdAt: "", name: "Grooming", updatedAt: ""},
+    {id: "", createdAt: "", name: "Health Care", updatedAt: ""},
+];
+
+
 const CreatePost = () => {
-    const [imageUri, setImageUri] = useState<string>("https://pub-4f8704924751443bbd3260d113d11a8f.r2.dev/uploads/pfps/default_pfp.png");
+    const [imageUri, setImageUri] = useState<string>("");
     const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
     const [selectedPet, setSelectedPet] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
+    const [formData, setFormData] = useState({
+        title: "",
+        description: "",
+        petId: "",
+        scheduledTime: "",
+        duration: "",
+        price: 0,
+        location: "",
+        serviceName: ""
+    });
 
-    const [date, setDate] = useState<Date | null>(null);
     const [isPickerVisible, setPickerVisible] = useState(false);
+    const [date, setDate] = useState<Date | null>(null);
 
     const showDatePicker = () => setPickerVisible(true);
     const hideDatePicker = () => setPickerVisible(false);
 
     const handleConfirm = (selectedDate: Date) => {
         setDate(selectedDate);
+        setFormData(prev => ({
+            ...prev,
+            scheduledTime: selectedDate.toISOString(),
+        }));
         hideDatePicker();
     };
+
+    const submitPost = async () => {
+        try {
+            console.log(formData);
+            const res = await api.post("/posts", formData);
+
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    useFocusEffect(useCallback(() => {
+        setFormData(
+            {
+                title: "",
+                description: "",
+                petId: "",
+                scheduledTime: "",
+                duration: "",
+                price: 0,
+                location: "",
+                serviceName: ""
+            }
+        );
+        const fetchLoc = async () => {
+            try {
+                const res = await api.get("/users/me");
+                if (res.data.location === null) {
+                    alert("Please set your location from the edit profile section before proceeding.");
+
+                    setTimeout(() => {
+                        router.push("/(tabs)/(profile)/editProfile");
+                    }, 0);
+                } else {
+                    setFormData(prev => ({...prev, location: res.data.location.name}));
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        fetchLoc();
+    }, []))
 
     const pickImage = async () => {
 
@@ -71,15 +137,20 @@ const CreatePost = () => {
                     <CustomDropdown
                         data={pets}
                         value={selectedPet}
-                        onChange={setSelectedPet}
+                        onChange={(value) => {
+                            setSelectedPet(value);
+                            setFormData(prev => ({...prev, petId: "00654ad7-b981-4684-8f7a-b95a999ee834"}));
+                        }}
                         placeholder="Select Pet"
                         wrapperWidth={"w-[45%]"}
                         buttonColor={"#f1f1f1"}
                     />
                     <CustomDropdown
-                        data={pets}
-                        value={selectedPet}
-                        onChange={setSelectedPet}
+                        data={services}
+                        value={formData.serviceName}
+                        onChange={(value) => {
+                            setFormData(prev => ({...prev, serviceName: value}));
+                        }}
                         placeholder="Select Service"
                         wrapperWidth={"w-[45%]"}
                         buttonColor={"#f1f1f1"}
@@ -88,10 +159,12 @@ const CreatePost = () => {
                 <View className={"px-5 w-full text-[#0A0A0A]"}>
                     <Text className={"text-xl"}>Title</Text>
                     <TextInput
-                        className={
-                            "w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"
+                        className="w-full h-14 border border-gray-300 rounded-xl mt-3 px-5"
+                        value={formData.title}
+                        onChangeText={(text) =>
+                            setFormData(prev => ({...prev, title: text}))
                         }
-                        autoCapitalize={"none"}
+                        autoCapitalize="none"
                         autoComplete="off"
                         textContentType="none"
                         importantForAutofill="no"
@@ -101,12 +174,13 @@ const CreatePost = () => {
                 <View className={"px-5 w-full mt-4 text-[#0A0A0A]"}>
                     <Text className={"text-xl"}>Description</Text>
                     <TextInput
-                        className={
-                            "w-full h-28 border border-gray-300 rounded-xl mt-3 px-5 py-3"
-                        }
+                        className="w-full h-28 border border-gray-300 rounded-xl mt-3 px-5 py-3"
                         multiline={true}
-
-                        autoCapitalize={"none"}
+                        value={formData.description}
+                        onChangeText={(text) =>
+                            setFormData(prev => ({...prev, description: text}))
+                        }
+                        autoCapitalize="none"
                         autoComplete="off"
                         textContentType="none"
                         importantForAutofill="no"
@@ -117,15 +191,17 @@ const CreatePost = () => {
                     <View className={"px-5 pr-2 w-[50%] text-[#0A0A0A] "}>
                         <Text className={"text-xl"}>Duration</Text>
                         <TextInput
-                            className={
-                                "w-full h-14 border border-gray-300 rounded-xl mt-3 px-5 placeholder:text-xl pb-2"
+                            className="w-full h-14 border border-gray-300 rounded-xl mt-3 px-5 placeholder:text-xl pb-2"
+                            value={formData.duration}
+                            onChangeText={(text) =>
+                                setFormData(prev => ({...prev, duration: text}))
                             }
-                            autoCapitalize={"none"}
+                            autoCapitalize="none"
                             style={{textAlignVertical: 'center'}}
                             autoComplete="off"
                             textContentType="none"
                             importantForAutofill="no"
-                            placeholder={"5 Days"}
+                            placeholder="5 Days"
                         />
                     </View>
                     <View className={"px-5 pl-2 w-[50%] text-[#0A0A0A]"}>
@@ -137,15 +213,18 @@ const CreatePost = () => {
                         >
                             <Text className={"text-2xl text-[#0a0a0a]"}>$</Text>
                             <TextInput
-                                className={
-                                    "w-full h-14 px-2 flex flex-row items-center justify-center placeholder:text-xl pb-2"
+                                className="w-full h-14 px-2 flex flex-row items-center justify-center placeholder:text-xl pb-2"
+                                value={formData.price.toString()}
+                                onChangeText={(text) =>
+                                    setFormData(prev => ({...prev, price: Number(text)}))
                                 }
                                 style={{textAlignVertical: 'center'}}
-                                autoCapitalize={"none"}
+                                autoCapitalize="none"
                                 autoComplete="off"
-                                placeholder={"0.00"}
+                                placeholder="0.00"
                                 textContentType="none"
                                 importantForAutofill="no"
+                                keyboardType="numeric"
                             />
                         </View>
                     </View>
@@ -174,7 +253,8 @@ const CreatePost = () => {
                     />
                 </View>
                 <TouchableOpacity
-                    className="w-[85%] ml-[7.5%] bg-[#3944D5] h-14 rounded-full flex flex-row items-center justify-center mt-8 mb-5"
+                    className="w-[85%] ml-[7.5%] bg-[#3944D5] h-14 rounded-full flex flex-row items-center justify-center mt-8 mb-28"
+                    onPress={submitPost}
                 >
                     {loading ? (
                         <ActivityIndicator color={"#FFFFFF"} size={"small"}/>
