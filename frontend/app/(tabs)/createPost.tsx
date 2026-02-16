@@ -7,6 +7,7 @@ import DatePicker from "react-native-date-picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import api from "@/config/api";
 import {router, useFocusEffect} from "expo-router";
+import {type} from "node:os";
 
 const pets = [
     {id: '1', createdAt: '', name: 'Dog', updatedAt: ''},
@@ -24,7 +25,8 @@ const services = [
 
 
 const CreatePost = () => {
-    const [imageUri, setImageUri] = useState<string>("");
+    const [imageUri, setImageUri] = useState<string | null>(null);
+    const [status, setStatus] = useState({message: "", type: ""});
     const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
     const [selectedPet, setSelectedPet] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -35,10 +37,10 @@ const CreatePost = () => {
         scheduledTime: "",
         duration: "",
         price: 0,
+        imageUrl: "",
         location: "",
         serviceName: ""
     });
-
     const [isPickerVisible, setPickerVisible] = useState(false);
     const [date, setDate] = useState<Date | null>(null);
 
@@ -58,25 +60,24 @@ const CreatePost = () => {
         try {
             console.log(formData);
             const res = await api.post("/posts", formData);
-
-        } catch (e) {
-            console.error(e);
+            setStatus({message: "Post uploaded successfully.", type: "success"});
+        } catch (e: any) {
+            if (e.status === 400)
+            {
+                setStatus({message: "Please fill out all fields.", type: "error"});
+            }
+            else if (e.status === 500)
+            {
+                setStatus({message: "Server error, please try again later.", type: "error"});
+            }
+            else
+            {
+                setStatus({message: "An error has occurred.", type: "error"});
+            }
         }
     }
 
     useFocusEffect(useCallback(() => {
-        setFormData(
-            {
-                title: "",
-                description: "",
-                petId: "",
-                scheduledTime: "",
-                duration: "",
-                price: 0,
-                location: "",
-                serviceName: ""
-            }
-        );
         const fetchLoc = async () => {
             try {
                 const res = await api.get("/users/me");
@@ -117,6 +118,28 @@ const CreatePost = () => {
         const pickedImage = result.assets[0];
         setImage(pickedImage);
         setImageUri(pickedImage.uri);
+
+        const formData = new FormData();
+        formData.append("file", {
+            uri: pickedImage.uri,
+            name: "profile.jpg",
+            type: "image/jpeg",
+        } as any);
+
+        try {
+            const res = await api.post("/posts/upload-image", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            setFormData(prev => ({...prev, imageUrl: res.data.imageUrl}))
+        } catch (e: any) {
+            if (e.status === 400) {
+                setStatus({message: "Invalid image format or size.", type: "error"});
+            } else {
+                setStatus({message: "An error has occurred.", type: "error"});
+            }
+        }
     };
 
     return (
@@ -127,7 +150,7 @@ const CreatePost = () => {
                 </View>
                 <TouchableOpacity className={'relative w-full px-10 mb-4'} onPress={pickImage}>
                     <Image
-                        source={require("../../assets/images/placeholder.png")}
+                        source={(imageUri && imageUri !== "") ? {uri: imageUri} : require("../../assets/images/placeholder.png")}
                         alt="logo"
                         className="w-full h-52 rounded-3xl border border-[#dddddd]"
                         resizeMode="cover"
@@ -139,7 +162,7 @@ const CreatePost = () => {
                         value={selectedPet}
                         onChange={(value) => {
                             setSelectedPet(value);
-                            setFormData(prev => ({...prev, petId: "00654ad7-b981-4684-8f7a-b95a999ee834"}));
+                            setFormData(prev => ({...prev, petId: "fe7db900-98a5-4e46-8380-83da86a12501"}));
                         }}
                         placeholder="Select Pet"
                         wrapperWidth={"w-[45%]"}
@@ -252,8 +275,10 @@ const CreatePost = () => {
                         date={date || new Date()}
                     />
                 </View>
+                <Text
+                    className={`${status.type === "error" ? "text-rose-600" : "text-green-600"} font-bold my-4`}>{status.message}</Text>
                 <TouchableOpacity
-                    className="w-[85%] ml-[7.5%] bg-[#3944D5] h-14 rounded-full flex flex-row items-center justify-center mt-8 mb-28"
+                    className="w-[85%] ml-[7.5%] bg-[#3944D5] h-14 rounded-full flex flex-row items-center justify-center mb-28"
                     onPress={submitPost}
                 >
                     {loading ? (
