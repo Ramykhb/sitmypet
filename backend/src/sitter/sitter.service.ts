@@ -107,6 +107,7 @@ export class SitterService {
       posts = await this.prisma.post.findMany({
         where: {
           status: 'OPEN',
+          ownerId: { not: userId },
           location: {
             contains: locationName,
             mode: 'insensitive',
@@ -202,6 +203,7 @@ export class SitterService {
 
     const where: Prisma.PostWhereInput = {
       status: 'OPEN',
+      ownerId: { not: userId },
     };
 
     if (search) {
