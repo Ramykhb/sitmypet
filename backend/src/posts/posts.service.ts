@@ -25,7 +25,7 @@ export class PostsService {
       }
     }
 
-    return this.prisma.post.create({
+return this.prisma.post.create({
       data: {
         ownerId,
         serviceId: service.id,
@@ -36,6 +36,7 @@ export class PostsService {
         duration: dto.duration,
         price: dto.price,
         location: dto.location,
+        imageUrl: dto.imageUrl,
       },
       include: {
         service: { select: { id: true, name: true } },

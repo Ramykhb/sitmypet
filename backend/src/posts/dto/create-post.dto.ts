@@ -35,7 +35,11 @@ export class CreatePostDto {
   @IsNotEmpty()
   location: string;
 
-  @IsString()
+@IsString()
   @IsNotEmpty()
   serviceName: string;
+
+  @IsString()
+  @IsOptional()
+  imageUrl?: string;
 }
