@@ -9,12 +9,12 @@ import api from "@/config/api";
 import {router, useFocusEffect} from "expo-router";
 import {type} from "node:os";
 
-const pets = [
-    {id: '1', createdAt: '', name: 'Dog', updatedAt: ''},
-    {id: '2', createdAt: '', name: 'Cat', updatedAt: ''},
-    {id: '3', createdAt: '', name: 'Bird', updatedAt: ''},
-    {id: '4', createdAt: '', name: 'Rabbit', updatedAt: ''},
-];
+type Pet = {
+    id: string;
+    name: string;
+    createdAt: string;
+    updatedAt: string;
+}
 
 const services = [
     {id: "", createdAt: "", name: "Dog Walking", updatedAt: ""},
@@ -29,6 +29,7 @@ const CreatePost = () => {
     const [status, setStatus] = useState({message: "", type: ""});
     const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
     const [selectedPet, setSelectedPet] = useState<string | null>(null);
+    const [pets, setPets] = useState<Pet[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [formData, setFormData] = useState({
         title: "",
@@ -94,7 +95,23 @@ const CreatePost = () => {
                 console.error(e);
             }
         }
+        const fetchPets = async () => {
+            try {
+                const res = await api.get("/owner/pets");
+                if (res.data.length === 0)
+                {
+                    alert("You currently don't have any registered pets. Please add a new pet before proceeding.");
+                }
+                else
+                {
+                    setPets(res.data);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
         fetchLoc();
+        fetchPets()
     }, []))
 
     const pickImage = async () => {
@@ -162,7 +179,7 @@ const CreatePost = () => {
                         value={selectedPet}
                         onChange={(value) => {
                             setSelectedPet(value);
-                            setFormData(prev => ({...prev, petId: "fe7db900-98a5-4e46-8380-83da86a12501"}));
+                            setFormData(prev => ({...prev, petId: pets.filter(pet => pet.name === value)[0].id}));
                         }}
                         placeholder="Select Pet"
                         wrapperWidth={"w-[45%]"}

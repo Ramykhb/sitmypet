@@ -13,6 +13,7 @@ import { PostsModule } from './posts/posts.module';
 import { StorageModule } from './storage/storage.module';
 import { BookingsModule } from './bookings/bookings.module';
 import { ApplicationsModule } from './applications/applications.module';
+import { OwnerModule } from './owner/owner.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ApplicationsModule } from './applications/applications.module';
     AuthModule,
     ContactModule,
     LocationsModule,
+    OwnerModule,
     SitterModule,
     OcrModule,
     PostsModule,
