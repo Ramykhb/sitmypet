@@ -17,6 +17,7 @@ type User = {
 
 export default function Index() {
     const [name, setName] = useState("");
+    const [role, setRole] = useState("");
     const [userProfileImageUrl, setUserProfileImageUrl] = useState("");
 
     async function clearAuthData() {
@@ -44,7 +45,9 @@ export default function Index() {
                     const pfp = await SecureStore.getItemAsync("profileImageUrl");
                     const fname = await SecureStore.getItemAsync("firstname");
                     const lname = await SecureStore.getItemAsync("lastname");
+                    const role = await SecureStore.getItemAsync("role");
                     setName(fname as string + " " + lname as string);
+                    setRole(role as string);
                     setUserProfileImageUrl(pfp as string);
                 } catch (e) {
                     console.log(e);
@@ -72,15 +75,26 @@ export default function Index() {
                             {name}
                         </Text>
                     </View>
-                    <TouchableOpacity
-                        onPress={() => {
-                            router.push("/(tabs)/(profile)/editProfile");
-                        }}
-                        className={"w-full h-[60px] bg-[#dfe4e8] mt-5 rounded-full flex flex-row justify-center items-center"}>
-                        <Image source={require("../../../assets/icons/edit-profile.png")} className={"w-8 h-8 mr-3"}
-                               tintColor={"#555555"}/>
-                        <Text className={"text-[#0A0A0A] font-bold text-xl"}>Edit Profile</Text>
-                    </TouchableOpacity>
+                    <View className={"w-full flex-row justify-between"}>
+                        <TouchableOpacity
+                            onPress={() => {
+                                router.push("/(tabs)/(profile)/editProfile");
+                            }}
+                            className={"w-[48%] h-[60px] bg-[#dfe4e8] mt-5 rounded-full flex flex-row justify-center items-center"}>
+                            <Image source={require("../../../assets/icons/edit-profile.png")} className={"w-7 h-7 mr-2"}
+                                   tintColor={"#555555"}/>
+                            <Text className={"text-[#0A0A0A] font-bold text-lg"}>Edit Profile</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => {
+                                router.push("/(tabs)/(profile)/editProfile");
+                            }}
+                            className={"w-[48%] h-[60px] bg-[#3944D5] mt-5 rounded-full flex flex-row justify-center items-center"}>
+                            <Image source={require("../../../assets/icons/paw.png")} className={"w-7 h-7 mr-2"}
+                                   tintColor={"#FFFFFF"}/>
+                            <Text className={"text-[#FFFFFF] font-bold text-lg"}>Manage Pets</Text>
+                        </TouchableOpacity>
+                    </View>
                     <Text className="text-[#0A0A0A] text-2xl font-bold self-start mt-10 mb-5">Help and Support</Text>
                     <View className={"w-full bg-[#dfe4e8] rounded-2xl"}>
                         <TouchableOpacity className={"w-full h-16 flex flex-row justify-between items-center pl-7 pr-2"}

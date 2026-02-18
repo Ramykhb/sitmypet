@@ -58,23 +58,21 @@ const CreatePost = () => {
     };
 
     const submitPost = async () => {
+        if (loading) return;
+        setLoading(true);
         try {
-            console.log(formData);
             const res = await api.post("/posts", formData);
             setStatus({message: "Post uploaded successfully.", type: "success"});
         } catch (e: any) {
-            if (e.status === 400)
-            {
+            if (e.status === 400) {
                 setStatus({message: "Please fill out all fields.", type: "error"});
-            }
-            else if (e.status === 500)
-            {
+            } else if (e.status === 500) {
                 setStatus({message: "Server error, please try again later.", type: "error"});
-            }
-            else
-            {
+            } else {
                 setStatus({message: "An error has occurred.", type: "error"});
             }
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -98,12 +96,9 @@ const CreatePost = () => {
         const fetchPets = async () => {
             try {
                 const res = await api.get("/owner/pets");
-                if (res.data.length === 0)
-                {
+                if (res.data.length === 0) {
                     alert("You currently don't have any registered pets. Please add a new pet before proceeding.");
-                }
-                else
-                {
+                } else {
                     setPets(res.data);
                 }
             } catch (e) {
@@ -293,7 +288,7 @@ const CreatePost = () => {
                     />
                 </View>
                 <Text
-                    className={`${status.type === "error" ? "text-rose-600" : "text-green-600"} font-bold my-4`}>{status.message}</Text>
+                    className={`${status.type === "error" ? "text-rose-600" : "text-green-600"} font-bold my-4 text-center`}>{status.message}</Text>
                 <TouchableOpacity
                     className="w-[85%] ml-[7.5%] bg-[#3944D5] h-14 rounded-full flex flex-row items-center justify-center mb-28"
                     onPress={submitPost}
