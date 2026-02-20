@@ -113,7 +113,7 @@ export default function Index() {
                 >
                   <View className={"flex flex-row justify-center items-center"}>
                     <Image
-                      source={require("../../../assets/icons/contact.png")}
+                      source={require("../../../assets/icons/paw-outline.png")}
                       className={"w-8 h-8 mr-4"}
                       tintColor={"#555555"}
                     />
@@ -138,7 +138,7 @@ export default function Index() {
                 >
                   <View className={"flex flex-row justify-center items-center"}>
                     <Image
-                      source={require("../../../assets/icons/terms.png")}
+                      source={require("../../../assets/icons/layout.png")}
                       className={"w-8 h-8 mr-4"}
                       tintColor={"#555555"}
                     />
