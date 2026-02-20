@@ -22,7 +22,15 @@ export default function VerifyUser() {
                 setLoading(false);
             }
             await SecureStore.setItemAsync("isVerified", "true");
-            router.replace("/(tabs)/(home)");
+            const role = await SecureStore.getItemAsync("role");
+            if (role !== "OWNER" && role !== "SITTER")
+            {
+                router.replace("/(auth)/homeAuth");
+            }
+            else
+            {
+                router.replace("/(tabs)/(home)");
+            }
         };
 
         checkDoc();
