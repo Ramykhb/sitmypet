@@ -11,7 +11,6 @@ import {
   FlatList,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import "../global.css";
 import { BlurView } from "expo-blur";
 import api from "@/config/api";
 import SitterNearYouCardLoading from "@/components/SitterNearYouCardLoading";
@@ -88,7 +87,7 @@ export default function MyPosts() {
             No posts found
           </Text>
           <Text className="text-center text-base text-gray-500">
-            You haven't posted anything yet.
+              {"You haven't posted anything yet."}
           </Text>
         </View>
       ) : (

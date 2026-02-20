@@ -11,7 +11,6 @@ import {
   FlatList,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import "../global.css";
 import { BlurView } from "expo-blur";
 import api from "@/config/api";
 import SitterNearYouCardLoading from "@/components/SitterNearYouCardLoading";

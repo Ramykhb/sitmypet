@@ -108,7 +108,7 @@ export default function Index() {
                     "w-full h-16 flex flex-row justify-between items-center pl-7 pr-2"
                   }
                   onPress={() => {
-                    router.push("/contactPage");
+                    router.push("/(tabs)/(profile)/myPets");
                   }}
                 >
                   <View className={"flex flex-row justify-center items-center"}>
@@ -133,10 +133,9 @@ export default function Index() {
                     "w-full h-16 flex flex-row justify-between items-center pl-7 pr-2"
                   }
                   onPress={() => {
-                    router.push("/termsAndConditions");
+                    router.push("/(tabs)/(profile)/myPosts");
                   }}
                 >
-                  // TODO: Edit Images
                   <View className={"flex flex-row justify-center items-center"}>
                     <Image
                       source={require("../../../assets/icons/terms.png")}

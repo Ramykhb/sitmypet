@@ -28,6 +28,7 @@ const CreatePost = () => {
     const [imageUri, setImageUri] = useState<string | null>(null);
     const [status, setStatus] = useState({message: "", type: ""});
     const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
+    const [fetching, setFetching] = useState<boolean>(false);
     const [selectedPet, setSelectedPet] = useState<string | null>(null);
     const [pets, setPets] = useState<Pet[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
@@ -78,12 +79,14 @@ const CreatePost = () => {
 
     useFocusEffect(useCallback(() => {
         const fetchLoc = async () => {
+            setFetching(true);
             try {
                 const res = await api.get("/users/me");
                 if (res.data.location === null) {
                     alert("Please set your location from the edit profile section before proceeding.");
 
                     setTimeout(() => {
+                        setFetching(false);
                         router.push("/(tabs)/(profile)/editProfile");
                     }, 0);
                 } else {
@@ -98,11 +101,17 @@ const CreatePost = () => {
                 const res = await api.get("/owner/pets");
                 if (res.data.length === 0) {
                     alert("You currently don't have any registered pets. Please add a new pet before proceeding.");
+                    setTimeout(() => {
+                        setFetching(false);
+                        router.push("/(tabs)/(profile)/myPets");
+                    }, 0);
                 } else {
                     setPets(res.data);
                 }
             } catch (e) {
                 console.error(e);
+            } finally {
+                setFetching(false);
             }
         }
         fetchLoc();
@@ -156,7 +165,12 @@ const CreatePost = () => {
 
     return (
         <SafeAreaView className="home-auth flex-1" edges={["right", "top", "left"]}>
-            <ScrollView className={"w-full flex-1"}>
+            {fetching ? <View className={"flex-1 flex justify-center items-center"}>
+                <View>
+                    <ActivityIndicator size="large" />
+                    <Text className={"text-center font-bold text-xl mt-3 text-[#0a0a0a]"}>Please wait...</Text>
+                </View>
+            </View> : <ScrollView className={"w-full flex-1"}>
                 <View className="flex flex-col flex-1 w-full p-10 items-center">
                     <Text className="text-[#0A0A0A] text-5xl self-start">Create Post</Text>
                 </View>
@@ -299,7 +313,7 @@ const CreatePost = () => {
                         <Text className="text-white text-lg font-bold">Submit Post</Text>
                     )}
                 </TouchableOpacity>
-            </ScrollView>
+            </ScrollView>}
         </SafeAreaView>
     );
 }
