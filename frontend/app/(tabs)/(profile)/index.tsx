@@ -97,61 +97,67 @@ export default function Index() {
               Edit Profile
             </Text>
           </TouchableOpacity>
-          <Text className="text-[#0A0A0A] text-2xl font-bold self-start mt-10 mb-5">
-            General
-          </Text>
-          <View className={"w-full bg-[#dfe4e8] rounded-2xl"}>
-            <TouchableOpacity
-              className={
-                "w-full h-16 flex flex-row justify-between items-center pl-7 pr-2"
-              }
-              onPress={() => {
-                router.push("/contactPage");
-              }}
-            >
-              <View className={"flex flex-row justify-center items-center"}>
-                <Image
-                  source={require("../../../assets/icons/contact.png")}
-                  className={"w-8 h-8 mr-4"}
-                  tintColor={"#555555"}
-                />
-                <Text className={"text-[#0A0A0A] font-bold text-xl"}>
-                  Manage Pets
-                </Text>
+          {role === "OWNER" ? (
+            <>
+              <Text className="text-[#0A0A0A] text-2xl font-bold self-start mt-10 mb-5">
+                General
+              </Text>
+              <View className={"w-full bg-[#dfe4e8] rounded-2xl"}>
+                <TouchableOpacity
+                  className={
+                    "w-full h-16 flex flex-row justify-between items-center pl-7 pr-2"
+                  }
+                  onPress={() => {
+                    router.push("/contactPage");
+                  }}
+                >
+                  <View className={"flex flex-row justify-center items-center"}>
+                    <Image
+                      source={require("../../../assets/icons/contact.png")}
+                      className={"w-8 h-8 mr-4"}
+                      tintColor={"#555555"}
+                    />
+                    <Text className={"text-[#0A0A0A] font-bold text-xl"}>
+                      Manage Pets
+                    </Text>
+                  </View>
+                  <Image
+                    source={require("../../../assets/icons/right-arrow.png")}
+                    className={"w-4 h-4 mr-4 "}
+                    tintColor={"#555555"}
+                  />
+                </TouchableOpacity>
+                <View className={"w-[75%] self-center h-[1px] bg-gray-300"} />
+                <TouchableOpacity
+                  className={
+                    "w-full h-16 flex flex-row justify-between items-center pl-7 pr-2"
+                  }
+                  onPress={() => {
+                    router.push("/termsAndConditions");
+                  }}
+                >
+                  // TODO: Edit Images
+                  <View className={"flex flex-row justify-center items-center"}>
+                    <Image
+                      source={require("../../../assets/icons/terms.png")}
+                      className={"w-8 h-8 mr-4"}
+                      tintColor={"#555555"}
+                    />
+                    <Text className={"text-[#0A0A0A] font-bold text-xl"}>
+                      My Posts
+                    </Text>
+                  </View>
+                  <Image
+                    source={require("../../../assets/icons/right-arrow.png")}
+                    className={"w-4 h-4 mr-4 "}
+                    tintColor={"#555555"}
+                  />
+                </TouchableOpacity>
               </View>
-              <Image
-                source={require("../../../assets/icons/right-arrow.png")}
-                className={"w-4 h-4 mr-4 "}
-                tintColor={"#555555"}
-              />
-            </TouchableOpacity>
-            <View className={"w-[75%] self-center h-[1px] bg-gray-300"} />
-            <TouchableOpacity
-              className={
-                "w-full h-16 flex flex-row justify-between items-center pl-7 pr-2"
-              }
-              onPress={() => {
-                router.push("/termsAndConditions");
-              }}
-            >
-              // TODO: Edit Images
-              <View className={"flex flex-row justify-center items-center"}>
-                <Image
-                  source={require("../../../assets/icons/terms.png")}
-                  className={"w-8 h-8 mr-4"}
-                  tintColor={"#555555"}
-                />
-                <Text className={"text-[#0A0A0A] font-bold text-xl"}>
-                  My Posts
-                </Text>
-              </View>
-              <Image
-                source={require("../../../assets/icons/right-arrow.png")}
-                className={"w-4 h-4 mr-4 "}
-                tintColor={"#555555"}
-              />
-            </TouchableOpacity>
-          </View>
+            </>
+          ) : (
+            <></>
+          )}
           <Text className="text-[#0A0A0A] text-2xl font-bold self-start mt-10 mb-5">
             Help and Support
           </Text>
