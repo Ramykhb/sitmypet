@@ -24,7 +24,7 @@ type Service = {
   updatedAt: string;
 };
 
-export type SavedPost = {
+export type Post = {
   id: string;
   title: string;
   location: string;
@@ -38,13 +38,14 @@ export type SavedPost = {
   createdAt: string;
 };
 
-export default function Saved() {
-  const [posts, setPosts] = useState<SavedPost[]>([]);
+export default function MyPosts() {
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
 
   const getNearYou = async () => {
     setLoading(true);
     try {
+      // TODO CHANGE ENDPOINT
       const res = await api.get("/sitter/saved-posts");
       setPosts(res.data.posts ?? []);
     } catch (error) {
@@ -67,7 +68,7 @@ export default function Saved() {
   return (
     <SafeAreaView className="flex-1" edges={["top", "right", "left"]}>
       <View className="flex flex-col w-full p-10 items-center pb-3">
-        <Text className="text-[#0A0A0A] text-4xl self-start">Saved posts</Text>
+        <Text className="text-[#0A0A0A] text-4xl self-start">My posts</Text>
       </View>
       {loading ? (
         <View className="flex mt-5">
@@ -84,11 +85,10 @@ export default function Saved() {
       ) : posts.length === 0 ? (
         <View className={"flex-1 flex items-center justify-center px-10"}>
           <Text className="text-xl font-semibold text-[#0A0A0A] mb-2">
-            No saved posts yet
+            No posts found
           </Text>
           <Text className="text-center text-base text-gray-500">
-            You haven't saved any posts. When you find a post you like, tap the
-            save icon and it will appear here.
+            You haven't posted anything yet.
           </Text>
         </View>
       ) : (

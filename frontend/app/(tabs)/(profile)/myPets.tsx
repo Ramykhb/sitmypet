@@ -17,57 +17,35 @@ import api from "@/config/api";
 import SitterNearYouCardLoading from "@/components/SitterNearYouCardLoading";
 import SitterNearYouCard from "@/components/SitterNearYouCard";
 
-type Service = {
+type Pet = {
   id: string;
-  createdAt: string;
   name: string;
+  createdAt: string;
   updatedAt: string;
 };
 
-export type SavedPost = {
-  id: string;
-  title: string;
-  location: string;
-  duration: string;
-  imageUrl: string;
-  service: Service;
-  rating: number;
-  reviewCount: number;
-  ownerName: string;
-  isSaved: boolean;
-  createdAt: string;
-};
-
-export default function Saved() {
-  const [posts, setPosts] = useState<SavedPost[]>([]);
+export default function MyPets() {
+  const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(false);
-
-  const getNearYou = async () => {
-    setLoading(true);
-    try {
-      const res = await api.get("/sitter/saved-posts");
-      setPosts(res.data.posts ?? []);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useFocusEffect(
     useCallback(() => {
-      getNearYou();
+      const fetchPets = async () => {
+        try {
+          const res = await api.get("/owner/pets");
+          setPets(res.data);
+        } catch (e) {
+          console.error(e);
+        }
+      };
+      fetchPets();
     }, []),
   );
-
-  const handleRemove = (postId: string) => {
-    setPosts((prev) => prev.filter((p) => p.id !== postId));
-  };
 
   return (
     <SafeAreaView className="flex-1" edges={["top", "right", "left"]}>
       <View className="flex flex-col w-full p-10 items-center pb-3">
-        <Text className="text-[#0A0A0A] text-4xl self-start">Saved posts</Text>
+        <Text className="text-[#0A0A0A] text-4xl self-start">My posts</Text>
       </View>
       {loading ? (
         <View className="flex mt-5">
@@ -81,28 +59,22 @@ export default function Saved() {
             <SitterNearYouCardLoading />
           </View>
         </View>
-      ) : posts.length === 0 ? (
+      ) : pets.length === 0 ? (
         <View className={"flex-1 flex items-center justify-center px-10"}>
           <Text className="text-xl font-semibold text-[#0A0A0A] mb-2">
-            No saved posts yet
+            No pets found
           </Text>
           <Text className="text-center text-base text-gray-500">
-            You haven't saved any posts. When you find a post you like, tap the
-            save icon and it will appear here.
+            You haven't added any pet yet.
           </Text>
         </View>
       ) : (
         <FlatList
-          data={posts}
+          data={pets}
           className={"w-full mt-5"}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <View className={"w-full h-60 px-8 mb-6"}>
-              <SitterNearYouCard
-                {...item}
-                onUnsave={() => handleRemove(item.id)}
-              />
-            </View>
+            <View className={"w-full h-60 px-8 mb-6"}></View>
           )}
           contentContainerStyle={{ paddingBottom: 75 }}
         />
