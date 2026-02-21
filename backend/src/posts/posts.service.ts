@@ -45,6 +45,20 @@ return this.prisma.post.create({
     });
   }
 
+  async findMyPosts(ownerId: string) {
+    return this.prisma.post.findMany({
+      where: { ownerId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        service: { select: { id: true, name: true } },
+        pet: true,
+        applications: {
+          select: { id: true },
+        },
+      },
+    });
+  }
+
   async findOne(id: string, userId?: string) {
     const job = await this.prisma.post.findUnique({
       where: { id },

@@ -58,6 +58,11 @@ export class PostsController {
     return { imageUrl: uploaded.url };
   }
 
+  @Get()
+  async getMyPosts(@Req() req: { user: { sub: string } }) {
+    return await this.postsService.findMyPosts(req.user.sub);
+  }
+
   @Get(':id')
   async getOne(@Param('id') id: string, @Req() req: { user: { sub: string } }) {
     const userId = req.user.sub;
