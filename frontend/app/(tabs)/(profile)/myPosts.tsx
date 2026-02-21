@@ -11,10 +11,19 @@ import {
   FlatList,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { BlurView } from "expo-blur";
 import api from "@/config/api";
 import SitterNearYouCardLoading from "@/components/SitterNearYouCardLoading";
 import SitterNearYouCard from "@/components/SitterNearYouCard";
+
+export type Pet = {
+    id: string;
+    name: string;
+    breed: string;
+    imageUrl: string | null;
+    ownerId: string;
+    createdAt: string;
+    updatedAt: string;
+};
 
 type Service = {
   id: string;
@@ -41,12 +50,11 @@ export default function MyPosts() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const getNearYou = async () => {
+  const getMyPosts = async () => {
     setLoading(true);
     try {
-      // TODO CHANGE ENDPOINT
-      const res = await api.get("/sitter/saved-posts");
-      setPosts(res.data.posts ?? []);
+      const res = await api.get("/posts");
+      setPosts(res.data ?? []);
     } catch (error) {
       console.error(error);
     } finally {
@@ -54,21 +62,16 @@ export default function MyPosts() {
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      getNearYou();
-    }, []),
-  );
+    useEffect(() => {
+        getMyPosts();
+    }, []);
 
   const handleRemove = (postId: string) => {
     setPosts((prev) => prev.filter((p) => p.id !== postId));
   };
 
   return (
-    <SafeAreaView className="flex-1" edges={["top", "right", "left"]}>
-      <View className="flex flex-col w-full p-10 items-center pb-3">
-        <Text className="text-[#0A0A0A] text-4xl self-start">My posts</Text>
-      </View>
+    <SafeAreaView className="flex-1" edges={["right", "left"]}>
       {loading ? (
         <View className="flex mt-5">
           <View className={"w-full h-60 px-8 mb-6"}>
@@ -82,7 +85,7 @@ export default function MyPosts() {
           </View>
         </View>
       ) : posts.length === 0 ? (
-        <View className={"flex-1 flex items-center justify-center px-10"}>
+        <View className={"flex-1 flex items-center justify-center px-10 mb-24"}>
           <Text className="text-xl font-semibold text-[#0A0A0A] mb-2">
             No posts found
           </Text>
