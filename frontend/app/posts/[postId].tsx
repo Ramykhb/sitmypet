@@ -13,6 +13,7 @@ type Owner = {
     profileImageUrl: string;
     emailVerified: boolean;
     clientRating: number;
+    createdAt: string;
     email: string;
     reviewsCount: number;
 };
