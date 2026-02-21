@@ -1,6 +1,6 @@
-import {View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator, Linking} from 'react-native'
+import {View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator, Linking, Alert} from 'react-native'
 import React, {useEffect, useState} from 'react'
-import {useLocalSearchParams} from 'expo-router'
+import {router, useLocalSearchParams} from 'expo-router'
 import api from "@/config/api";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {backendPath} from "@/config/backConfig";
@@ -60,9 +60,42 @@ const PostDetails = () => {
     const {postId} = useLocalSearchParams<{ postId: string }>();
     const [post, setPost] = useState<Post>();
     const [loading, setLoading] = useState<boolean>(false);
+    const [deleting, setDeleting] = useState<boolean>(false);
     const [applying, setApplying] = useState<boolean>(false);
     const [isApplied, setIsApplied] = useState<boolean>(false);
     const [userId, setUserId] = useState<string>("");
+
+    const deletePost = async () => {
+        try {
+            setDeleting(true);
+            const res = await api.delete(`/posts/${postId}`);
+            await SecureStore.setItemAsync("deletedPost", "true");
+            router.back();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setDeleting(false);
+        }
+    };
+
+    const showConfirmAlert = () => {
+        Alert.alert(
+            "Confirm Action",
+            "Are you sure you want to delete this post?",
+            [
+                {
+                    text: "No",
+                    onPress: () => console.log("User pressed No"),
+                    style: "cancel"
+                },
+                {
+                    text: "Yes",
+                    onPress: () => deletePost()
+                }
+            ],
+            { cancelable: false }
+        );
+    };
 
     const handleSave = async () => {
         if (!post) return;
@@ -249,8 +282,10 @@ const PostDetails = () => {
                     <Text className={`text-lg font-bold text-[#3944D5]`}>View Applications</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
+                    onPress={showConfirmAlert}
                     className={"w-full h-14 bg-[#fcb3b3] rounded-full flex flex-row justify-center items-center"}>
-                    <Text className={"text-red-600 font-bold text-lg"}>Delete Post</Text>
+                    {deleting ? <ActivityIndicator size="small" color={"#dc2626"}/> :
+                    <Text className={"text-red-600 font-bold text-lg"}>Delete Post</Text>}
                 </TouchableOpacity>
             </View> : <View
                 className={"bg-white flex justify-around p-10 h-60 w-full absolute bottom-0 left-0 rounded-tl-[35px] rounded-tr-[35px] shadow-xl"}>

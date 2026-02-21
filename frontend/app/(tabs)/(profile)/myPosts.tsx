@@ -66,6 +66,20 @@ export default function MyPosts() {
         getMyPosts();
     }, []);
 
+    useFocusEffect(useCallback(
+        () => {
+            const getDeleted = async () => {
+                const deleted = await SecureStore.getItemAsync("deletedPost");
+                if (deleted === "true")
+                {
+                    getMyPosts();
+                    await SecureStore.setItemAsync("deletedPost", "false");
+                }
+            }
+            getDeleted()
+        }, []
+    ))
+
   const handleRemove = (postId: string) => {
     setPosts((prev) => prev.filter((p) => p.id !== postId));
   };
