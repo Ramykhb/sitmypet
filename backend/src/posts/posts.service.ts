@@ -1,10 +1,40 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
+import { R2Service } from '../storage/r2.service';
 
 @Injectable()
 export class PostsService {
   constructor(private prisma: PrismaService) {}
+
+  async deletePost(postId: string, ownerId: string, r2Service: R2Service) {
+    const post = await this.prisma.post.findUnique({
+      where: { id: postId },
+    });
+
+    if (!post) {
+      throw new NotFoundException(`Post with ID ${postId} not found`);
+    }
+
+    if (post.ownerId !== ownerId) {
+      throw new ForbiddenException('You can only delete your own posts');
+    }
+
+    if (post.imageUrl) {
+      const key = r2Service.extractKeyFromUrl(post.imageUrl);
+      if (key) {
+        await r2Service.delete(key);
+      }
+    }
+
+    await this.prisma.post.delete({ where: { id: postId } });
+
+    return { message: 'Post deleted successfully' };
+  }
 
   async create(ownerId: string, dto: CreatePostDto) {
     const service = await this.prisma.service.findFirst({
@@ -77,6 +107,7 @@ return this.prisma.post.create({
             email: true,
             profileImageUrl: true,
             emailVerified: true,
+            createdAt: true,
             bookingsAsOwner: {
               select: {
                 review: {

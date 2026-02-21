@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from '@aws-sdk/client-s3';
 
 @Injectable()
 export class R2Service {
@@ -40,5 +44,22 @@ export class R2Service {
       key,
       url: publicUrl,
     };
+  }
+
+  async delete(key: string) {
+    await this.r2Client.send(
+      new DeleteObjectCommand({
+        Bucket: this.configService.get<string>('R2_BUCKET')!,
+        Key: key,
+      }),
+    );
+  }
+
+  extractKeyFromUrl(url: string): string | null {
+    const publicUrl = this.configService.get<string>('R2_PUBLIC_URL');
+    if (publicUrl && url.startsWith(publicUrl)) {
+      return url.slice(publicUrl.length + 1);
+    }
+    return null;
   }
 }
