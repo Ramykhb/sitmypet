@@ -78,7 +78,7 @@ export default function MyPosts() {
             }
             getDeleted()
         }, []
-    ))
+    ));
 
   const handleRemove = (postId: string) => {
     setPosts((prev) => prev.filter((p) => p.id !== postId));

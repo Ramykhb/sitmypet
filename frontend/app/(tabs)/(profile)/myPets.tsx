@@ -8,7 +8,7 @@ import {
     TouchableOpacity,
     View,
     StyleSheet,
-    FlatList,
+    FlatList, Alert, ActivityIndicator,
 } from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 import api from "@/config/api";
@@ -24,6 +24,7 @@ type Pet = {
 export default function MyPets() {
     const [pets, setPets] = useState<Pet[]>([]);
     const [loading, setLoading] = useState(false);
+    const [deleting, setDeleting] = useState({deleting: false, petId: ""});
 
     useFocusEffect(
         useCallback(() => {
@@ -31,7 +32,6 @@ export default function MyPets() {
                 setLoading(true);
                 try {
                     const res = await api.get("/owner/pets");
-                    console.log(res.data);
                     setPets(res.data);
                 } catch (e) {
                     console.error(e);
@@ -42,6 +42,37 @@ export default function MyPets() {
             fetchPets();
         }, []),
     );
+
+    const deletePet = async (petId: string) => {
+        try {
+            setDeleting({deleting: true, petId: petId});
+            const res = await api.delete(`/owner/pets/${petId}`);
+            setPets(pets.filter((pet) => pet.id !== petId));
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setDeleting({deleting: false, petId: ""});
+        }
+    };
+
+    const showConfirmAlert = (petId: string) => {
+        Alert.alert(
+            "Confirm Action",
+            "Are you sure you want to delete this pet?",
+            [
+                {
+                    text: "No",
+                    onPress: () => console.log("User pressed No"),
+                    style: "cancel"
+                },
+                {
+                    text: "Yes",
+                    onPress: () => deletePet(petId)
+                }
+            ],
+            {cancelable: false}
+        );
+    };
 
     return (
         <SafeAreaView className="flex-1 pt-8" edges={["right", "left"]}>
@@ -84,11 +115,14 @@ export default function MyPets() {
                                     <Text className={"font-bold text-xl text-[#0a0a0a]"}>{item.name}</Text>
                                     <Text className={"font-semibold text-base text-gray-500"}>{item.breed}</Text>
                                 </View>
-                                <View
+                                <TouchableOpacity
+                                    onPress={() => showConfirmAlert(item.id)}
                                     className={"flex justify-center items-center w-12 h-12 bg-[#fcb3b3] rounded-full"}>
-                                    <Image source={require("../../../assets/icons/trash.png")} tintColor={"#dc2626"}
-                                           className={"w-8 h-8"}/>
-                                </View>
+                                    {deleting.deleting === true && deleting.petId === item.id ?
+                                        <ActivityIndicator size="small" color={"#dc2626"}/> :
+                                        <Image source={require("../../../assets/icons/trash.png")} tintColor={"#dc2626"}
+                                               className={"w-8 h-8"}/>}
+                                </TouchableOpacity>
                             </View>
                         )}
                         contentContainerStyle={{paddingBottom: 75}}
