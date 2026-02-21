@@ -42,7 +42,9 @@ const lebaneseCities = [
 async function main() {
   console.log('Seeding locations...');
 
-  const uniqueCities = [...new Set(lebaneseCities)].sort();
+  let uniqueCities: string[];
+  // @ts-ignore
+  uniqueCities = [...new Set(lebaneseCities)].sort();
 
   for (const cityName of uniqueCities) {
     await prisma.location.upsert({
