@@ -44,11 +44,11 @@ export default function MyPets() {
     );
 
     return (
-        <SafeAreaView className="flex-1 pt-10" edges={["right", "left"]}>
+        <SafeAreaView className="flex-1 pt-8" edges={["right", "left"]}>
             {loading ? (
                 [0, 1, 2, 3, 4, 5].map((value) => (
                     <View
-                        className={"w-[90%] ml-[5%] rounded-3xl border border-gray-300 h-24 px-8 mb-6 flex flex-row items-center opacity-40"}
+                        className={"w-[90%] ml-[5%] rounded-full border border-gray-300 h-24 p-4 mb-6 flex flex-row items-center opacity-40"}
                         key={value}>
                         <View className={"w-20 h-20 mr-4 bg-gray-400 rounded-full"}/>
                         <View className={"flex justify-around flex-1 h-20"}>
@@ -76,11 +76,11 @@ export default function MyPets() {
                         keyExtractor={(item) => item.id}
                         renderItem={({item}) => (
                             <View
-                                className={"w-[90%] ml-[5%] rounded-3xl border border-gray-300 h-24 px-8 mb-6 flex flex-row items-center "}>
+                                className={"w-[90%] ml-[5%] rounded-full border border-gray-300 h-24 p-4 mb-6 flex flex-row items-center "}>
                                 <Image
                                     source={item.imageUrl ? {uri: item.imageUrl} : require("../../../assets/images/dog-placeholder.png")}
                                     className={"w-20 h-20 mr-4 rounded-full"}/>
-                                <View className={"flex justify-around flex-1 h-20"}>
+                                <View className={"flex justify-around flex-1 h-20 py-2"}>
                                     <Text className={"font-bold text-xl text-[#0a0a0a]"}>{item.name}</Text>
                                     <Text className={"font-semibold text-base text-gray-500"}>{item.breed}</Text>
                                 </View>
