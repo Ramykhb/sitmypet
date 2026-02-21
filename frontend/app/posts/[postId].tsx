@@ -142,7 +142,6 @@ const PostDetails = () => {
         try {
             setLoading(true);
             const res = await api.get(`/posts/${postId}`);
-            console.log(res.data);
             setPost(res.data);
         } catch (error) {
             console.error(error);
@@ -229,6 +228,13 @@ const PostDetails = () => {
                                 <Text className={" text-gray-600"}>Rating</Text>
                             </View>
                         </View>
+                        <View className={"w-full flex flex-row items-center my-2 mb-2 mt-6 rounded-full py-2"}>
+                            <Image source={{uri: post?.owner.profileImageUrl}} className={"w-16 h-16 rounded-full"} />
+                            <View className={"flex justify-around ml-3 py-2"}>
+                                <Text numberOfLines={1} className={"text-xl font-bold text-[#0a0a0a] flex-1"}>{post?.owner.firstname + " " + post?.owner.lastname}</Text>
+                                <Text numberOfLines={1} className={"text-gray-500 text-sm font-bold"}>Joined {post?.owner.createdAt.split("-")[0]}</Text>
+                            </View>
+                        </View>
                         <Text className={"text-xl text-[#0a0a0a] mt-5"}>Description</Text>
                         <Text className={"text-lg text-gray-500 mb-6"}>{post?.description}</Text>
                     </View>
@@ -243,8 +249,6 @@ const PostDetails = () => {
                 </TouchableOpacity>
                 <TouchableOpacity
                     className={"w-full h-14 bg-[#fcb3b3] rounded-full flex flex-row justify-center items-center"}>
-                    <Image source={require("../../assets/icons/trash.png")} className={"w-8 h-8 mr-3"}
-                           tintColor={"#dc2626"}/>
                     <Text className={"text-red-600 font-bold text-lg"}>Delete Post</Text>
                 </TouchableOpacity>
             </View> : <View
