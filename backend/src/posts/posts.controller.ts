@@ -3,6 +3,7 @@ import {
   Get,
   Param,
   Post,
+  Delete,
   Req,
   UseGuards,
   Body,
@@ -61,6 +62,14 @@ export class PostsController {
   @Get()
   async getMyPosts(@Req() req: { user: { sub: string } }) {
     return await this.postsService.findMyPosts(req.user.sub);
+  }
+
+  @Delete(':id')
+  async deletePost(
+    @Param('id') id: string,
+    @Req() req: { user: { sub: string } },
+  ) {
+    return await this.postsService.deletePost(id, req.user.sub, this.r2Service);
   }
 
   @Get(':id')
