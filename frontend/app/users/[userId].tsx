@@ -51,10 +51,13 @@ const starNums = ["one", "two", "three", "four", "five"];
 const UserProfile = () => {
     const [loading, setLoading] = useState(false);
     const [isPetsOpen, setIsPetsOpen] = useState(true);
+    const [rating, setRating] = useState(0);
+    const [submitting, setSubmitting] = useState(false);
     const [filledStars, setFilledStars] = useState({one: false, two: false, three: false, four: false, five: false});
 
     const fillStars = (starNum: number) => {
         let tempStars: any = {};
+        setRating(starNum+1);
         for (let i = 0; i < 5; i++) {
             if (i <= starNum) tempStars[starNums[i]] = true;
             else tempStars[starNums[i]] = false;
@@ -148,6 +151,43 @@ const UserProfile = () => {
                         }
                         <Text className={"text-2xl text-[#0a0a0a] mt-8"}>Contact Information</Text>
                         <Text className={"text-gray-500 text-lg mt-5"}>Email: ramykhb18@gmail.com</Text>
+                        <Text className={"text-2xl text-[#0a0a0a] mt-8"}>Rate User</Text>
+                        <View className={"w-full flex flex-row items-center justify-center mt-5"}>
+                            <TouchableWithoutFeedback onPress={() => fillStars(0)}>
+                                <Image
+                                    source={filledStars.one ? require("../../assets/icons/star.png") : require("../../assets/icons/star-outline.png")}
+                                    alt="Star" className={"w-12 h-12 mx-1"}/>
+                            </TouchableWithoutFeedback>
+                            <TouchableWithoutFeedback onPress={() => fillStars(1)}>
+                                <Image
+                                    source={filledStars.two ? require("../../assets/icons/star.png") : require("../../assets/icons/star-outline.png")}
+                                    alt="Star" className={"w-12 h-12 mx-1"}/>
+                            </TouchableWithoutFeedback>
+                            <TouchableWithoutFeedback onPress={() => fillStars(2)}>
+                                <Image
+                                    source={filledStars.three ? require("../../assets/icons/star.png") : require("../../assets/icons/star-outline.png")}
+                                    alt="Star" className={"w-12 h-12 mx-1"}/>
+                            </TouchableWithoutFeedback>
+                            <TouchableWithoutFeedback onPress={() => fillStars(3)}>
+                                <Image
+                                    source={filledStars.four ? require("../../assets/icons/star.png") : require("../../assets/icons/star-outline.png")}
+                                    alt="Star" className={"w-12 h-12 mx-1"}/>
+                            </TouchableWithoutFeedback>
+                            <TouchableWithoutFeedback onPress={() => fillStars(4)}>
+                                <Image
+                                    source={filledStars.five ? require("../../assets/icons/star.png") : require("../../assets/icons/star-outline.png")}
+                                    alt="Star" className={"w-12 h-12 mx-1"}/>
+                            </TouchableWithoutFeedback>
+                        </View>
+                        {rating === 0 ? <></> : <TouchableOpacity
+                            className="w-[40%] ml-[30%] bg-[#3944D5] h-12 rounded-full flex flex-row items-center justify-center mt-5 mb-5"
+                        >
+                            {submitting ? (
+                                <ActivityIndicator color={"#FFFFFF"} size={"small"}/>
+                            ) : (
+                                <Text className="text-white text-lg font-semibold">Submit</Text>
+                            )}
+                        </TouchableOpacity>}
 
                     </View>
                 </ScrollView>
