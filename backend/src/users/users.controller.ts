@@ -124,4 +124,9 @@ export class UsersController {
   ) {
     return this.usersService.deleteAccount(req.user.sub, dto.password);
   }
+
+  @Get(':id/profile')
+  async getUserProfile(@Req() req: { params: { id: string } }) {
+    return this.usersService.getUserProfile(req.params.id);
+  }
 }

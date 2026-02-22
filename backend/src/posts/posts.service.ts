@@ -55,7 +55,7 @@ export class PostsService {
       }
     }
 
-return this.prisma.post.create({
+    return this.prisma.post.create({
       data: {
         ownerId,
         serviceId: service.id,
