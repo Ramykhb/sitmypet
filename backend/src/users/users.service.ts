@@ -453,4 +453,137 @@ export class UsersService {
       },
     });
   }
+
+  async getUserProfile(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        firstname: true,
+        lastname: true,
+        email: true,
+        profileImageUrl: true,
+        profile: {
+          select: {
+            location: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        ownedPets: {
+          select: {
+            id: true,
+            name: true,
+            breed: true,
+            imageUrl: true,
+          },
+        },
+        postsAsOwner: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            price: true,
+            location: true,
+            scheduledTime: true,
+            duration: true,
+            imageUrl: true,
+            status: true,
+            pet: {
+              select: {
+                id: true,
+                name: true,
+                imageUrl: true,
+              },
+            },
+            service: {
+              select: {
+                name: true,
+              },
+            },
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const sitterBookings = await this.prisma.booking.findMany({
+      where: {
+        sitterId: userId,
+        status: 'COMPLETED',
+        scheduledTime: {
+          lt: new Date(),
+        },
+      },
+      select: {
+        ownerId: true,
+        review: {
+          select: {
+            rating: true,
+          },
+        },
+      },
+    });
+
+    const uniqueClients = new Set(sitterBookings.map((b) => b.ownerId)).size;
+    const reviews = sitterBookings.filter((b) => b.review);
+    const totalReviews = reviews.length;
+    const averageRating =
+      totalReviews > 0
+        ? reviews.reduce((acc, curr) => acc + curr.review!.rating, 0) /
+          totalReviews
+        : 0;
+
+    const ownerBookings = await this.prisma.booking.findMany({
+      where: {
+        ownerId: userId,
+        status: 'COMPLETED',
+        scheduledTime: {
+          lt: new Date(),
+        },
+      },
+      select: {
+        sitterId: true,
+      },
+    });
+
+    const uniqueSittersBooked = new Set(ownerBookings.map((b) => b.sitterId))
+      .size;
+
+    const jobsPosted = await this.prisma.post.count({
+      where: {
+        ownerId: userId,
+      },
+    });
+
+    return {
+      contactInfo: {
+        id: user.id,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        profileImageUrl: user.profileImageUrl,
+        location: user.profile?.location?.name || null,
+      },
+      sitterInfo: {
+        clientsWorkedWith: uniqueClients,
+        reviewsCount: totalReviews,
+        averageRating: Number(averageRating.toFixed(1)),
+      },
+      ownerInfo: {
+        sittersWorkedWith: uniqueSittersBooked,
+        jobsPosted: jobsPosted,
+      },
+      pets: user.ownedPets,
+      posts: user.postsAsOwner,
+    };
+  }
 }
