@@ -1,5 +1,6 @@
 import React from "react";
-import { Image, Text, View } from "react-native";
+import {Image, Text, TouchableOpacity, View} from "react-native";
+import {router} from "expo-router";
 
 type ClientHistory = {
     id: string;
@@ -10,7 +11,7 @@ type ClientHistory = {
 const ClientHistoryCard = (props:ClientHistory) => {
     const fName = props.ownerName.split(" ")[0]
   return (
-    <View className={"flex flex-col w-20 items-center ml-3"}>
+    <TouchableOpacity className={"flex flex-col w-20 items-center ml-3"} onPress={() => router.push(`/users/${props.id}`)}>
       <Image
         source={{ uri: props.ownerImageUrl }}
         alt="Home Image"
@@ -18,7 +19,7 @@ const ClientHistoryCard = (props:ClientHistory) => {
         resizeMode={"cover"}
       />
       <Text className={"text-base text-[#0A0A0A] text-center mt-2"}>{fName}</Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 

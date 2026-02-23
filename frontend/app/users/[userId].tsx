@@ -218,7 +218,7 @@ const UserProfile = () => {
                                     <SitterNearYouCard {...item} />
                                 </View>
                             )}
-                        /> : <Text className={"text-center mt-3"}>This user has no posts</Text>}
+                        /> : <Text className={"text-center mt-5"}>This user has no posts</Text>}
                         <Text className={"text-2xl text-[#0a0a0a] mt-8"}>Contact Information</Text>
                         <Text className={"text-gray-500 text-lg mt-5"}>Email: {user?.contactInfo.email}</Text>
                         <Text className={"text-2xl text-[#0a0a0a] mt-8"}>Rate User</Text>
