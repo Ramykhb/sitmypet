@@ -54,6 +54,7 @@ const UserProfile = () => {
     const {userId} = useLocalSearchParams<{ userId: string }>();
     const [loading, setLoading] = useState(false);
     const [isPetsOpen, setIsPetsOpen] = useState(true);
+    const [enabled, setEnabled] = useState<boolean>(true);
     const [rating, setRating] = useState(0);
     const [submitting, setSubmitting] = useState(false);
     const [user, setUser] = useState<UserProfileResponse>();
@@ -61,6 +62,7 @@ const UserProfile = () => {
 
     const fillStars = (starNum: number) => {
         let tempStars: any = {};
+        setEnabled(true);
         setRating(starNum + 1);
         for (let i = 0; i < 5; i++) {
             if (i <= starNum) tempStars[starNums[i]] = true;
@@ -69,7 +71,29 @@ const UserProfile = () => {
         setFilledStars(tempStars);
     }
 
+    const reviewUser = async () => {
+        if (submitting) {
+            return;
+        }
+        setEnabled(false)
+        setSubmitting(true);
+        try {
+            const res = await api.post(`users/${userId}/reviews`, {rating: rating});
+        } catch (e: any) {
+            if (e.status === 400) {
+                alert("You dont have any past bookings with this user before.")
+            } else if (e.status === 503) {
+                alert("Server error, please try again later.");
+                router.replace("/homeAuth")
+            }
+        } finally {
+            setSubmitting(false);
+        }
+    }
+
     useFocusEffect(useCallback(() => {
+        setFilledStars({one: false, two: false, three: false, four: false, five: false})
+        setRating(0)
         const fetchUser = async () => {
             setLoading(true);
             try {
@@ -211,12 +235,15 @@ const UserProfile = () => {
                             </TouchableWithoutFeedback>
                         </View>
                         {rating === 0 ? <></> : <TouchableOpacity
+                            disabled={!enabled}
+                            onPress={reviewUser}
                             className="w-[40%] ml-[30%] bg-[#3944D5] h-12 rounded-full flex flex-row items-center justify-center mt-5 mb-5"
                         >
                             {submitting ? (
                                 <ActivityIndicator color={"#FFFFFF"} size={"small"}/>
                             ) : (
-                                <Text className="text-white text-lg font-semibold">{user?.previousRating ? "Update" : "Submit"}</Text>
+                                <Text
+                                    className="text-white text-lg font-semibold">{user?.previousRating ? "Update" : "Submit"}</Text>
                             )}
                         </TouchableOpacity>}
 
