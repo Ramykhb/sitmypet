@@ -5,6 +5,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { Response } from 'express';
 
 @Catch(
   Prisma.PrismaClientKnownRequestError,
@@ -13,11 +14,14 @@ import { Prisma } from '@prisma/client';
   Prisma.PrismaClientInitializationError,
 )
 export class PrismaExceptionFilter implements ExceptionFilter {
-  catch(exception: any, host: ArgumentsHost) {
+  catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse();
+    const response = ctx.getResponse<Response>();
 
-    if (exception.code === 'P1001') {
+    if (
+      exception instanceof Prisma.PrismaClientKnownRequestError &&
+      exception.code === 'P1001'
+    ) {
       return response.status(HttpStatus.SERVICE_UNAVAILABLE).json({
         message: 'Database unavailable',
       });

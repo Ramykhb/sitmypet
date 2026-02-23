@@ -4,7 +4,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { OwnerHomeFeedDto } from './dto/owner-home.dto';
+import { OwnerHomeFeedDto, SitterHistoryDto } from './dto/owner-home.dto';
 import { CreatePetDto } from './dto/create-pet.dto';
 import { R2Service } from '../storage/r2.service';
 import { Prisma } from '@prisma/client';
@@ -66,7 +66,7 @@ export class OwnerService {
       },
     });
 
-    const uniqueSitters = new Map();
+    const uniqueSitters = new Map<string, SitterHistoryDto>();
     for (const booking of completedBookings) {
       if (!uniqueSitters.has(booking.sitterId) && uniqueSitters.size < 10) {
         uniqueSitters.set(booking.sitterId, {
