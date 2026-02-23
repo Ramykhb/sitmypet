@@ -93,7 +93,7 @@ const PostDetails = () => {
                     onPress: () => deletePost()
                 }
             ],
-            { cancelable: false }
+            {cancelable: false}
         );
     };
 
@@ -262,13 +262,17 @@ const PostDetails = () => {
                                 <Text className={" text-gray-600"}>Rating</Text>
                             </View>
                         </View>
-                        <View className={"w-full flex flex-row items-center my-2 mb-2 mt-6 rounded-full py-2"}>
-                            <Image source={{uri: post?.owner.profileImageUrl}} className={"w-16 h-16 rounded-full"} />
+                        <TouchableOpacity
+                            className={"w-full flex flex-row items-center my-2 mb-2 mt-6 rounded-full py-2"}
+                            onPress={() => router.replace(`/users/${post?.owner.id}`)}>
+                            <Image source={{uri: post?.owner.profileImageUrl}} className={"w-16 h-16 rounded-full"}/>
                             <View className={"flex justify-around ml-3 py-2"}>
-                                <Text numberOfLines={1} className={"text-xl font-bold text-[#0a0a0a] flex-1"}>{post?.owner.firstname + " " + post?.owner.lastname}</Text>
-                                <Text numberOfLines={1} className={"text-gray-500 text-sm font-bold"}>Joined {post?.owner.createdAt.split("-")[0]}</Text>
+                                <Text numberOfLines={1}
+                                      className={"text-xl font-bold text-[#0a0a0a] flex-1"}>{post?.owner.firstname + " " + post?.owner.lastname}</Text>
+                                <Text numberOfLines={1}
+                                      className={"text-gray-500 text-sm font-bold"}>Joined {post?.owner.createdAt.split("-")[0]}</Text>
                             </View>
-                        </View>
+                        </TouchableOpacity>
                         <Text className={"text-xl text-[#0a0a0a] mt-5"}>Description</Text>
                         <Text className={"text-lg text-gray-500 mb-6"}>{post?.description}</Text>
                     </View>
@@ -285,7 +289,7 @@ const PostDetails = () => {
                     onPress={showConfirmAlert}
                     className={"w-full h-14 bg-[#fcb3b3] rounded-full flex flex-row justify-center items-center"}>
                     {deleting ? <ActivityIndicator size="small" color={"#dc2626"}/> :
-                    <Text className={"text-red-600 font-bold text-lg"}>Delete Post</Text>}
+                        <Text className={"text-red-600 font-bold text-lg"}>Delete Post</Text>}
                 </TouchableOpacity>
             </View> : <View
                 className={"bg-white flex justify-around p-10 h-60 w-full absolute bottom-0 left-0 rounded-tl-[35px] rounded-tr-[35px] shadow-xl"}>

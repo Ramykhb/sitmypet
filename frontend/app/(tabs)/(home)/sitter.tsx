@@ -331,7 +331,7 @@ export default function Sitter() {
                             <FlatList
                                 data={nearYouFound}
                                 horizontal={true}
-                                className={"w-full mb-28"}
+                                className={"w-full mb-10"}
                                 showsHorizontalScrollIndicator={false}
                                 keyExtractor={(item) => item.id}
                                 renderItem={({item}) => (

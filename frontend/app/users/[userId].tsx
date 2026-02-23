@@ -16,6 +16,7 @@ import {SafeAreaView} from "react-native-safe-area-context";
 import {backendPath} from "@/config/backConfig";
 import * as SecureStore from "expo-secure-store";
 import TodaysBookingCard from "@/components/TodaysBookingCard";
+import SitterNearYouCard from "@/components/SitterNearYouCard";
 
 type Pet = {
     id: string;
@@ -94,6 +95,7 @@ const UserProfile = () => {
     useFocusEffect(useCallback(() => {
         setFilledStars({one: false, two: false, three: false, four: false, five: false})
         setRating(0)
+        setIsPetsOpen(true)
         const fetchUser = async () => {
             setLoading(true);
             try {
@@ -130,7 +132,7 @@ const UserProfile = () => {
                                            className={"w-4 h-4 ml-2"}/>
                                 </View>
                                 <Text
-                                    className={"text-sm text-gray-500 font-semibold"}>{user?.contactInfo.location}</Text>
+                                    className={"text-sm text-gray-500 font-semibold"}>{user?.contactInfo.location ? user?.contactInfo.location : "Location not set"}</Text>
                             </View>
                         </View>
                         <Text className={"text-2xl text-[#0a0a0a] mt-8"}>Pet Sitter Profile</Text>
@@ -204,6 +206,19 @@ const UserProfile = () => {
                                 <Text className={"text-center"}>This user has no registered pets</Text>
                             )
                         )}
+                        <Text className={"text-2xl text-[#0a0a0a] mt-8"}>Posts</Text>
+                        {user?.posts && user.posts.length > 0 ? <FlatList
+                            data={user?.posts}
+                            horizontal={true}
+                            className={"w-full mt-5"}
+                            showsHorizontalScrollIndicator={false}
+                            keyExtractor={(item) => item.id}
+                            renderItem={({item}) => (
+                                <View className="w-[300px] h-60 pl-8">
+                                    <SitterNearYouCard {...item} />
+                                </View>
+                            )}
+                        /> : <Text className={"text-center mt-3"}>This user has no posts</Text>}
                         <Text className={"text-2xl text-[#0a0a0a] mt-8"}>Contact Information</Text>
                         <Text className={"text-gray-500 text-lg mt-5"}>Email: {user?.contactInfo.email}</Text>
                         <Text className={"text-2xl text-[#0a0a0a] mt-8"}>Rate User</Text>

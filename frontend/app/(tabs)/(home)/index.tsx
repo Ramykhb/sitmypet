@@ -14,8 +14,7 @@ export default function Index() {
             if (role === "OWNER") {
                 router.replace("/(tabs)/(home)/owner");
             } else if (role === "SITTER") {
-                // router.replace("/(tabs)/(home)/sitter");
-                router.replace("/users/38042e2e-5d4f-4bf6-8338-8506fe5f449d")
+                router.replace("/(tabs)/(home)/sitter");
             } else {
                 router.replace("/(auth)/homeAuth");
             }
