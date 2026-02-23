@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -585,5 +586,48 @@ export class UsersService {
       pets: user.ownedPets,
       posts: user.postsAsOwner,
     };
+  }
+
+  async reviewUser(reviewerId: string, targetUserId: string, rating: number) {
+    if (reviewerId === targetUserId) {
+      throw new ConflictException('You cannot review yourself');
+    }
+
+    const booking = await this.prisma.booking.findFirst({
+      where: {
+        OR: [
+          { ownerId: reviewerId, sitterId: targetUserId },
+          { ownerId: targetUserId, sitterId: reviewerId },
+        ],
+        status: 'COMPLETED',
+        scheduledTime: {
+          lt: new Date(),
+        },
+      },
+      orderBy: {
+        scheduledTime: 'desc',
+      },
+      include: {
+        review: true,
+      },
+    });
+
+    if (!booking) {
+      throw new BadRequestException(
+        'You can only review users you have worked with in a completed job.',
+      );
+    }
+    return this.prisma.review.upsert({
+      where: {
+        bookingId: booking.id,
+      },
+      update: {
+        rating,
+      },
+      create: {
+        bookingId: booking.id,
+        rating,
+      },
+    });
   }
 }
