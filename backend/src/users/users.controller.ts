@@ -128,8 +128,11 @@ export class UsersController {
   }
 
   @Get(':id/profile')
-  async getUserProfile(@Req() req: { params: { id: string } }) {
-    return this.usersService.getUserProfile(req.params.id);
+  async getUserProfile(
+    @Req() req: { user: { sub: string } },
+    @Param('id') targetUserId: string,
+  ) {
+    return this.usersService.getUserProfile(targetUserId, req.user?.sub);
   }
 
   @Post(':id/reviews')

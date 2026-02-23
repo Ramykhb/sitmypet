@@ -455,7 +455,7 @@ export class UsersService {
     });
   }
 
-  async getUserProfile(userId: string) {
+  async getUserProfile(userId: string, requesterId?: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -565,6 +565,32 @@ export class UsersService {
       },
     });
 
+    let previousRating: number | null = null;
+
+    if (requesterId && requesterId !== userId) {
+      const previousBookingReview = await this.prisma.booking.findFirst({
+        where: {
+          OR: [
+            { ownerId: requesterId, sitterId: userId },
+            { ownerId: userId, sitterId: requesterId },
+          ],
+          review: { isNot: null },
+        },
+        orderBy: { scheduledTime: 'desc' },
+        select: {
+          review: {
+            select: {
+              rating: true,
+            },
+          },
+        },
+      });
+
+      if (previousBookingReview?.review) {
+        previousRating = previousBookingReview.review.rating;
+      }
+    }
+
     return {
       contactInfo: {
         id: user.id,
@@ -585,6 +611,7 @@ export class UsersService {
       },
       pets: user.ownedPets,
       posts: user.postsAsOwner,
+      previousRating,
     };
   }
 
