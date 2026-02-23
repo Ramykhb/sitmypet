@@ -11,6 +11,7 @@ import {
   Patch,
   Post,
   Req,
+  Param,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -24,6 +25,7 @@ import { DeleteAccountDto } from './dto/delete-account.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 import { OcrService } from '../ocr/ocr.service';
+import { UserReviewDto } from './dto/user-review.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('users')
@@ -128,5 +130,14 @@ export class UsersController {
   @Get(':id/profile')
   async getUserProfile(@Req() req: { params: { id: string } }) {
     return this.usersService.getUserProfile(req.params.id);
+  }
+
+  @Post(':id/reviews')
+  async reviewUser(
+    @Req() req: { user: { sub: string } },
+    @Param('id') targetUserId: string,
+    @Body() dto: UserReviewDto,
+  ) {
+    return this.usersService.reviewUser(req.user.sub, targetUserId, dto.rating);
   }
 }
