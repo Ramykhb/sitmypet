@@ -2,6 +2,7 @@ import {
   Controller,
   Post,
   Delete,
+  Get,
   Param,
   Req,
   UseGuards,
@@ -28,5 +29,16 @@ export class ApplicationsController {
     @Req() req: { user: { sub: string } },
   ) {
     return this.applicationsService.withdraw(postId, req.user.sub);
+  }
+
+  @Get(':postId')
+  async getApplicationsByPostId(
+    @Param('postId') postId: string,
+    @Req() req: { user: { sub: string } },
+  ) {
+    return this.applicationsService.getApplicationsByPostId(
+      postId,
+      req.user.sub,
+    );
   }
 }
