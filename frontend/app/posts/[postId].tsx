@@ -282,7 +282,7 @@ const PostDetails = () => {
                 className={"bg-white flex justify-around p-10 h-60 w-full absolute bottom-0 left-0 rounded-tl-[35px] rounded-tr-[35px] shadow-xl"}>
                 <TouchableOpacity
                     className={`w-full h-14 bg-[#E7E8FF] rounded-full flex items-center justify-center`}
-                    onPress={handeApplication}>
+                    onPress={() => router.push(`/posts/applications/${post?.id}`)}>
                     <Text className={`text-lg font-bold text-[#3944D5]`}>View Applications</Text>
                 </TouchableOpacity>
                 <TouchableOpacity

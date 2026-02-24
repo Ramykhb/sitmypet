@@ -24,22 +24,16 @@ const PostsLayout = () => {
                             >
                                 <View className="flex flex-row items-center">
                                     <Image
-                                        source={require("../../assets/icons/back-arrow.png")}
+                                        source={require("../../../assets/icons/back-arrow.png")}
                                         className="w-7 h-7 mr-3"
                                     />
                                     <Text className="text-[#0A0A0A] text-2xl font-bold">
-                                        Job Details
+                                        Job Applications
                                     </Text>
                                 </View>
                             </TouchableOpacity>
                         </View>
                     ),
-                }}
-            />
-            <Stack.Screen
-                name="applications"
-                options={{
-                    headerShown: false,
                 }}
             />
         </Stack>
