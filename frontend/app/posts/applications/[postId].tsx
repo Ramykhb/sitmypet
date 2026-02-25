@@ -64,16 +64,18 @@ const PostDetails = () => {
                 <Text className={"text-2xl mt-6 text-[#0a0a0a] text-center"}>Fetching applications...</Text>
             </View> : applications && applications.length > 0 ?
                 <FlatList data={applications} horizontal={false} showsVerticalScrollIndicator={false}
+                          className={"pt-6"}
                           keyExtractor={(item) => item.id}
                           renderItem={({item}) => (
-                              <View className="w-full h-20 flex flex-row px-10 mt-8 mb-3 items-center">
+                              <>
+                              <View className="w-full h-20 flex flex-row px-10 mt-1 mb-2 items-center">
                                   <Image source={{uri: item.sitter.profileImageUrl}}
                                          className={"rounded-full w-16 h-16 mr-3"}/>
                                   <View
                                       className={"flex justify-around py-3 h-20 flex-1"}><Text
                                       className={"text-lg text-[#0a0a0a] font-bold"}>{item.sitter.firstname + " " + item.sitter.lastname}</Text>
                                       <Text
-                                          className={"text-sm text-gray-500 font-semibold"}>{item.createdAt.split("T0")[0] + " " + item.createdAt.split("T0")[1].split(".")[0]}
+                                          className={"text-sm text-gray-500 font-semibold"}>{item.createdAt.split("T")[0] + " at " + item.createdAt.split("T")[1].split(".")[0]}
                                       </Text>
                                   </View>
                                   <View className={"flex flex-row items-center"}>
@@ -85,6 +87,8 @@ const PostDetails = () => {
                                       </View>
                                   </View>
                               </View>
+                                  <View  className={"w-[60%] ml-[20%] h-[1px] bg-gray-300 mb-1"}/>
+                              </>
                           )}/> :
                 <View className={"flex-1 flex justify-center items-center px-10"}><Text
                     className={"text-center text-lg text-[#0a0a0a]"}>This post has no pending
