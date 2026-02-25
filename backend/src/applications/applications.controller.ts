@@ -41,4 +41,26 @@ export class ApplicationsController {
       req.user.sub,
     );
   }
+
+  @Post(':id/accept')
+  async acceptApplication(
+    @Param('id') applicationId: string,
+    @Req() req: { user: { sub: string } },
+  ) {
+    return this.applicationsService.acceptApplication(
+      applicationId,
+      req.user.sub,
+    );
+  }
+
+  @Post(':id/reject')
+  async rejectApplication(
+    @Param('id') applicationId: string,
+    @Req() req: { user: { sub: string } },
+  ) {
+    return this.applicationsService.rejectApplication(
+      applicationId,
+      req.user.sub,
+    );
+  }
 }

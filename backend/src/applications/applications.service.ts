@@ -113,4 +113,79 @@ export class ApplicationsService {
       },
     });
   }
+
+  async acceptApplication(applicationId: string, ownerId: string) {
+    const application = await this.prisma.application.findUnique({
+      where: { id: applicationId },
+      include: {
+        post: true,
+      },
+    });
+
+    if (!application) {
+      throw new NotFoundException('Application not found');
+    }
+
+    if (application.post.ownerId !== ownerId) {
+      throw new BadRequestException(
+        'You do not have permission to accept this application',
+      );
+    }
+
+    if (!application.post.petId) {
+      throw new BadRequestException(
+        'Cannot accept application: Post is missing an associated pet ID',
+      );
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      const booking = await tx.booking.create({
+        data: {
+          sitterId: application.sitterId,
+          ownerId: application.post.ownerId,
+          petId: application.post.petId,
+          serviceId: application.post.serviceId,
+          location: application.post.location,
+          scheduledTime: application.post.scheduledTime,
+          status: 'CONFIRMED',
+        },
+      });
+
+      await tx.post.update({
+        where: { id: application.postId },
+        data: { status: 'CLOSED' },
+      });
+
+      await tx.application.deleteMany({
+        where: { postId: application.postId },
+      });
+
+      return booking;
+    });
+  }
+
+  async rejectApplication(applicationId: string, ownerId: string) {
+    const application = await this.prisma.application.findUnique({
+      where: { id: applicationId },
+      include: {
+        post: true,
+      },
+    });
+
+    if (!application) {
+      throw new NotFoundException('Application not found');
+    }
+
+    if (application.post.ownerId !== ownerId) {
+      throw new BadRequestException(
+        'You do not have permission to reject this application',
+      );
+    }
+
+    await this.prisma.application.delete({
+      where: { id: applicationId },
+    });
+
+    return { success: true };
+  }
 }
