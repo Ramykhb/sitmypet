@@ -579,10 +579,10 @@ export class UsersService {
     });
 
     const totalReviewsCombined = totalReviews + ownerTotalReviews;
-    const combinedAverageRating = 
+    const combinedAverageRating =
       totalReviewsCombined > 0
-        ? (reviews.reduce((acc, curr) => acc + curr.review!.rating, 0) + 
-           ownerReviews.reduce((acc, curr) => acc + curr.review!.rating, 0)) / 
+        ? (reviews.reduce((acc, curr) => acc + curr.review!.rating, 0) +
+            ownerReviews.reduce((acc, curr) => acc + curr.review!.rating, 0)) /
           totalReviewsCombined
         : 0;
 
