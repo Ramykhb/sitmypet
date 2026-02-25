@@ -553,17 +553,38 @@ export class UsersService {
       },
       select: {
         sitterId: true,
+        review: {
+          select: {
+            rating: true,
+          },
+        },
       },
     });
 
     const uniqueSittersBooked = new Set(ownerBookings.map((b) => b.sitterId))
       .size;
 
+    const ownerReviews = ownerBookings.filter((b) => b.review);
+    const ownerTotalReviews = ownerReviews.length;
+    const ownerAverageRating =
+      ownerTotalReviews > 0
+        ? ownerReviews.reduce((acc, curr) => acc + curr.review!.rating, 0) /
+          ownerTotalReviews
+        : 0;
+
     const jobsPosted = await this.prisma.post.count({
       where: {
         ownerId: userId,
       },
     });
+
+    const totalReviewsCombined = totalReviews + ownerTotalReviews;
+    const combinedAverageRating = 
+      totalReviewsCombined > 0
+        ? (reviews.reduce((acc, curr) => acc + curr.review!.rating, 0) + 
+           ownerReviews.reduce((acc, curr) => acc + curr.review!.rating, 0)) / 
+          totalReviewsCombined
+        : 0;
 
     let previousRating: number | null = null;
 
@@ -608,10 +629,14 @@ export class UsersService {
       ownerInfo: {
         sittersWorkedWith: uniqueSittersBooked,
         jobsPosted: jobsPosted,
+        reviewsCount: ownerTotalReviews,
+        averageRating: Number(ownerAverageRating.toFixed(1)),
       },
       pets: user.ownedPets,
       posts: user.postsAsOwner,
       previousRating,
+      reviewsCount: totalReviewsCombined,
+      averageRating: Number(combinedAverageRating.toFixed(1)),
     };
   }
 

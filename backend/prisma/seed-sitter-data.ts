@@ -2,7 +2,8 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-const SITTER_EMAIL = 'tarekalkhatibb@gmail.com';
+// const SITTER_EMAIL = 'tarekalkhatibb@gmail.com';
+const SITTER_EMAIL = 'ramykhb18@gmail.com';
 
 //npx ts-node prisma/seed-locations.ts && npx ts-node prisma/seed-services.ts && npx ts-node prisma/seed-posts.ts && npx ts-node prisma/seed-sitter-data.ts
 
@@ -326,6 +327,30 @@ async function main() {
       });
     }
 
+    // Ensure owner has a profile with location
+    let locationRecord = await prisma.location.findUnique({
+      where: { name: postData.location },
+    });
+
+    if (!locationRecord) {
+      locationRecord = await prisma.location.create({
+        data: { name: postData.location },
+      });
+    }
+
+    const existingProfile = await prisma.profile.findUnique({
+      where: { userId: owner.id },
+    });
+
+    if (!existingProfile) {
+      await prisma.profile.create({
+        data: {
+          userId: owner.id,
+          locationId: locationRecord.id,
+        },
+      });
+    }
+
     // Create pet for owner
     let pet = await prisma.pet.findFirst({
       where: {
@@ -394,6 +419,30 @@ async function main() {
           lastname: clientData.lastname,
           passwordHash: 'hashed_password_placeholder',
           roles: ['OWNER'],
+        },
+      });
+    }
+
+    // Ensure owner has a profile with location
+    let locationRecord = await prisma.location.findUnique({
+      where: { name: clientData.location },
+    });
+
+    if (!locationRecord) {
+      locationRecord = await prisma.location.create({
+        data: { name: clientData.location },
+      });
+    }
+
+    const existingProfile = await prisma.profile.findUnique({
+      where: { userId: owner.id },
+    });
+
+    if (!existingProfile) {
+      await prisma.profile.create({
+        data: {
+          userId: owner.id,
+          locationId: locationRecord.id,
         },
       });
     }
@@ -477,6 +526,30 @@ async function main() {
           lastname: bookingData.ownerLastname,
           passwordHash: 'hashed_password_placeholder',
           roles: ['OWNER'],
+        },
+      });
+    }
+
+    // Ensure owner has a profile with location
+    let locationRecord = await prisma.location.findUnique({
+      where: { name: bookingData.location },
+    });
+
+    if (!locationRecord) {
+      locationRecord = await prisma.location.create({
+        data: { name: bookingData.location },
+      });
+    }
+
+    const existingProfile = await prisma.profile.findUnique({
+      where: { userId: owner.id },
+    });
+
+    if (!existingProfile) {
+      await prisma.profile.create({
+        data: {
+          userId: owner.id,
+          locationId: locationRecord.id,
         },
       });
     }
