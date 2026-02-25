@@ -88,6 +88,32 @@ async function main() {
         include: { ownedPets: true },
       });
     }
+
+    // Ensure this owner has a profile and location
+    const locationName = 'Beirut'; // Safest default for seeds
+    let locationRecord = await prisma.location.findUnique({
+      where: { name: locationName },
+    });
+
+    if (!locationRecord) {
+      locationRecord = await prisma.location.create({
+        data: { name: locationName },
+      });
+    }
+
+    const existingProfile = await prisma.profile.findUnique({
+      where: { userId: owner.id },
+    });
+
+    if (!existingProfile) {
+      console.log(`Creating a Profile for ${owner.firstname}...`);
+      await prisma.profile.create({
+        data: {
+          userId: owner.id,
+          locationId: locationRecord.id,
+        },
+      });
+    }
   }
 
   let pet = owner.ownedPets[0];
