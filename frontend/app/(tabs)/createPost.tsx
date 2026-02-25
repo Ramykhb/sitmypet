@@ -27,7 +27,7 @@ const services = [
 const CreatePost = () => {
     const [imageUri, setImageUri] = useState<string | null>(null);
     const [status, setStatus] = useState({message: "", type: ""});
-    const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
+    const [uploading, setUploading] = useState<boolean>(false);
     const [fetching, setFetching] = useState<boolean>(false);
     const [selectedPet, setSelectedPet] = useState<string | null>(null);
     const [pets, setPets] = useState<Pet[]>([]);
@@ -59,7 +59,16 @@ const CreatePost = () => {
     };
 
     const submitPost = async () => {
+        setStatus({message: "", type: ""});
         if (loading) return;
+        if (uploading){
+            setStatus({message: "Uploading image, please wait...", type: "error"});
+            return;
+        }
+        if (!imageUri) {
+            setStatus({message: "Please upload an image.", type: "error"});
+            return;
+        }
         setLoading(true);
         try {
             const res = await api.post("/posts", formData);
@@ -119,10 +128,11 @@ const CreatePost = () => {
     }, []))
 
     const pickImage = async () => {
-
+        setUploading(true);
         const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (!permission.granted) {
             alert("Permission required");
+            setUploading(false);
             return;
         }
 
@@ -133,11 +143,11 @@ const CreatePost = () => {
         });
 
         if (result.canceled) {
+            setUploading(false);
             return;
         }
 
         const pickedImage = result.assets[0];
-        setImage(pickedImage);
         setImageUri(pickedImage.uri);
 
         const formData = new FormData();
@@ -160,6 +170,8 @@ const CreatePost = () => {
             } else {
                 setStatus({message: "An error has occurred.", type: "error"});
             }
+        } finally {
+            setUploading(false);
         }
     };
 
