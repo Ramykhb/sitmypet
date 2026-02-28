@@ -143,7 +143,7 @@ export class ApplicationsService {
         data: {
           sitterId: application.sitterId,
           ownerId: application.post.ownerId,
-          petId: application.post.petId,
+          petId: application.post.petId!,
           serviceId: application.post.serviceId,
           location: application.post.location,
           scheduledTime: application.post.scheduledTime,

@@ -18,6 +18,7 @@ import {
 } from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 import "../../global.css";
+import OwnerNearYouCard from "@/components/OwnerNearYouCard";
 
 type Service = {
     id: string;
@@ -77,7 +78,10 @@ type cachedUser = {
 export default function Sitter() {
     const [user, setUser] = useState<User | null>(null);
     const [role, setRole] = useState<string>("");
-    const [cachedUser, setCachedUser] = useState<cachedUser | null>({profileImageUrl: "https://pub-4f8704924751443bbd3260d113d11a8f.r2.dev/uploads/pfps/default_pfp.png", firstname: "Guest"});
+    const [cachedUser, setCachedUser] = useState<cachedUser | null>({
+        profileImageUrl: "https://pub-4f8704924751443bbd3260d113d11a8f.r2.dev/uploads/pfps/default_pfp.png",
+        firstname: "Guest"
+    });
     const [bookingFound, setBookingFound] = useState<TodaysBooking[]>([]);
     const [clientFound, setClientFound] = useState<ClientHistory[]>([]);
     const [nearYouFound, setNearYouFound] = useState<NearbyPost[]>([]);
@@ -93,13 +97,10 @@ export default function Sitter() {
                 setNearYouFound(res.data.nearbyPosts ?? []);
                 setClientFound(res.data.recentClients ?? []);
                 setBookingFound(res.data.todaysBookings ?? []);
-            }
-            else
-            {
+            } else {
                 const res = await api.get("/owner/home");
-                console.log(res.data)
-                setNearYouFound(res.data.nearbyPosts ?? []);
-                setClientFound(res.data.recentClients ?? []);
+                setNearYouFound(res.data.nearbySitters ?? []);
+                setClientFound(res.data.recentSitters ?? []);
                 setBookingFound(res.data.todaysBookings ?? []);
             }
         } catch (error) {
@@ -126,10 +127,10 @@ export default function Sitter() {
 
     const getCachedUser = async () => {
         try {
-            const fname =  await SecureStore.getItemAsync("firstname") as string;
-            const role =  await SecureStore.getItemAsync("role") as string;
+            const fname = await SecureStore.getItemAsync("firstname") as string;
+            const role = await SecureStore.getItemAsync("role") as string;
             setRole(role);
-            const profileImageUrl =  await SecureStore.getItemAsync("profileImageUrl") as string;
+            const profileImageUrl = await SecureStore.getItemAsync("profileImageUrl") as string;
             setCachedUser({firstname: fname, profileImageUrl})
         } catch (e) {
             console.log(e);
@@ -251,7 +252,7 @@ export default function Sitter() {
                             }
                         >
                             <Text className={"text-2xl ml-8 text-[#0A0A0A]"}>
-                                Client History
+                                {role === "SITTER" ? "Client History" : "Pet Sitters History"}
                             </Text>
                             <Link href={"/recentClients"} className={"mr-8"} disabled={clientFound.length <= 0}>
                                 <Text
@@ -286,10 +287,10 @@ export default function Sitter() {
                                 }
                             >
                                 <Text className="text-xl text-[#0a0a0a] font-bold mb-1">
-                                    No Clients Found.
+                                    {role === "SITTER" ? "No Clients Found." : "You haven't worked with any sitters."}
                                 </Text>
                                 <Text className="text-lg text-[#0a0a0a]">
-                                    Apply to nearby requests to get started.
+                                    {role === "SITTER" ? "Apply to nearby requests to get started." : "Search for nearby sitters to get started."}
                                 </Text>
                                 <TouchableOpacity
                                     className="w-[60%] bg-[#3944D5] h-14 rounded-full flex flex-row items-center justify-center my-5">
@@ -304,7 +305,8 @@ export default function Sitter() {
                                 "flex w-full flex-row justify-between items-center my-5"
                             }
                         >
-                            <Text className={"text-2xl ml-8 text-[#0A0A0A]"}>Near You</Text>
+                            <Text
+                                className={"text-2xl ml-8 text-[#0A0A0A]"}>{role === "SITTER" ? "Near You" : "Pet Sitters Near You"}</Text>
                             <Link
                                 href={"/sitterNearYou"}
                                 className={"mr-8"}
@@ -327,19 +329,30 @@ export default function Sitter() {
                                     <SitterNearYouCardLoading/>
                                 </View>
                             </View>
-                        ) : nearYouFound.length > 0 ? (
-                            <FlatList
-                                data={nearYouFound}
-                                horizontal={true}
-                                className={"w-full mb-10"}
-                                showsHorizontalScrollIndicator={false}
-                                keyExtractor={(item) => item.id}
-                                renderItem={({item}) => (
-                                    <View className="w-[300px] h-60 pl-8">
-                                        <SitterNearYouCard {...item} />
-                                    </View>
-                                )}
-                            />
+                        ) : nearYouFound.length > 0 ? (role === "SITTER" ?
+                                <FlatList
+                                    data={nearYouFound}
+                                    horizontal={true}
+                                    className={"w-full mb-10"}
+                                    showsHorizontalScrollIndicator={false}
+                                    keyExtractor={(item) => item.id}
+                                    renderItem={({item}) => (
+                                        <View className="w-[300px] h-60 pl-8">
+                                            <SitterNearYouCard {...item} />
+                                        </View>
+                                    )}
+                                /> : <FlatList
+                                    data={nearYouFound}
+                                    horizontal={true}
+                                    className={"w-full mb-10"}
+                                    showsHorizontalScrollIndicator={false}
+                                    keyExtractor={(item) => item.id}
+                                    renderItem={({item}) => (
+                                        <View className="w-[300px] h-56 pl-8">
+                                            <OwnerNearYouCard {...item} />
+                                        </View>
+                                    )}
+                                />
                         ) : (
                             <View
                                 className={
@@ -347,10 +360,10 @@ export default function Sitter() {
                                 }
                             >
                                 <Text className="text-xl text-[#0a0a0a] font-bold mb-1">
-                                    {user?.location == null ? "Location not set."  : "No current jobs available. 🙁"}
+                                    {user?.location == null ? "Location not set." : role === "SITTER" ? "No current jobs available. 🙁" : "No current sitters available. 👀"}
                                 </Text>
                                 <Text className="text-lg px-8 text-center text-[#0a0a0a]">
-                                    {user?.location == null ? "Set your location in Profile → Edit Profile to see nearby jobs."  : "We'll notify you when something opens up."}
+                                    {user?.location == null ? "Set your location in Profile → Edit Profile to see nearby jobs." : role === "SITTER" ? "We'll notify you when something opens up." : "We'll notify you when someone shows up."}
                                 </Text>
                             </View>
                         )}

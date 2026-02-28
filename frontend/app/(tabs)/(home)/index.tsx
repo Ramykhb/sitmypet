@@ -11,9 +11,7 @@ export default function Index() {
     useEffect(() => {
         const checkRole = async () => {
             const role = await SecureStore.getItemAsync("role");
-            if (role === "OWNER") {
-                router.replace("/(tabs)/(home)/owner");
-            } else if (role === "SITTER") {
+            if (role === "OWNER" || role === "SITTER") {
                 router.replace("/(tabs)/(home)/sitter");
             } else {
                 router.replace("/(auth)/homeAuth");
