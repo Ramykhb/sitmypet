@@ -7,7 +7,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import { OwnerHomeFeedDto, SitterHistoryDto } from './dto/owner-home.dto';
 import { CreatePetDto } from './dto/create-pet.dto';
 import { R2Service } from '../storage/r2.service';
-import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class OwnerService {
@@ -86,85 +85,66 @@ export class OwnerService {
 
     const locationName = profile?.location?.name;
 
-    type PostWithRelations = Prisma.PostGetPayload<{
-      include: {
-        service: true;
-        owner: {
-          include: {
-            bookingsAsOwner: {
-              include: {
-                review: true;
-              };
-            };
-          };
-        };
-        savedBy: true;
-      };
-    }>;
-
-    let posts: PostWithRelations[] = [];
     let nearbySitters: any[] | null = null;
 
     if (locationName) {
-      posts = await this.prisma.post.findMany({
+      const sitters = await this.prisma.user.findMany({
         where: {
-          status: 'OPEN',
-          location: {
-            contains: locationName,
-            mode: 'insensitive',
-          },
-        },
-        include: {
-          service: true,
-          owner: {
-            include: {
-              bookingsAsOwner: {
-                where: {
-                  status: 'COMPLETED',
-                },
-                include: {
-                  review: true,
-                },
+          id: { not: userId },
+          roles: { has: 'SITTER' },
+          profile: {
+            location: {
+              name: {
+                contains: locationName,
+                mode: 'insensitive',
               },
             },
           },
-          savedBy: {
-            where: {
-              userId: userId,
+        },
+        select: {
+          id: true,
+          firstname: true,
+          lastname: true,
+          profileImageUrl: true,
+          profile: {
+            select: {
+              location: { select: { name: true } },
+              savedBy: {
+                where: { userId },
+                select: { id: true },
+              },
             },
           },
-        },
-        orderBy: {
-          createdAt: 'desc',
+          bookingsAsSitter: {
+            where: { status: 'COMPLETED' },
+            select: {
+              review: { select: { rating: true } },
+            },
+          },
         },
         take: 10,
       });
 
-      nearbySitters = posts.map((post) => {
-        const reviews = post.owner.bookingsAsOwner
-          .map((booking) => booking.review)
-          .filter((review) => review !== null);
+      nearbySitters = sitters.map((sitter) => {
+        const reviews = sitter.bookingsAsSitter
+          .map((b) => b.review)
+          .filter((r) => r !== null);
 
         const reviewCount = reviews.length;
         const rating =
           reviewCount > 0
-            ? reviews.reduce((sum, review) => sum + (review?.rating || 0), 0) /
+            ? reviews.reduce((sum, r) => sum + (r?.rating || 0), 0) /
               reviewCount
             : 0;
 
         return {
-          id: post.id,
-          title: post.title,
-          location: post.location,
-          service: {
-            id: post.service.id,
-            name: post.service.name,
-          },
-          duration: post.duration,
+          id: sitter.id,
+          sitterName: `${sitter.firstname} ${sitter.lastname}`,
+          sitterImageUrl: sitter.profileImageUrl ?? undefined,
+          location: sitter.profile?.location?.name ?? null,
           rating: Number(rating.toFixed(1)),
-          reviewCount: reviewCount,
-          imageUrl: post.imageUrl ?? undefined,
-          isSaved: post.savedBy.length > 0,
+          reviewCount,
+          isSaved: (sitter.profile?.savedBy?.length ?? 0) > 0,
         };
       });
     }

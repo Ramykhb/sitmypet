@@ -23,16 +23,11 @@ export class SitterHistoryDto {
 
 export class NearbySittersDto {
   id: string;
-  title: string;
-  location: string;
-  service: {
-    id: string;
-    name: string;
-  };
-  duration: string;
+  sitterName: string;
+  sitterImageUrl?: string;
+  location: string | null;
   rating: number;
   reviewCount: number;
-  imageUrl?: string;
   isSaved: boolean;
 }
 
