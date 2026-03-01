@@ -198,10 +198,10 @@ export default function Sitter() {
                             <Text className={"text-2xl ml-8 text-[#0A0A0A]"}>
                                 {"Today's Bookings"}
                             </Text>
-                            <Link href={"/todaysBookings"} className={"mr-8"} disabled={bookingFound.length <= 0}>
+                            <Link href={"/todaysBookings"} className={"mr-8"} disabled={loading}>
                                 <Text
                                     className={"text-lg font-bold  text-[#3944D5]"}
-                                    style={bookingFound.length > 0 ? {} : {color: "#AAAAAA"}}
+                                    style={!loading ? {} : {color: "#AAAAAA"}}
                                 >
                                     See all
                                 </Text>

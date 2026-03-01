@@ -13,8 +13,7 @@ export default function HomeLayout() {
         headerShadowVisible: false,
       }}
     >
-      <Stack.Screen name="sitter" options={{ headerShown: false }} />
-      <Stack.Screen name="owner" options={{ headerShown: false }} />
+      <Stack.Screen name="homepage" options={{ headerShown: false }} />
       <Stack.Screen name="index" options={{ headerShown: false }} />
     </Stack>
   );

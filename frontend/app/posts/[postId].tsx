@@ -176,6 +176,7 @@ const PostDetails = () => {
         try {
             setLoading(true);
             const res = await api.get(`/posts/${postId}`);
+            console.log(res.data)
             setPost(res.data);
         } catch (error) {
             console.error(error);

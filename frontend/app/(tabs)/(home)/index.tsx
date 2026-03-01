@@ -12,7 +12,7 @@ export default function Index() {
         const checkRole = async () => {
             const role = await SecureStore.getItemAsync("role");
             if (role === "OWNER" || role === "SITTER") {
-                router.replace("/(tabs)/(home)/sitter");
+                router.replace("/(tabs)/(home)/homepage");
             } else {
                 router.replace("/(auth)/homeAuth");
             }
