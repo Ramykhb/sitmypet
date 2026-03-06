@@ -1,6 +1,7 @@
 import {BlurView} from "expo-blur";
 import React, {useState} from "react";
-import {Image, Pressable, Text, View} from "react-native";
+import {Image, Pressable, Text, TouchableOpacity, View} from "react-native";
+import {router} from "expo-router";
 
 type NearbySitter = {
     id: string;
@@ -14,7 +15,8 @@ type NearbySitter = {
 
 const OwnerNearYouCard = (props: NearbySitter) => {
     return (
-        <View
+        <TouchableOpacity
+            onPress={() => router.push(`/users/${props.id}`)}
             className={
                 "flex flex-col px-4 py-4 w-full h-full rounded-3xl border-gray-300 border"
             }
@@ -56,7 +58,7 @@ const OwnerNearYouCard = (props: NearbySitter) => {
                     </Text>
                 </View>
             </View>
-        </View>
+        </TouchableOpacity>
     );
 };
 
