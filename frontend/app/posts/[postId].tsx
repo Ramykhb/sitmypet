@@ -59,6 +59,7 @@ type Post = {
 const PostDetails = () => {
     const {postId} = useLocalSearchParams<{ postId: string }>();
     const [post, setPost] = useState<Post>();
+    const [expired, setExpired] = useState(true);
     const [loading, setLoading] = useState<boolean>(false);
     const [deleting, setDeleting] = useState<boolean>(false);
     const [applying, setApplying] = useState<boolean>(false);
@@ -137,7 +138,7 @@ const PostDetails = () => {
 
     const formatLongDate = (isoDate: string) => {
         const date = new Date(isoDate);
-        const month = date.toLocaleDateString('en-US', {month: 'long'}); // Feb
+        const month = date.toLocaleDateString('en-US', {month: 'long'});
         const dayOfMonth = date.getDate();
         const time = date.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true}); // 5:00 PM
         return `${month} ${dayOfMonth}, ${time}`;
@@ -176,7 +177,7 @@ const PostDetails = () => {
         try {
             setLoading(true);
             const res = await api.get(`/posts/${postId}`);
-            console.log(res.data)
+            setExpired(new Date(res.data.scheduledTime) < new Date());
             setPost(res.data);
         } catch (error) {
             console.error(error);
@@ -282,9 +283,11 @@ const PostDetails = () => {
             {loading ? <></> : userId === post?.ownerId ? <View
                 className={"bg-white flex justify-around p-10 h-60 w-full absolute bottom-0 left-0 rounded-tl-[35px] rounded-tr-[35px] shadow-xl"}>
                 <TouchableOpacity
-                    className={`w-full h-14 bg-[#E7E8FF] rounded-full flex items-center justify-center`}
+                    disabled={expired}
+                    className={`w-full h-14 ${expired ? "bg-gray-200" : "bg-[#E7E8FF]"} rounded-full flex items-center justify-center`}
                     onPress={() => router.push(`/posts/applications/${post?.id}`)}>
-                    <Text className={`text-lg font-bold text-[#3944D5]`}>View Applications</Text>
+                    <Text
+                        className={`text-lg  ${expired ? "text-gray-500 font-semibold" : "text-[#3944D5] font-bold"}`}>{expired ? "Post Expired" : "View Applications"}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={showConfirmAlert}
@@ -301,9 +304,12 @@ const PostDetails = () => {
                     <Text className={"text-lg font-bold text-[#0a0a0a]"}>Contact via email</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    className={`w-full h-14 ${isApplied ? "bg-[#E7E8FF]" : "bg-[#3944D5]"} rounded-full flex items-center justify-center`}
-                    onPress={handeApplication}>
-                    {applying ? <ActivityIndicator size="small" color={"#ffffff"}/> : !isApplied ?
+                    className={`w-full h-14 ${isApplied ? "bg-[#E7E8FF]" : expired ? "bg-gray-200" : "bg-[#3944D5]"} rounded-full flex items-center justify-center`}
+                    onPress={handeApplication}
+                    disabled={expired}
+                >
+                    {applying ? <ActivityIndicator size="small" color={"#ffffff"}/> : expired ? <Text
+                        className={"text-lg text-gray-500 font-semibold"}>Post Expired</Text> : !isApplied ?
                         <Text className={"text-lg font-bold text-white"}>Apply to job</Text> :
                         <Text className={`text-lg font-bold text-[#3944D5]`}>Withdraw application</Text>}
                 </TouchableOpacity>
