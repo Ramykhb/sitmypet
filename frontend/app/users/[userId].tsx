@@ -26,6 +26,9 @@ type Pet = {
 };
 
 export type UserProfileResponse = {
+    averageRating: number;
+    reviewsCount: number;
+
     contactInfo: {
         id: string;
         firstname: string;
@@ -34,13 +37,19 @@ export type UserProfileResponse = {
         location: string;
         profileImageUrl: string;
     };
+
     ownerInfo: {
+        averageRating: number;
         jobsPosted: number;
+        reviewsCount: number;
         sittersWorkedWith: number;
     };
+
     pets: Pet[];
     posts: any[];
+
     previousRating: number | null;
+
     sitterInfo: {
         averageRating: number;
         clientsWorkedWith: number;
@@ -59,9 +68,11 @@ const UserProfile = () => {
     const [rating, setRating] = useState(0);
     const [submitting, setSubmitting] = useState(false);
     const [user, setUser] = useState<UserProfileResponse>();
+    const [reviewed, setReviewed] = useState(false);
     const [filledStars, setFilledStars] = useState({one: false, two: false, three: false, four: false, five: false});
 
     const fillStars = (starNum: number) => {
+        setReviewed(false);
         let tempStars: any = {};
         setEnabled(true);
         setRating(starNum + 1);
@@ -80,6 +91,7 @@ const UserProfile = () => {
         setSubmitting(true);
         try {
             const res = await api.post(`users/${userId}/reviews`, {rating: rating});
+            setReviewed(true);
         } catch (e: any) {
             if (e.status === 400) {
                 alert("You dont have any past bookings with this user before.")
@@ -89,6 +101,8 @@ const UserProfile = () => {
             }
         } finally {
             setSubmitting(false);
+            const response = await api.get(`users/${userId}/profile`);
+            setUser(response.data);
         }
     }
 
@@ -101,8 +115,8 @@ const UserProfile = () => {
             try {
                 const res = await api.get(`users/${userId}/profile`);
                 setUser(res.data);
-                if (res.data.ownerInfo.previousRating) {
-                    fillStars(res.data.ownerInfo.previousRating - 4);
+                if (res.data.previousRating) {
+                    fillStars(res.data.previousRating - 1);
                 }
             } catch (e) {
                 console.error(e);
@@ -144,7 +158,7 @@ const UserProfile = () => {
                             </View>
                             <View className={"w-[33%] flex items-center justify-center border-r border-r-gray-400"}>
                                 <Text
-                                    className={"text-xl font-bold text-[#0a0a0a]"}>{user?.sitterInfo.reviewsCount}</Text>
+                                    className={"text-xl font-bold text-[#0a0a0a]"}>{user?.reviewsCount}</Text>
                                 <Text className={" text-gray-500"}>Reviews</Text>
                             </View>
                             <View className={"w-[33%] flex items-center justify-center"}>
@@ -152,7 +166,7 @@ const UserProfile = () => {
                                     <Image source={require("../../assets/icons/star.png")} alt="Star"
                                            className={"w-6 h-6 mr-2"}/>
                                     <Text
-                                        className={"text-xl font-bold text-[#0a0a0a]"}>{user?.sitterInfo.averageRating ? user?.sitterInfo.clientsWorkedWith : "-"}</Text>
+                                        className={"text-xl font-bold text-[#0a0a0a]"}>{user?.averageRating ? user?.averageRating : "-"}</Text>
                                 </View>
                                 <Text className={" text-gray-600"}>Rating</Text>
                             </View>
@@ -256,7 +270,7 @@ const UserProfile = () => {
                         >
                             {submitting ? (
                                 <ActivityIndicator color={"#FFFFFF"} size={"small"}/>
-                            ) : (
+                            ) : reviewed ? <Image source={require("../../assets/icons/tick.png")} className={"w-5 h-5"} tintColor={"#FFFFFF"}/> : (
                                 <Text
                                     className="text-white text-lg font-semibold">{user?.previousRating ? "Update" : "Submit"}</Text>
                             )}
