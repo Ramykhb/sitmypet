@@ -14,6 +14,8 @@ interface Appointment {
     location: string;
     ownerImageURL: string;
     ownerName: string;
+    sitterImageURL: string;
+    sitterName: string;
     petName: string;
     service: {
         id: string;
@@ -92,7 +94,7 @@ const TodaysBookings = () => {
                   {isFutureOpen &&
                     unCompleted.map((booking) => (
                       <View key={booking.id} className="w-full mb-6">
-                        <TodaysBookingCard {...booking} styling="w-[86%] ml-[7%] h-52" longDate={true} />
+                        <TodaysBookingCard {...booking} styling="w-[86%] ml-[7%] h-52" longDate={true} isSitter={role === "SITTER"} />
                       </View>
                     ))
                   }
@@ -109,7 +111,7 @@ const TodaysBookings = () => {
                   {isPastOpen &&
                     completed.map((booking) => (
                       <View key={booking.id} className="w-full mb-6">
-                        <TodaysBookingCard {...booking} styling="w-[86%] ml-[7%] h-52" longDate={true} />
+                        <TodaysBookingCard {...booking} styling="w-[86%] ml-[7%] h-52" longDate={true} isSitter={role === "SITTER"} />
                       </View>
                     ))
                   }

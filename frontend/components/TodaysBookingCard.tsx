@@ -20,6 +20,7 @@ type TodaysBooking = {
     time: string;
     styling: string;
     longDate?: boolean;
+    isSitter?: boolean;
 };
 
 const serviceIcons: Record<string, any> = {
@@ -47,14 +48,14 @@ const TodaysBookingCard = (props: TodaysBooking) => {
             <View className={"flex-row flex w-full justify-between items-center "}>
                 <View className={"flex flex-row"}>
                     <Image
-                        source={props.ownerName ? { uri: props.ownerImageURL } : { uri: props.sitterImageURL }}
+                        source={props.isSitter ? { uri: props.ownerImageURL } : { uri: props.sitterImageURL } }
                         alt="Home Image"
                         className={"w-12 h-12 rounded-full"}
                         resizeMode={"cover"}
                     />
                     <View className={"flex flex-col ml-3"}>
                         <Text className={"text-base text-[#0A0A0A] text-left"}>
-                            {props.ownerName ? props.ownerName : props.sitterName}
+                            {props.isSitter ? props.ownerName : props.sitterName}
                         </Text>
                         <Text className={"text-sm text-gray-500 text-left"}>
                             {props.petName}

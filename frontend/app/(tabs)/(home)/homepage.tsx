@@ -239,7 +239,7 @@ export default function Sitter() {
                                 data={bookingFound}
                                 className={"mr-10"}
                                 keyExtractor={(item) => item.id}
-                                renderItem={({item}) => <TodaysBookingCard {...item} styling={"w-[310px] h-48"}/>}
+                                renderItem={({item}) => <TodaysBookingCard {...item} isSitter={role === "SITTER"} styling={"w-[310px] h-48"}/>}
                                 showsHorizontalScrollIndicator={false}
                             />
                         ) : (
