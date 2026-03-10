@@ -43,6 +43,8 @@ export class BookingsService {
       ownerName: booking.owner.firstname,
       petName: booking.pet.name,
       ownerImageURL: booking.owner.profileImageUrl,
+      sitterName: booking.sitter.firstname,
+      sitterImageURL: booking.sitter.profileImageUrl,
       service: {
         id: booking.service.id,
         name: booking.service.name,
