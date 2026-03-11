@@ -4,10 +4,14 @@ import { ExploreQueryDto, SortBy } from './dto/explore-query.dto';
 import { ExploreResponseDto } from './dto/explore-response.dto';
 import { SitterHomeFeedDto } from './dto/sitter-home.dto';
 import { Prisma } from '@prisma/client';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class SitterService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   async getHomeFeed(userId: string): Promise<SitterHomeFeedDto> {
     const today = new Date();
@@ -169,6 +173,8 @@ export class SitterService {
       });
     }
 
+    const unreadCount = await this.notificationsService.getUnreadCount(userId);
+
     return {
       todaysBookings,
       recentClients: recentClients as {
@@ -179,6 +185,7 @@ export class SitterService {
         lastBookingDate: Date;
       }[],
       nearbyPosts,
+      unreadCount,
     };
   }
 

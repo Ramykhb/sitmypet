@@ -7,10 +7,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { OwnerHomeFeedDto, SitterHistoryDto } from './dto/owner-home.dto';
 import { CreatePetDto } from './dto/create-pet.dto';
 import { R2Service } from '../storage/r2.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class OwnerService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   async getHomeFeed(userId: string): Promise<OwnerHomeFeedDto> {
     const today = new Date();
@@ -150,10 +154,13 @@ export class OwnerService {
       });
     }
 
+    const unreadCount = await this.notificationsService.getUnreadCount(userId);
+
     return {
       todaysBookings,
       recentSitters,
       nearbySitters,
+      unreadCount,
     };
   }
 

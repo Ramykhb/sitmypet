@@ -36,4 +36,5 @@ export class OwnerHomeFeedDto {
   todaysBookings: TodaysBookingDto[];
   recentSitters: SitterHistoryDto[];
   nearbySitters: NearbySittersDto[] | null;
+  unreadCount: number;
 }

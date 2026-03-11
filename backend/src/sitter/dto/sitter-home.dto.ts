@@ -41,4 +41,5 @@ export class SitterHomeFeedDto {
   todaysBookings: TodaysBookingDto[];
   recentClients: ClientHistoryDto[];
   nearbyPosts: NearbyPostDto[] | null;
+  unreadCount: number;
 }
