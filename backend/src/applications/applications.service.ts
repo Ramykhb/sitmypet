@@ -138,18 +138,12 @@ export class ApplicationsService {
       );
     }
 
-    if (!application.post.petId) {
-      throw new BadRequestException(
-        'Cannot accept application: Post is missing an associated pet ID',
-      );
-    }
-
     return this.prisma.$transaction(async (tx) => {
       const booking = await tx.booking.create({
         data: {
           sitterId: application.sitterId,
           ownerId: application.post.ownerId,
-          petId: application.post.petId,
+          petId: application.post.petId!,
           serviceId: application.post.serviceId,
           location: application.post.location,
           scheduledTime: application.post.scheduledTime,
