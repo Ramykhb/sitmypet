@@ -695,7 +695,7 @@ export class UsersService {
       'NEW_REVIEW',
       'New Review Received',
       `${reviewer?.firstname} left you a ${rating}-star review for your recent booking.`,
-      { bookingId: booking.id },
+      { bookingId: booking.id, senderId: reviewerId },
     );
 
     return review;

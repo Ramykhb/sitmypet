@@ -52,7 +52,7 @@ export class ApplicationsService {
       'NEW_APPLICATION',
       'New Application',
       `${application.sitter.firstname} applied to your post titled "${post.title}"`,
-      { applicationId: application.id, postId: post.id },
+      { applicationId: application.id, postId: post.id, senderId: sitterId },
     );
 
     return application;
@@ -189,7 +189,7 @@ export class ApplicationsService {
       'APPLICATION_ACCEPTED',
       'Application Accepted',
       `${owner?.firstname} accepted your application for the post "${application.post.title}"`,
-      { bookingId: result.id },
+      { bookingId: result.id, senderId: ownerId },
     );
 
     return result;
@@ -275,7 +275,7 @@ export class ApplicationsService {
       'APPLICATION_REJECTED',
       'Application Rejected',
       `${owner?.firstname} rejected your application for the post "${application.post.title}"`,
-      { postId: application.postId },
+      { postId: application.postId, senderId: ownerId },
     );
 
     return { success: true };

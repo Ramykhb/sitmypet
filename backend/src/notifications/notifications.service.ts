@@ -32,7 +32,12 @@ export class NotificationsService {
     type: NotificationType,
     title: string,
     message: string,
-    metadata?: { postId?: string; applicationId?: string; bookingId?: string },
+    metadata?: {
+      postId?: string;
+      applicationId?: string;
+      bookingId?: string;
+      senderId?: string;
+    },
   ) {
     return this.prisma.notification.create({
       data: {
@@ -48,6 +53,16 @@ export class NotificationsService {
   async getUserNotifications(userId: string) {
     const notifications = await this.prisma.notification.findMany({
       where: { userId },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            firstname: true,
+            lastname: true,
+            profileImageUrl: true,
+          },
+        },
+      },
       orderBy: { createdAt: 'desc' },
     });
 

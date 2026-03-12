@@ -36,6 +36,7 @@ model User {
   savedPosts               SavedPost[]
   savedSitters             SavedSitter[]
   notifications            Notification[]
+  sentNotifications        Notification[] @relation("NotificationSender")
 }
 
 model Profile {
@@ -228,6 +229,8 @@ model Notification {
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
   user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  senderId      String?
+  sender        User?            @relation("NotificationSender", fields: [senderId], references: [id], onDelete: SetNull)
   postId        String?
   applicationId String?
   bookingId     String?
