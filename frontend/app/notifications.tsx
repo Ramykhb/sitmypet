@@ -56,55 +56,75 @@ const Notifications = () => {
         fetchNotifications();
     }, []))
 
+    const markAllNotifications = async () => {
+        setAppNotifications(
+            appNotifications.map(item => ({
+                ...item,
+                isRead: true
+            }))
+        );
+        setReviewNotifications(
+            reviewNotifications.map(item => ({
+                ...item,
+                isRead: true
+            }))
+        );
+        try {
+            const res = await api.patch("/notifications/read-all");
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     return (
         <SafeAreaView edges={["bottom", "left", "right"]} className={"pt-14 px-10"}>
             <View className={"flex"}>
-                {/* Inbox Header */}
-                <View className={"flex flex-row items-center"}>
+                <View className={"flex flex-row items-center justify-between"}>
                     <Image
                         source={require("../assets/icons/tray-filled.png")}
                         className={"w-8 h-8 mr-3"}
                     />
-                    <Text className={"text-2xl text-[#0a0a0a]"}>Inbox</Text>
+                    <Text className={"text-2xl text-[#0a0a0a] flex-1"}>Inbox</Text>
+                    <TouchableOpacity onPress={markAllNotifications}><Text className={"text-blue-600 mt-2 font-bold"}>Mark
+                        all as read</Text></TouchableOpacity>
                 </View>
 
-                <View className={"flex w-full"}>
-                    <FlatList
-                        data={appNotifications}
-                        keyExtractor={(item) => item.id}
-                        renderItem={({item}) => (
-                            <View className={"flex flex-row items-center mt-6"}>
-                                <Image
-                                    source={{uri: item.sender.profileImageUrl}}
-                                    className={"w-16 h-16 mr-3 rounded-full"}
-                                />
-                                <View className={"flex justify-between flex-1"}>
-                                    <Text className={"text-2xl text-[#0a0a0a]"}>{item.type === "APPLICATION_ACCEPTED" ? item.title : item.sender.firstname + " " + item.sender.lastname }</Text>
-                                    <Text className={"text-md text-[#666666]"} numberOfLines={1}>
-                                        {item.message}
-                                    </Text>
-                                </View>
-                                {!item.isRead && (
-                                    <View
-                                        className={
-                                            "w-6 h-6 rounded-full bg-red-500 flex justify-center items-center ml-3"
-                                        }
-                                    >
-                                        <Text className={"text-white"}>1</Text>
+                <View className={"flex w-full h-[285px]"}>
+                    {appNotifications.length > 0 ?
+                        <FlatList
+                            data={appNotifications}
+                            keyExtractor={(item) => item.id}
+                            renderItem={({item}) => (
+                                <View className={"flex flex-row items-center mt-6"}>
+                                    <Image
+                                        source={{uri: item.sender.profileImageUrl}}
+                                        className={"w-16 h-16 mr-3 rounded-full"}
+                                    />
+                                    <View className={"flex justify-between flex-1"}>
+                                        <Text
+                                            className={"text-2xl text-[#0a0a0a]"}>{item.type === "APPLICATION_ACCEPTED" ? item.title : item.sender.firstname + " " + item.sender.lastname}</Text>
+                                        <Text className={"text-md text-[#666666]"} numberOfLines={1}>
+                                            {item.message}
+                                        </Text>
                                     </View>
-                                )}
-                            </View>
-                        )}
-                        horizontal={false}
-                        showsHorizontalScrollIndicator={false}
-                        showsVerticalScrollIndicator={false}
-                    />
+                                    {!item.isRead && (
+                                        <View
+                                            className={
+                                                "w-6 h-6 rounded-full bg-red-500 flex justify-center items-center ml-3"
+                                            }
+                                        >
+                                            <Text className={"text-white"}>1</Text>
+                                        </View>
+                                    )}
+                                </View>
+                            )}
+                            horizontal={false}
+                            showsHorizontalScrollIndicator={false}
+                            showsVerticalScrollIndicator={false}
+                        /> : <View className={"flex-1 flex justify-center items-center"}><Text
+                            className={"text-center text-[#0a0a0a]"}>{"You haven't received any new applications"}</Text></View>}
                 </View>
-                <TouchableOpacity
-                    className="w-[36%] ml-[32%] bg-[#3944D5] h-10 rounded-full flex flex-row items-center justify-center mt-6 mb-4">
-                    <Text className="text-white text-md font-bold">View All</Text>
-                </TouchableOpacity>
-                <View className={"flex flex-row items-center"}>
+                <View className={"flex flex-row items-center mt-5"}>
                     <Image
                         source={require("../assets/icons/half-review.png")}
                         className={"w-8 h-8 mr-3"}
@@ -112,8 +132,8 @@ const Notifications = () => {
                     <Text className={"text-2xl text-[#0a0a0a]"}>Reviews</Text>
                 </View>
 
-                <View className={"flex w-full"}>
-                    <FlatList
+                <View className={"flex w-full h-[285px]"}>
+                    {reviewNotifications.length > 0 ? (<FlatList
                         data={reviewNotifications}
                         keyExtractor={(item) => item.id}
                         renderItem={({item}) => (
@@ -144,12 +164,9 @@ const Notifications = () => {
                         horizontal={false}
                         showsHorizontalScrollIndicator={false}
                         showsVerticalScrollIndicator={false}
-                    />
+                    />) : <View className={"flex-1 flex justify-center items-center"}><Text
+                        className={"text-center text-[#0a0a0a]"}>{"You haven't received any new reviews"}</Text></View>}
                 </View>
-                <TouchableOpacity
-                    className="w-[36%] ml-[32%] bg-[#3944D5] h-10 rounded-full flex flex-row items-center justify-center mt-6">
-                    <Text className="text-white text-md font-bold">View All</Text>
-                </TouchableOpacity>
             </View>
         </SafeAreaView>
     );
