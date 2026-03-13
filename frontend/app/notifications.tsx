@@ -1,7 +1,7 @@
-import {View, Text, Image, TouchableOpacity, FlatList} from "react-native";
+import {View, Text, Image, TouchableOpacity, FlatList, ActivityIndicator} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 import React, {useCallback, useState} from "react";
-import {useFocusEffect, useNavigation} from "expo-router";
+import {router, useFocusEffect, useNavigation} from "expo-router";
 import api from "@/config/api";
 
 export const unstable_settings = {
@@ -76,8 +76,20 @@ const Notifications = () => {
         }
     }
 
+    const readNotification = async (notificationId: string) => {
+        try {
+            const res = await api.patch(`/notifications/${notificationId}/read`);
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
     return (
-        <SafeAreaView edges={["bottom", "left", "right"]} className={"pt-14 px-10"}>
+        <SafeAreaView edges={["bottom", "left", "right"]} className={"pt-14 px-10 flex-1"}>
+            {loading ? <View className={"flex flex-col flex-1 justify-center items-center h-full w-full"}>
+                    <ActivityIndicator size="large"/>
+                    <Text className={"text-2xl mt-6 text-[#0a0a0a] text-center"}>Fetching notifications...</Text>
+                </View> :
             <View className={"flex"}>
                 <View className={"flex flex-row items-center justify-between"}>
                     <Image
@@ -95,7 +107,16 @@ const Notifications = () => {
                             data={appNotifications}
                             keyExtractor={(item) => item.id}
                             renderItem={({item}) => (
-                                <View className={"flex flex-row items-center mt-6"}>
+                                <TouchableOpacity className={"flex flex-row items-center mt-6"} onPress={() => {
+                                    if (item.type === "APPLICATION_ACCEPTED") {
+                                        router.push("/todaysBookings")
+                                    }
+                                    else
+                                    {
+                                        router.push(`/users/${item.sender.id}`)
+                                    }
+                                    readNotification(item.id);
+                                }}>
                                     <Image
                                         source={{uri: item.sender.profileImageUrl}}
                                         className={"w-16 h-16 mr-3 rounded-full"}
@@ -116,7 +137,7 @@ const Notifications = () => {
                                             <Text className={"text-white"}>1</Text>
                                         </View>
                                     )}
-                                </View>
+                                </TouchableOpacity>
                             )}
                             horizontal={false}
                             showsHorizontalScrollIndicator={false}
@@ -137,7 +158,10 @@ const Notifications = () => {
                         data={reviewNotifications}
                         keyExtractor={(item) => item.id}
                         renderItem={({item}) => (
-                            <View className={"flex flex-row items-center mt-6"}>
+                            <TouchableOpacity className={"flex flex-row items-center mt-6"} onPress={() => {
+                                router.push(`/users/${item.sender.id}`)
+                                readNotification(item.id)
+                            }}>
                                 <Image
                                     source={{uri: item.sender.profileImageUrl}}
                                     className={"w-16 h-16 mr-6 rounded-full"}
@@ -159,7 +183,7 @@ const Notifications = () => {
                                         <Text className={"text-white"}>1</Text>
                                     </View>
                                 )}
-                            </View>
+                            </TouchableOpacity>
                         )}
                         horizontal={false}
                         showsHorizontalScrollIndicator={false}
@@ -167,7 +191,7 @@ const Notifications = () => {
                     />) : <View className={"flex-1 flex justify-center items-center"}><Text
                         className={"text-center text-[#0a0a0a]"}>{"You haven't received any new reviews"}</Text></View>}
                 </View>
-            </View>
+            </View>}
         </SafeAreaView>
     );
 };
