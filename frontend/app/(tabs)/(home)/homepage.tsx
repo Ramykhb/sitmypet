@@ -19,6 +19,7 @@ import {
 import {SafeAreaView} from "react-native-safe-area-context";
 import "../../global.css";
 import OwnerNearYouCard from "@/components/OwnerNearYouCard";
+import {awaitExpression} from "@babel/types";
 
 type Service = {
     id: string;
@@ -155,10 +156,19 @@ export default function Sitter() {
         }
     }
 
+    const getReadAll = async () => {
+        const readAll = await SecureStore.getItemAsync("readAll");
+        if (readAll === "TRUE") {
+            setUnreadCount(0);
+            await SecureStore.setItemAsync("readAll", "FALSE");
+        }
+    }
+
     useFocusEffect(useCallback(
         () => {
             getCachedUser()
             getUser();
+            getReadAll();
         }, []
     ));
 

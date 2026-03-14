@@ -3,6 +3,7 @@ import {SafeAreaView} from "react-native-safe-area-context";
 import React, {useCallback, useState} from "react";
 import {router, useFocusEffect, useNavigation} from "expo-router";
 import api from "@/config/api";
+import * as SecureStore from "expo-secure-store";
 
 export const unstable_settings = {
     tabBarStyle: {display: 'none'},
@@ -71,6 +72,7 @@ const Notifications = () => {
         );
         try {
             const res = await api.patch("/notifications/read-all");
+            await SecureStore.setItemAsync("readAll", "TRUE");
         } catch (e) {
             console.error(e);
         }
@@ -78,7 +80,19 @@ const Notifications = () => {
 
     const readNotification = async (notificationId: string) => {
         try {
-            const res = await api.patch(`/notifications/${notificationId}/read`);
+            await api.patch(`/notifications/${notificationId}/read`);
+            setAppNotifications(
+                appNotifications.map(item => ({
+                    ...item,
+                    isRead: item.id === notificationId ? true : item.isRead
+                }))
+            );
+            setReviewNotifications(
+                reviewNotifications.map(item => ({
+                    ...item,
+                    isRead: item.id === notificationId ? true : item.isRead
+                }))
+            );
         } catch (e) {
             console.log(e);
         }
