@@ -8,11 +8,12 @@ import {
     TouchableOpacity,
     View,
     StyleSheet,
-    FlatList, Alert, ActivityIndicator,
+    FlatList, Alert, ActivityIndicator, Modal,
 } from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 import api from "@/config/api";
 import {BlurView} from "expo-blur";
+import * as ImagePicker from "expo-image-picker";
 
 type Pet = {
     id: string;
@@ -25,9 +26,21 @@ export default function MyPets() {
     const [pets, setPets] = useState<Pet[]>([]);
     const [loading, setLoading] = useState(false);
     const [deleting, setDeleting] = useState({deleting: false, petId: ""});
+    const [showAddPet, setShowAddPet] = useState(false);
+    const [newPetName, setNewPetName] = useState("");
+    const [newPetBreed, setNewPetBreed] = useState("");
+    const [newPetImage, setNewPetImage] = useState("");
+    const [uploading, setUploading] = useState(false);
+    const [error, setError] = useState("");
+    const [adding, setAdding] = useState(false);
 
     useFocusEffect(
         useCallback(() => {
+            setNewPetImage("");
+            setError("");
+            setNewPetName("");
+            setNewPetBreed("");
+            setUploading(false);
             const fetchPets = async () => {
                 setLoading(true);
                 try {
@@ -47,6 +60,59 @@ export default function MyPets() {
             fetchPets();
         }, []),
     );
+
+    const pickImage = async () => {
+        setUploading(true);
+        const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (!permission.granted) {
+            alert("Permission required");
+            setUploading(false);
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            quality: 0.8,
+        });
+
+        if (result.canceled) {
+            setUploading(false);
+            return;
+        }
+
+        const pickedImage = result.assets[0];
+        setNewPetImage(pickedImage.uri);
+
+        const formData = new FormData();
+        formData.append("file", {
+            uri: pickedImage.uri,
+            name: "pet.jpg",
+            type: "image/jpeg",
+        } as any);
+
+        try {
+            const userId = SecureStore.getItemAsync("id")
+            const res = await api.post(`/owner/pets/upload-image`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            setNewPetImage(res.data.imageUrl);
+        } catch (e: any) {
+            if (e.status === 400) {
+                setError("Invalid image format or size.");
+            } else if (e.status === 503) {
+                alert("Server error, please try again later.");
+                router.replace("/homeAuth")
+            }else {
+                console.log(e)
+                setError("An error has occurred.");
+            }
+        } finally {
+            setUploading(false);
+        }
+    };
 
     const deletePet = async (petId: string) => {
         try {
@@ -82,6 +148,35 @@ export default function MyPets() {
             ],
             {cancelable: false}
         );
+    };
+
+    const addPet = async () => {
+        if (uploading) {
+            setError("Uploading image please wait...");
+        }
+        if (!newPetName || !newPetBreed) {
+            setError("Please enter both name and breed");
+            return;
+        }
+        try {
+            setAdding(true);
+            const res = await api.post("/owner/pets", {
+                name: newPetName,
+                breed: newPetBreed,
+                imageUrl: newPetImage,
+            });
+            setPets([res.data, ...pets]);
+            setShowAddPet(false);
+            setNewPetName("");
+            setNewPetBreed("");
+            setError("");
+            setNewPetImage("");
+        } catch (error: any) {
+            console.log(error);
+            setError("Failed to add pet. Try again.");
+        } finally {
+            setAdding(false);
+        }
     };
 
     return (
@@ -139,7 +234,10 @@ export default function MyPets() {
                     />
                 </>
             )}
-            {loading ? <></> : <TouchableOpacity className={"absolute bottom-28 right-10"}>
+            {loading ? <></> : <TouchableOpacity
+                className={"absolute bottom-28 right-10"}
+                onPress={() => setShowAddPet(true)}
+            >
                 <View
                     style={{
                         shadowColor: "#000",
@@ -180,6 +278,75 @@ export default function MyPets() {
                     </View>
                 </View>
             </TouchableOpacity>}
+            <Modal visible={showAddPet} transparent animationType="fade">
+                <View style={{ flex: 1 }}>
+                    <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+
+                    <View
+                        style={{
+                            flex: 1,
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }}
+                    >
+                        <TouchableOpacity
+                            style={StyleSheet.absoluteFill}
+                            activeOpacity={1}
+                            onPress={() => setShowAddPet(false)}
+                        />
+
+                        <View style={{
+                            width: "85%",
+                            backgroundColor: "white",
+                            borderRadius: 20,
+                            padding: 20
+                        }}>
+                            <Text className="text-xl font-bold mb-4">Add New Pet</Text>
+
+                            <TouchableOpacity className={'relative w-full mb-4'} onPress={pickImage}>
+                                <Image
+                                    source={(newPetImage && newPetImage !== "") ? {uri: newPetImage} : require("../../../assets/images/placeholder.png")}
+                                    alt="logo"
+                                    className="w-full h-44 rounded-3xl border border-[#dddddd]"
+                                    resizeMode="cover"
+                                />
+                            </TouchableOpacity>
+
+                            <TextInput
+                                placeholder="Pet Name"
+                                value={newPetName}
+                                onChangeText={setNewPetName}
+                                className="border border-gray-300 rounded-xl p-3 mb-4"
+                            />
+
+                            <TextInput
+                                placeholder="Breed"
+                                value={newPetBreed}
+                                onChangeText={setNewPetBreed}
+                                className="border border-gray-300 rounded-xl p-3 mb-4"
+                            />
+
+                            <Text className={"text-sm, text-center text-rose-600 my-2"}>{error}</Text>
+
+                            <View className="flex flex-row justify-between">
+                                <TouchableOpacity
+                                    onPress={() => setShowAddPet(false)}
+                                    className="px-4 py-2"
+                                >
+                                    <Text className="text-gray-500">Cancel</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    onPress={addPet}
+                                    className="bg-black px-4 py-2 rounded-lg"
+                                >
+                                    {adding ? <ActivityIndicator size={"small"} color={"#FFFFFF"} /> : <Text className="text-white">Add</Text>}
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </SafeAreaView>
     );
 }
