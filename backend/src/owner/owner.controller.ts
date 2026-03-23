@@ -62,14 +62,6 @@ export class OwnerController {
     return this.ownerService.createPet(req.user.sub, dto);
   }
 
-  @Delete('pets/:id')
-  async deletePet(
-    @Param('id') id: string,
-    @Req() req: { user: { sub: string } },
-  ) {
-    return this.ownerService.deletePet(req.user.sub, id, this.r2Service);
-  }
-
   @Post('pets/upload-image')
   @UseInterceptors(FileInterceptor('file'))
   async uploadPetImage(
@@ -90,5 +82,13 @@ export class OwnerController {
       file,
       this.r2Service,
     );
+  }
+
+  @Delete('pets/:id')
+  async deletePet(
+    @Param('id') id: string,
+    @Req() req: { user: { sub: string } },
+  ) {
+    return this.ownerService.deletePet(req.user.sub, id, this.r2Service);
   }
 }
