@@ -21,7 +21,7 @@ const OwnerNearYouCard = (props: NearbySitter) => {
                 "flex flex-col px-4 py-4 w-full h-full rounded-3xl border-gray-300 border"
             }
         >
-            <View className={"w-full h-[80%] rounded-2xl overflow-hidden relative mb-2"}>
+            <View className={"w-full h-[80%] overflow-hidden relative mb-2"}>
                 <View className={"rounded-full absolute top-1 right-3 z-10 overflow-hidden"}>
                     <BlurView
                         intensity={60}
