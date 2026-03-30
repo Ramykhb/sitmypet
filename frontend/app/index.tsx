@@ -28,7 +28,7 @@ async function checkUser(): Promise<number> {
   try {
     const token = await SecureStore.getItemAsync("accessToken");
 
-    if (token !== null && token !== ""){
+    if (token && token.length > 0) {
         const verified = await SecureStore.getItemAsync("isVerified");
         if (verified === "true") {
             return 2;
